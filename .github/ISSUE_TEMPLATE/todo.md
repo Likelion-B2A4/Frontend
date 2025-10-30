@@ -1,14 +1,12 @@
 ---
 name: Issue
 about: 데모데이 B2A4 프론트엔드 이슈 템플릿입니다.
-title: "커밋타입: 주요작업내용"
-labels: ""
-assignees: ""
+title: '커밋타입: 주요작업내용'
+labels: ''
+assignees: ''
 ---
 
 ## ❓ 작업 페이지
-
-## 🤔 어떤 기능을 구현하나요?
 
 ## ✅ 작업 상세 내용
 
