@@ -1,11 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        alice: ['AliceDigitalLearning', 'sans-serif'],
+        sans: ['Pretendard', 'sans-serif'],
+
+        pretendard: ['Pretendard', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
-}
+};
