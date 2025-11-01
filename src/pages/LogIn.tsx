@@ -1,13 +1,14 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import { isValidPassword } from '../utils/validation';
 
 const LogIn = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const nav = useNavigate();
 
-  const isFormInvalid = id === '' || password === '';
+  const isFormInvalid = id === '' || !isValidPassword(password);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +42,13 @@ const LogIn = () => {
           onChange={(e) => setPassword(e.target.value)}
           className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
         />
+        <div
+          className={
+            'text-[12px] pl-[8px] ' + (isFormInvalid ? ' text-[#A9ACB2]' : ' text-[#FFFFFF]')
+          }
+        >
+          영문, 숫자 포함 8자 이상
+        </div>
       </div>
       <div className="gap-[10px] flex flex-col mt-[40px] py-[12px]">
         <Button children="회원가입" />
