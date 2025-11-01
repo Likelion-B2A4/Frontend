@@ -1,7 +1,6 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import React from 'react';
-import SplashPageWeb from './pages/splash.tsx';
+import {Route, Routes } from 'react-router-dom';
+import SplashPageWeb from './pages/Splash.tsx';
 import Intro from './pages/Intro.tsx';
 import LogIn from './pages/LogIn.tsx';
 
