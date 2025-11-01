@@ -7,7 +7,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = ({ children, className = '', variant = 'default', ...props }: ButtonProps) => {
-  const baseStyles = 'w-[320px] h-[56px] rounded-[12px] border-0 text-[20px] fontweight-600 ';
+  const baseStyles =
+    'w-[320px] h-[56px] rounded-[12px] border-0 text-[20px] fontweight-600 cursor-pointer ';
 
   const stylesByVariant = {
     default: 'bg-[#F4F6F8] text-black',
