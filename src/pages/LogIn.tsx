@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { isValidPassword } from '../utils/validation';
+import FormInput from '../components/FormInput';
 
 const LogIn = () => {
   const [id, setId] = useState('');
@@ -35,7 +36,7 @@ const LogIn = () => {
       {/* 로그인 폼 */}
       <form onSubmit={handleLogin} className="flex flex-col gap-y-[16px]">
         <div className="gap-y-[16px] flex flex-col py-0">
-          <input
+          {/* <input
             type="text"
             placeholder="아이디를 입력하세요"
             onChange={(e) => setId(e.target.value)}
@@ -47,12 +48,24 @@ const LogIn = () => {
             placeholder="비밀번호를 입력하세요"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
+            className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
+          /> */}
+          <FormInput
+            label="아이디"
+            type="text"
+            placeholder="아이디를 입력하세요"
+            onChange={(e) => setId(e.target.value)}
+            value={id}
+          />
+          <FormInput
+            label="비밀번호"
+            type="text"
+            placeholder="비밀번호를 입력하세요"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
           />
           <div
-            className={
-              'text-[12px] pl-[8px] ' + (isFormInvalid ? ' text-[#A9ACB2]' : ' text-[#FFFFFF]')
-            }
+            className={'pl-[8px] ' + (isFormInvalid ? ' text-[12px] text-[#A9ACB2]' : ' hidden')}
           >
             영문, 숫자 포함 8자 이상
           </div>
