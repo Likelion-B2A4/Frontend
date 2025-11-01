@@ -6,18 +6,19 @@ const SplashPageWeb = () => {
   const navigate = useNavigate();
   const [isFadingOut, setIsFadingOut] = useState(false);
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setIsFadingOut(true);
-  //   }, 2000);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsFadingOut(true);
+    }, 2000);
 
-  //   const navigateTimer = setTimeout(() => {
-  //     navigate('/logointro', { replace: true });
-  //   }, 2700);
+    const navigateTimer = setTimeout(() => {
+      navigate('/logointro', { replace: true });
+    }, 2500);
 
-  //   return () => clearTimeout(timer);
-  //   return () => clearTimeout(navigateTimer);
-  // }, [navigate]);
+    return () => clearTimeout(timer);
+    return () => clearTimeout(navigateTimer);
+  }, [navigate]);
+
   return (
     <div
       className={`flex h-screen flex-col justify-center items-center p-[16px] transition-opacity duration-500 ease-out 

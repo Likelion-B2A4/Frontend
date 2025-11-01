@@ -1,13 +1,14 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import { isValidPassword } from '../utils/validation';
 
 const LogIn = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const nav = useNavigate();
 
-  const isFormInvalid = id === '' || password === '';
+  const isFormInvalid = id === '' || !isValidPassword(password);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +19,10 @@ const LogIn = () => {
     nav('/main');
   };
 
+  const handleSinup = () => {
+    nav('/signup');
+  };
+
   return (
     <div className="flex h-screen flex-col justify-center items-center p-[16px]">
       <div className="mb-[60px]">
@@ -26,26 +31,39 @@ const LogIn = () => {
           손빛
         </div>
       </div>
-      <div className="gap-y-[16px] flex flex-col py-0">
-        <input
-          type="text"
-          placeholder="아이디를 입력하세요"
-          onChange={(e) => setId(e.target.value)}
-          value={id}
-          className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
-        />
-        <input
-          type="text"
-          placeholder="비밀번호를 입력하세요"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
-        />
-      </div>
-      <div className="gap-[10px] flex flex-col mt-[40px] py-[12px]">
-        <Button children="회원가입" />
-        <Button disabled={isFormInvalid} variant="colored" children="로그인" />
-      </div>
+
+      {/* 로그인 폼 */}
+      <form onSubmit={handleLogin} className="flex flex-col gap-y-[16px]">
+        <div className="gap-y-[16px] flex flex-col py-0">
+          <input
+            type="text"
+            placeholder="아이디를 입력하세요"
+            onChange={(e) => setId(e.target.value)}
+            value={id}
+            className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
+          />
+          <input
+            type="text"
+            placeholder="비밀번호를 입력하세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="flex text-[16px] w-[320px] h-[48px] pl-[8px] pr-[16px] items-center border-x-transparent border-t-transparent border-b-1 border-gray-400 outline-0  focus:border-b-[#0F58FF] caret-[#0F58FF]"
+          />
+          <div
+            className={
+              'text-[12px] pl-[8px] ' + (isFormInvalid ? ' text-[#A9ACB2]' : ' text-[#FFFFFF]')
+            }
+          >
+            영문, 숫자 포함 8자 이상
+          </div>
+        </div>
+
+        {/* button */}
+        <div className="gap-[10px] flex flex-col mt-[40px] py-[12px]">
+          <Button type="button" children="회원가입" onClick={handleSinup} />
+          <Button type="submit" disabled={isFormInvalid} variant="colored" children="로그인" />
+        </div>
+      </form>
     </div>
   );
 };
