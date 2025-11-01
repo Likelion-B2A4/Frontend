@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -25,7 +25,7 @@ const SplashPageWeb = () => {
                   ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}
     >
       <img src={'/sonbit.svg'} alt="손빛 로고" className="splash-logo" />
-      <div className="text-2xl text-transparent font-alice bg-clip-text bg-gradient-to-br from-[#0F58FF] to-[#3FB6FF]">
+      <div className="text-2xl text-transparent font-alice bg-clip-text bg-linear-to-br from-[#0F58FF] to-[#3FB6FF]">
         손빛
       </div>
     </div>
