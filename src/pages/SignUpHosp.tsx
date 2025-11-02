@@ -173,7 +173,11 @@ const SignUpHosp = () => {
             }
           />
         </div>
-        <Button type="submit" disabled>
+        <Button
+          type="submit"
+          variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
+          disabled={!(isStep1Valid && isStep2Valid)}
+        >
           완료
         </Button>
       </form>
