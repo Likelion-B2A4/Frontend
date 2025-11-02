@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '../components/Button';
 import { useState, useEffect } from 'react';
+import FormInput from '../components/FormInput';
 
 interface IFormData {
   hospitalName: string;
@@ -23,32 +24,35 @@ interface Step2FormProps {
 
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
   return (
-    <div id="step1">
+    <div id="step1" className="flex flex-col gap-y-[24px]">
       {/* 병원가입 폼-1 */}
-      <div>
-        병원명
-        <input
-          type="text"
-          placeholder="병원명을 입력하세요"
-          value={formData.hospitalName}
-          onChange={handleInputChange}
-          name="hospitalName"
-        />
+      <div className="flex flex-row justify-between">
+        <div>
+          병원명
+          <FormInput
+            label="form"
+            placeholder="병원명을 입력하세요"
+            name="hospitalName"
+            value={formData.hospitalName}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          {/* 드롭다운 선택지 */}
+          진료 과목
+          <FormInput
+            label="form"
+            placeholder="진료 과목을 입력하세요"
+            name="subject"
+            value={formData.subject}
+            onChange={handleInputChange}
+          />
+        </div>
       </div>
       <div>
-        진료 과목
-        <input
-          type="text"
-          placeholder="진료과목?"
-          name="subject"
-          value={formData.subject}
-          onChange={handleInputChange}
-        />
-      </div>{' '}
-      {/* 드롭다운 선택지 */}
-      <div>
         주소
-        <input
+        <FormInput
+          label="form"
           placeholder="병원 주소를 입력하세요"
           name="address"
           value={formData.address}
@@ -57,8 +61,10 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
       </div>
       <div>
         연락처
-        <input
+        <FormInput
+          label="form"
           placeholder="병원 연락처를 입력하세요"
+          hint="숫자만 입력해주세요"
           name="contactNumber"
           value={formData.contactNumber}
           onChange={handleInputChange}
@@ -119,14 +125,6 @@ const SignUpHosp = () => {
     }
   };
 
-  // 다음 단계로 이동
-  //   useEffect(() => {
-  //     if (currentStep === 1 && isStep1Valid && onkeydown=handleKeyDownEnter(e)) {
-  //       // 1단계가 유효하면 2단계로 자동 이동
-  //       setCurrentStep(2);
-  //     }
-  //   }, [formData, currentStep, isStep1Valid]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -144,9 +142,12 @@ const SignUpHosp = () => {
   };
 
   return (
-    <div>
+    <div className="my-[120px] mx-[296px]">
       {/* 안내문구 */}
-      <div>등록할 병원 정보를 입력해주세요</div>
+      <div className="flex justify-center items-center mb-[105px] text-[24px]">
+        등록할 병원 정보를 입력해주세요
+      </div>
+      {/* 폼 */}
       <form onSubmit={handleSubmit}>
         {currentStep === 1 && (
           <Step1Form
@@ -158,7 +159,7 @@ const SignUpHosp = () => {
         {currentStep === 2 && (
           <Step2Form formData={formData} handleInputChange={handleInputChange} />
         )}
-        <div className="flex flex-row gap-[12px]">
+        <div className="flex flex-row gap-[12px] mt-[32px] justify-center">
           {/* 슬라이더 용 버튼 */}
           <div
             className={
@@ -173,13 +174,15 @@ const SignUpHosp = () => {
             }
           />
         </div>
-        <Button
-          type="submit"
-          variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
-          disabled={!(isStep1Valid && isStep2Valid)}
-        >
-          완료
-        </Button>
+        <div className="mt-[32px] flex justify-center content-center items-center">
+          <Button
+            type="submit"
+            variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
+            disabled={!(isStep1Valid && isStep2Valid)}
+          >
+            완료
+          </Button>
+        </div>
       </form>
     </div>
   );
