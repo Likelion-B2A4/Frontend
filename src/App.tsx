@@ -5,6 +5,7 @@ import SplashPageWeb from './pages/Splash.tsx';
 import Intro from './pages/Intro.tsx';
 import LogIn from './pages/LogIn.tsx';
 import SignUp from './pages/SignUp.tsx';
+import SignUpHosp from './pages/SignUpHosp.tsx';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/logointro" element={<Intro />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/signuphosp" element={<SignUpHosp />} />
       </Routes>
     </div>
   );

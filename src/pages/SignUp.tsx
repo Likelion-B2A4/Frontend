@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import FormInput from '../components/FormInput';
 import Button from '../components/Button';
 import { isValidPassword } from '../utils/validation';
+import { useNavigate } from 'react-router-dom';
 
 type SignUpFormInputs = {
   id: string;
@@ -11,6 +12,8 @@ type SignUpFormInputs = {
 };
 
 const SignUp = () => {
+  const nav = useNavigate();
+
   //폼 관리자 호출
   const {
     register,
@@ -85,7 +88,7 @@ const SignUp = () => {
           type="submit"
           className="w-[320px] h-[48px] mt-[60px]"
           disabled={!isValid || !isPwConfirmed}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSubmit(onSubmit) && (() => nav('/signuphosp'))}
         >
           확인
         </Button>
