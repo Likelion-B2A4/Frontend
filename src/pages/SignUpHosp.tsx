@@ -28,6 +28,8 @@ interface FileFormProps {
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+// 폼 컴포넌트
+
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
   return (
     <div id="step1" className="flex flex-col gap-y-[24px]">
@@ -100,30 +102,56 @@ const Step2Form = ({ formData, handleInputChange }: Step2FormProps) => {
   );
 };
 
-// const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
-//   return (
-//     <>
-//       <label
-//         htmlFor="mainImage" // 5번의 input id와 연결
-//         className="w-full aspect-square bg-gray-100 rounded-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
-//       >
-//         <img
-//           src={URL.createObjectURL(mainImage)}
-//           alt="병원 사진 미리보기"
-//           className="w-full h-full object-cover rounded-full"
-//         />
-//         <input type="file" name="mainImage" onChange={handleFileChange} className="hidden" />;
-//       </label>
-//     </>
-//   );
-// };
+const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mainImage) {
+      setPreviewImage(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(mainImage);
+    setPreviewImage(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [mainImage]);
+
+  return (
+    <>
+      <label
+        htmlFor="mainImageInput"
+        className="w-[208px] h-[208px] bg-[#F4F6F8] rounded-full flex flex-col items-center justify-center cursor-pointer mr-[80px]"
+      >
+        {previewImage ? (
+          <img
+            src={previewImage}
+            alt="병원 사진 미리보기"
+            className="w-full h-full object-cover rounded-full"
+          />
+        ) : (
+          <div className="flex flex-col items-center content-center justify-center gap-[8px]">
+            <img src="/camera.svg" alt="카메라 아이콘" className="w-[24px]" />
+            <span className="text-sm text-gray-500 mt-2 text-[#A9ACB2]">사진을 선택해주세요</span>
+          </div>
+        )}
+      </label>
+      <input
+        type="file"
+        id="mainImageInput"
+        name="mainImage"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden" // 화면에서 숨김
+      />
+    </>
+  );
+};
 
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 2;
 
   //폼 데이터를 객체로 관리
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IFormData>({
     hospitalName: '',
     subject: '',
     address: '',
@@ -166,17 +194,17 @@ const SignUpHosp = () => {
     }
   };
 
-  //   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     e.preventDefault();
-  //     if (e.target.files && e.target.files.length > 0) {
-  //       const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
 
-  //       setFormData((prevData) => ({
-  //         ...prevData,
-  //         mainImage: file,
-  //       }));
-  //     }
-  //   };
+      setFormData((prevData) => ({
+        ...prevData,
+        mainImage: file,
+      }));
+    }
+  };
 
   return (
     <div className="my-[120px] mx-[296px]">
@@ -185,43 +213,49 @@ const SignUpHosp = () => {
         등록할 병원 정보를 입력해주세요
       </div>
       {/* 폼 */}
+
       <form onSubmit={handleSubmit}>
-        <div className="w-[208px] h-[208px]">사진입력</div>
-        {currentStep === 1 && (
-          <Step1Form
-            formData={formData}
-            handleInputChange={handleInputChange}
-            onKeyDown={handleKeyDownEnter}
-          />
-        )}
-        {currentStep === 2 && (
-          <Step2Form formData={formData} handleInputChange={handleInputChange} />
-        )}
-        <div className="flex flex-row gap-[12px] mt-[32px] justify-center">
-          {/* 슬라이더 용 버튼 */}
-          <div
-            className={
-              `w-[8px] h-[8px] rounded-full outline-0 ` +
-              (currentStep === 1 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
-            }
-            onClick={() => setCurrentStep(1)}
-          />
-          <div
-            className={
-              `w-[8px] h-[8px] rounded-full outline-0 ` +
-              (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
-            }
-            onClick={isStep1Valid ? () => setCurrentStep(2) : () => {}}
-          />
-        </div>
-        <div className="mt-[32px] flex justify-center content-center items-center">
-          <Button
-            type="submit"
-            variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
-            disabled={!(isStep1Valid && isStep2Valid)}
-          >
-            완료
-          </Button>
+        {/* <div className="w-[208px] h-[208px]">사진입력</div> */}
+        <div className="flex flex-row">
+          <FileForm mainImage={formData.mainImage} handleFileChange={handleFileChange} />
+          <div className="flex flex-col">
+            {currentStep === 1 && (
+              <Step1Form
+                formData={formData}
+                handleInputChange={handleInputChange}
+                onKeyDown={handleKeyDownEnter}
+              />
+            )}
+            {currentStep === 2 && (
+              <Step2Form formData={formData} handleInputChange={handleInputChange} />
+            )}
+            <div className="flex flex-row gap-[12px] mt-[32px] justify-center">
+              {/* 슬라이더 용 버튼 */}
+              <div
+                className={
+                  `w-[8px] h-[8px] rounded-full outline-0 ` +
+                  (currentStep === 1 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
+                }
+                onClick={() => setCurrentStep(1)}
+              />
+              <div
+                className={
+                  `w-[8px] h-[8px] rounded-full outline-0 ` +
+                  (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
+                }
+                onClick={isStep1Valid ? () => setCurrentStep(2) : () => {}}
+              />
+            </div>
+            <div className="mt-[32px] flex justify-center content-center items-center">
+              <Button
+                type="submit"
+                variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
+                disabled={!(isStep1Valid && isStep2Valid)}
+              >
+                완료
+              </Button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
