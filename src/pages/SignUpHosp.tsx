@@ -9,6 +9,7 @@ interface IFormData {
   address: string;
   contactNumber: string;
   operatingHours: string;
+  mainImage: File | null;
 }
 
 interface Step1FormProps {
@@ -20,6 +21,11 @@ interface Step1FormProps {
 interface Step2FormProps {
   formData: IFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}
+
+interface FileFormProps {
+  mainImage: File | null;
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
@@ -94,6 +100,24 @@ const Step2Form = ({ formData, handleInputChange }: Step2FormProps) => {
   );
 };
 
+// const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
+//   return (
+//     <>
+//       <label
+//         htmlFor="mainImage" // 5번의 input id와 연결
+//         className="w-full aspect-square bg-gray-100 rounded-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
+//       >
+//         <img
+//           src={URL.createObjectURL(mainImage)}
+//           alt="병원 사진 미리보기"
+//           className="w-full h-full object-cover rounded-full"
+//         />
+//         <input type="file" name="mainImage" onChange={handleFileChange} className="hidden" />;
+//       </label>
+//     </>
+//   );
+// };
+
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 2;
@@ -105,6 +129,7 @@ const SignUpHosp = () => {
     address: '',
     contactNumber: '',
     operatingHours: '',
+    mainImage: null,
   });
 
   // 유효성 검사
@@ -141,6 +166,18 @@ const SignUpHosp = () => {
     }
   };
 
+  //   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     e.preventDefault();
+  //     if (e.target.files && e.target.files.length > 0) {
+  //       const file = e.target.files[0];
+
+  //       setFormData((prevData) => ({
+  //         ...prevData,
+  //         mainImage: file,
+  //       }));
+  //     }
+  //   };
+
   return (
     <div className="my-[120px] mx-[296px]">
       {/* 안내문구 */}
@@ -149,6 +186,7 @@ const SignUpHosp = () => {
       </div>
       {/* 폼 */}
       <form onSubmit={handleSubmit}>
+        <div className="w-[208px] h-[208px]">사진입력</div>
         {currentStep === 1 && (
           <Step1Form
             formData={formData}
@@ -166,12 +204,14 @@ const SignUpHosp = () => {
               `w-[8px] h-[8px] rounded-full outline-0 ` +
               (currentStep === 1 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
             }
+            onClick={() => setCurrentStep(1)}
           />
           <div
             className={
               `w-[8px] h-[8px] rounded-full outline-0 ` +
               (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
             }
+            onClick={isStep1Valid ? () => setCurrentStep(2) : () => {}}
           />
         </div>
         <div className="mt-[32px] flex justify-center content-center items-center">
