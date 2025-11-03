@@ -17,6 +17,21 @@ const Hospitalmap = () => {
     };
 
     let map = new window.kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
+
+    // 마커 위치 데이터
+    const hospitalLocations = [
+      { lat: 37.5560379420754, lng: 126.924462416982 },
+      { lat: 37.5553020767532, lng: 126.923590029183 },
+      { lat: 37.5545808852364, lng: 126.922708589618 },
+    ];
+
+    // 마커 생성
+    hospitalLocations.forEach((location) => {
+      const marker = new window.kakao.maps.Marker({
+        position: new window.kakao.maps.LatLng(location.lat, location.lng),
+        map: map,
+      });
+    });
   }, []);
 
   return (
