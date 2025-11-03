@@ -2,13 +2,25 @@ import React from 'react';
 import Button from '../components/Button';
 import { useState, useEffect } from 'react';
 import FormInput from '../components/FormInput';
+import WeeklyButton from '../components/WeeklyButton';
+import Step2Form from '../components/Step2Form';
+
+interface IOperatingTime {
+  mon: string | null;
+  tue: string | null;
+  wed: string | null;
+  thu: string | null;
+  fri: string | null;
+  sat: string | null;
+  sun: string | null;
+}
 
 interface IFormData {
   hospitalName: string;
   subject: string;
   address: string;
   contactNumber: string;
-  operatingHours: string;
+  operatingTime: IOperatingTime;
   mainImage: File | null;
 }
 
@@ -16,11 +28,6 @@ interface Step1FormProps {
   formData: IFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => void;
-}
-
-interface Step2FormProps {
-  formData: IFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 interface FileFormProps {
@@ -85,22 +92,32 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
   );
 };
 
-const Step2Form = ({ formData, handleInputChange }: Step2FormProps) => {
-  return (
-    <div id="step2">
-      {/* 병원가입 폼-2 */}
-      <div>
-        운영시간
-        <input
-          name="operatingHours"
-          placeholder="운영시간을 입력하세요"
-          value={formData.operatingHours}
-          onChange={handleInputChange}
-        />
-      </div>
-    </div>
-  );
-};
+// const Step2Form = ({ operatingTime, onTimeChange  }: Step2FormProps) => {
+//   const weeklist = [
+//     {key: 'mon', label: '월' },
+//     {key: 'tue', label: '화' },
+//     {key: 'wed', label: '수' },
+//     {key: 'thu', label: '목' },
+//     {key: 'fri', label: '금' },
+//     {key: 'sat', label: '토' },
+//     {key: 'sun', label: '일' },
+//   ]
+
+//     return (
+//     <div id="step2">
+//       {/* 병원가입 폼-2 */}
+//       <div>
+//         운영시간
+//         {/* <input name="operatingHours" value={operatingHours} onChange={handleInputChange} /> */}
+//         {/* <div className="flex flex-row"></div> */}
+//         {weeklist.map((day) => (
+//             <div>
+//                 <WeeklyButton day={day.key} isSelected={false}  onDayClick={onTimeChange}/>
+//             ))}
+//       </div>
+//     </div>
+//   );
+// };
 
 const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -148,6 +165,7 @@ const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
 
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
   const totalSteps = 2;
 
   //폼 데이터를 객체로 관리
@@ -156,7 +174,7 @@ const SignUpHosp = () => {
     subject: '',
     address: '',
     contactNumber: '',
-    operatingHours: '',
+    operatingTime: { mon: null, tue: null, wed: null, thu: null, fri: null, sat: null, sun: null },
     mainImage: null,
   });
 
@@ -167,7 +185,38 @@ const SignUpHosp = () => {
     formData.address !== '' &&
     formData.contactNumber.length >= 9;
 
-  const isStep2Valid = formData.operatingHours !== '';
+  const isStep2Valid = {};
+
+  // 이벤트 핸들러
+  const handleDayToggle = (dayKey: keyof IOperatingTime) => {
+    setSelectedDays((prev) =>
+      prev.includes(dayKey) ? prev.filter((d) => d !== dayKey) : [...prev, dayKey]
+    );
+  };
+
+  const applyBatchTime = (time: string) => {
+    if (selectedDays.length === 0) return;
+
+    setFormData((prev) => {
+      const newTime = { ...prev.operatingTime };
+      selectedDays.forEach((dayKey) => {
+        newTime[dayKey] = time;
+      });
+      return { ...prev, opreratingTime: newTime };
+    });
+  };
+
+  const applyBatchDayOff = () => {
+    if (selectedDays.length === 0) return;
+
+    setFormData((prev) => {
+      const newTime = { ...prev.operatingTime };
+      selectedDays.forEach((dayKey) => {
+        newTime[dayKey] = null;
+      });
+      return { ...prev, operatingTime: newTime };
+    });
+  };
 
   const handleKeyDownEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (e.key === 'Enter') {
@@ -206,6 +255,16 @@ const SignUpHosp = () => {
     }
   };
 
+  const handleOperatingTimeChange = (dayKey: keyof IOperatingTime, value: string | null) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      operatingTime: {
+        ...prevData.operatingTime, // 기존 시간 객체를 복사하고
+        [dayKey]: value, // 👈 'mon' 키의 값만 새로 덮어쓰기
+      },
+    }));
+  };
+
   return (
     <div className="my-[120px] mx-[296px]">
       {/* 안내문구 */}
@@ -227,7 +286,13 @@ const SignUpHosp = () => {
               />
             )}
             {currentStep === 2 && (
-              <Step2Form formData={formData} handleInputChange={handleInputChange} />
+              <Step2Form
+                operatingTime={formData.operatingTime}
+                selectedDays={selectedDays}
+                onDayToggle={handleDayToggle}
+                onBatchTimeApply={applyBatchTime}
+                onBatchDayOffApply={applyBatchDayOff}
+              />
             )}
             <div className="flex flex-row gap-[12px] mt-[32px] justify-center">
               {/* 슬라이더 용 버튼 */}
@@ -243,7 +308,7 @@ const SignUpHosp = () => {
                   `w-[8px] h-[8px] rounded-full outline-0 ` +
                   (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
                 }
-                onClick={isStep1Valid ? () => setCurrentStep(2) : () => {}}
+                onClick={() => setCurrentStep(2)}
               />
             </div>
             <div className="mt-[32px] flex justify-center content-center items-center">
