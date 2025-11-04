@@ -10,7 +10,7 @@ interface WeeklyButtonProps {
 const WeeklyButton = ({ day, isSelected, onDayClick }: WeeklyButtonProps) => {
   const baseStyles =
     'w-[44px] aspect-square rounded-full  flex items-center justify-center m-[2px] cursor-pointer ';
-  const selectedStyles = 'bg-[#0F58FF] text-[#FFFFFF]';
+  const selectedStyles = 'bg-[#3D84FF] text-[#FFFFFF]';
   const unSelectedStyles = 'bg-[#EEEFF2] text-black ';
 
   const handleClick = () => {

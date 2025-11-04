@@ -39,7 +39,7 @@ interface FileFormProps {
 
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
   return (
-    <div id="step1" className="flex flex-col gap-y-[24px]">
+    <div id="step1" className="flex flex-col gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
       <div className="flex flex-row justify-between">
         <div>
@@ -92,33 +92,6 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
   );
 };
 
-// const Step2Form = ({ operatingTime, onTimeChange  }: Step2FormProps) => {
-//   const weeklist = [
-//     {key: 'mon', label: '월' },
-//     {key: 'tue', label: '화' },
-//     {key: 'wed', label: '수' },
-//     {key: 'thu', label: '목' },
-//     {key: 'fri', label: '금' },
-//     {key: 'sat', label: '토' },
-//     {key: 'sun', label: '일' },
-//   ]
-
-//     return (
-//     <div id="step2">
-//       {/* 병원가입 폼-2 */}
-//       <div>
-//         운영시간
-//         {/* <input name="operatingHours" value={operatingHours} onChange={handleInputChange} /> */}
-//         {/* <div className="flex flex-row"></div> */}
-//         {weeklist.map((day) => (
-//             <div>
-//                 <WeeklyButton day={day.key} isSelected={false}  onDayClick={onTimeChange}/>
-//             ))}
-//       </div>
-//     </div>
-//   );
-// };
-
 const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -166,7 +139,6 @@ const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
-  const totalSteps = 2;
 
   //폼 데이터를 객체로 관리
   const [formData, setFormData] = useState<IFormData>({
@@ -266,59 +238,64 @@ const SignUpHosp = () => {
   };
 
   return (
-    <div className="my-[120px] mx-[296px]">
+    <div className="max-w-[688px] my-[120px] mx-auto">
       {/* 안내문구 */}
       <div className="flex justify-center items-center mb-[105px] text-[24px]">
         등록할 병원 정보를 입력해주세요
       </div>
       {/* 폼 */}
-
       <form onSubmit={handleSubmit}>
-        {/* <div className="w-[208px] h-[208px]">사진입력</div> */}
-        <div className="flex flex-row">
+        <div className="flex flex-row max-w-[688px]">
           <FileForm mainImage={formData.mainImage} handleFileChange={handleFileChange} />
-          <div className="flex flex-col">
-            {currentStep === 1 && (
-              <Step1Form
-                formData={formData}
-                handleInputChange={handleInputChange}
-                onKeyDown={handleKeyDownEnter}
-              />
-            )}
-            {currentStep === 2 && (
-              <Step2Form
-                operatingTime={formData.operatingTime}
-                selectedDays={selectedDays}
-                onDayToggle={handleDayToggle}
-                onBatchTimeApply={applyBatchTime}
-                onBatchDayOffApply={applyBatchDayOff}
-              />
-            )}
-            <div className="flex flex-row gap-[12px] mt-[32px] justify-center">
-              {/* 슬라이더 용 버튼 */}
-              <div
-                className={
-                  `w-[8px] h-[8px] rounded-full outline-0 ` +
-                  (currentStep === 1 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
-                }
-                onClick={() => setCurrentStep(1)}
-              />
-              <div
-                className={
-                  `w-[8px] h-[8px] rounded-full outline-0 ` +
-                  (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
-                }
-                onClick={() => setCurrentStep(2)}
-              />
-            </div>
-            <div className="mt-[32px] flex justify-center content-center items-center">
-              <Button
-                type="submit"
-                variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
-                disabled={!(isStep1Valid && isStep2Valid)}
-              >
-                완료
-              </Button>
+          <div>
+            <div className="flex flex-1 flex-col max-w-[400px] min-h-[418px] justify-center items-center content-center">
+              {/* 정보 입력 칸 */}
+              {currentStep === 1 && (
+                <Step1Form
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  onKeyDown={handleKeyDownEnter}
+                />
+              )}
+              {currentStep === 2 && (
+                <Step2Form
+                  operatingTime={formData.operatingTime}
+                  selectedDays={selectedDays}
+                  onDayToggle={handleDayToggle}
+                  onBatchTimeApply={applyBatchTime}
+                  onBatchDayOffApply={applyBatchDayOff}
+                />
+              )}
+              <div className="mt-[32px] flex flex-col">
+                <div>
+                  <div className="flex flex-row gap-[12px] my-[32px] justify-center">
+                    {/* 슬라이더 용 버튼 */}
+                    <div
+                      className={
+                        `w-[8px] h-[8px] rounded-full outline-0 ` +
+                        (currentStep === 1 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
+                      }
+                      onClick={() => setCurrentStep(1)}
+                    />
+                    <div
+                      className={
+                        `w-[8px] h-[8px] rounded-full outline-0 ` +
+                        (currentStep === 2 ? 'bg-[#3D84FF]' : 'bg-[#E2E4E8]')
+                      }
+                      onClick={() => setCurrentStep(2)}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col justify-center content-center items-center">
+                <Button
+                  type="submit"
+                  variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
+                  disabled={!(isStep1Valid && isStep2Valid)}
+                >
+                  완료
+                </Button>
+              </div>
             </div>
           </div>
         </div>

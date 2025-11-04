@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import WeeklyButton from './WeeklyButton';
+import FormInput from './FormInput';
 
 interface IOperatingTime {
   mon: string | null;
@@ -42,6 +43,7 @@ const Step2Form = ({
   onBatchDayOffApply,
 }: Step2FormProps) => {
   const [batchTime, setBatchTime] = useState('');
+  const [breakTime, setBreakTime] = useState(false);
 
   const handleTimeApplyClik = () => {
     if (batchTime.trim() === '') return;
@@ -50,9 +52,9 @@ const Step2Form = ({
   };
 
   return (
-    <div>
+    <div className="min-h-[290px]">
       <div>운영일 선택</div>
-      <div className="flex flex-row justify-center gap-x-[2px]">
+      <div className="flex flex-row gap-x-[2px] mb-[8px] mt-[16px]">
         {weeklist.map((day) => (
           <WeeklyButton
             key={day.key}
@@ -61,6 +63,33 @@ const Step2Form = ({
             onDayClick={() => onDayToggle(day.key as keyof IOperatingTime)}
           />
         ))}
+      </div>
+      <div className="flex flex-row gap-x-[8px] items-center">
+        <FormInput label="form" placeholder="진료 시작" />
+        <div className="text-[16px]">—</div>
+        <FormInput label="form" placeholder="진료 종료" />
+      </div>
+      <div>
+        <div className="flex flex-row justify-start items-center gap-x-[8px] mt-[24px]">
+          <div
+            onClick={() => {
+              setBreakTime(!breakTime);
+            }}
+          >
+            <img
+              src={breakTime ? '/check_filled.svg' : '/check_unfilled.svg'}
+              className="w-[32px] h-[32px]"
+            />
+          </div>
+          <div className="tect-[16px]">휴게시간</div>
+        </div>
+        {breakTime && (
+          <div className="flex flex-row gap-x-[8px] items-center">
+            <FormInput label="form" placeholder="시작" />
+            <div className="text-[16px]">—</div>
+            <FormInput label="form" placeholder="종료" />
+          </div>
+        )}
       </div>
     </div>
   );
