@@ -182,6 +182,9 @@ const SignUpHosp = () => {
                   type="submit"
                   variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
                   disabled={!(isStep1Valid && isStep2Valid)}
+                  onClick={() => {
+                    console.log(formData);
+                  }}
                 >
                   완료
                 </Button>

@@ -9,6 +9,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hint?: string; //영문, 숫자 포함 8자 이상 (기본 제공)
   isDirty?: boolean; //입력여부
   isConfirmed?: boolean; //비밀번호 일치 여부
+  containerClassName?: string;
 }
 
 const FormInput = ({
@@ -19,6 +20,7 @@ const FormInput = ({
   isDirty,
   isConfirmed,
   type = 'text',
+  containerClassName = 'w-full',
   ...rest
 }: FormInputProps) => {
   // 상태 정의
@@ -51,7 +53,7 @@ const FormInput = ({
 
   // 렌더링
   return (
-    <div className="w-full">
+    <div className={containerClassName}>
       <div
         className={`flex text-[16px] h-[48px] pl-[8px] pr-[16px] items-center outline-none ${currentColor}`}
       >

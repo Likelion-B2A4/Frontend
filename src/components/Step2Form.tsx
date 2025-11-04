@@ -44,6 +44,12 @@ const Step2Form = ({
 }: Step2FormProps) => {
   const [batchTime, setBatchTime] = useState('');
   const [breakTime, setBreakTime] = useState(false);
+  const [dayOff, setDayOff] = useState(false);
+
+  const [startHour, setStartHour] = useState('');
+  const [startMinute, setStartMinute] = useState('');
+  const [endHour, setEndHour] = useState('');
+  const [endMinute, setEndMinute] = useState('');
 
   const handleTimeApplyClik = () => {
     if (batchTime.trim() === '') return;
@@ -64,30 +70,77 @@ const Step2Form = ({
           />
         ))}
       </div>
-      <div className="flex flex-row gap-x-[8px] items-center">
-        <FormInput label="form" placeholder="진료 시작" />
-        <div className="text-[16px]">—</div>
-        <FormInput label="form" placeholder="진료 종료" />
+      <div className="flex flex-row gap-x-[50px]">
+        {/* 진료시간 선택 */}
+        <div className="flex flex-row gap-x-[4px] items-center mb-[24px]">
+          <div className="flex flex-col gap-y-[8px]  items-center">
+            <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
+              <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+              <div className="text-[16px]">:</div>
+              <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+            </div>
+            <div className="text-[12px] text-[#666B76]">진료 시작 시간</div>
+          </div>
+          <div>—</div>
+          <div className="flex flex-col gap-y-[8px]  items-center">
+            <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
+              <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+              <div className="text-[16px]">:</div>
+              <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+            </div>
+            <div className="text-[12px] text-[#666B76]">진료 종료 시간</div>
+          </div>
+        </div>
+        <div>
+          <div
+            onClick={() => {
+              setDayOff(!dayOff);
+            }}
+            className="flex flex-row gap-x-[8px] items-center"
+          >
+            <img
+              src={dayOff ? '/check_filled.svg' : '/check_unfilled.svg'}
+              className="w-[32px] h-[32px] "
+            />
+            <div className="text-[16px]">휴무</div>
+          </div>
+        </div>
       </div>
+
       <div>
         <div className="flex flex-row justify-start items-center gap-x-[8px] mt-[24px]">
           <div
             onClick={() => {
               setBreakTime(!breakTime);
             }}
+            className="flex flex-row gap-x-[8px] items-center"
           >
             <img
               src={breakTime ? '/check_filled.svg' : '/check_unfilled.svg'}
-              className="w-[32px] h-[32px]"
+              className="w-[32px] h-[32px] "
             />
           </div>
           <div className="tect-[16px]">휴게시간</div>
         </div>
         {breakTime && (
-          <div className="flex flex-row gap-x-[8px] items-center">
-            <FormInput label="form" placeholder="시작" />
-            <div className="text-[16px]">—</div>
-            <FormInput label="form" placeholder="종료" />
+          <div className="flex flex-row gap-x-[4px] items-center">
+            <div className="flex flex-col gap-y-[8px]  items-center">
+              <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
+                <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+                <div className="text-[16px]">:</div>
+                <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+              </div>
+              <div className="text-[12px] text-[#666B76]">휴게 시작 시간</div>
+            </div>
+            <div>—</div>
+            <div className="flex flex-col gap-y-[8px] items-center">
+              <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
+                <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+                <div className="text-[16px]">:</div>
+                <FormInput label="form" placeholder="" containerClassName="w-[56px]" />
+              </div>
+              <div className="text-[12px] text-[#666B76]">휴게 종료 시간</div>
+            </div>
           </div>
         )}
       </div>
