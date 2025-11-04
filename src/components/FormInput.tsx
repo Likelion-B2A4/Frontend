@@ -51,7 +51,7 @@ const FormInput = ({
 
   // 렌더링
   return (
-    <div className="w-[320px]">
+    <div className="w-full">
       <div
         className={`flex text-[16px] h-[48px] pl-[8px] pr-[16px] items-center outline-none ${currentColor}`}
       >
@@ -71,6 +71,7 @@ const FormInput = ({
       {/* 힌트/에러 메시지 영역 */}
       {isPassword && <div className={messageClassName}>영문, 숫자 포함 8자 이상</div>}
       {isConfirmPassword && <div className={confirmedMessageClassName}>비밀번호가 일치합니다</div>}
+      {label !== 'id' || 'pw' ? <div className={messageClassName}>{hint}</div> : <div></div>}
     </div>
   );
 };
