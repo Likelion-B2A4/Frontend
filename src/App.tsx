@@ -6,6 +6,7 @@ import Intro from './pages/Intro.tsx';
 import LogIn from './pages/LogIn.tsx';
 import SignUp from './pages/SignUp.tsx';
 import SignUpHosp from './pages/SignUpHosp.tsx';
+import Calendar from './pages/Calendar.tsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signuphosp" element={<SignUpHosp />} />
+        <Route path="/medical-records" element={<Calendar />} />
       </Routes>
     </div>
   );
