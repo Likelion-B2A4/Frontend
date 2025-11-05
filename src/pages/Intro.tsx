@@ -5,6 +5,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 const Intro = () => {
   const isMobile = useIsMobile();
   // console.log('isMobile:', isMobile);
+  const nav = useNavigate();
 
   return (
     <>
@@ -39,6 +40,7 @@ const Intro = () => {
           <div>농인은 모바일을 사용해주세요</div>
         </div>
       )}
+      nav('/login');
     </>
   );
 };
