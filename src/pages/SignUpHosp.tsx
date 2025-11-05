@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import FormInput from '../components/FormInput';
 import WeeklyButton from '../components/WeeklyButton';
 import Step2Form from '../components/Step2Form';
+import Step1Form from '../components/Step1Form';
+import FileForm from '../components/FileForm';
 
 interface IOperatingTime {
   mon: string | null;
@@ -24,121 +26,47 @@ interface IFormData {
   mainImage: File | null;
 }
 
-interface Step1FormProps {
-  formData: IFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => void;
+interface Step2FormProps {
+  operatingTime: IOperatingTime;
+  selectedDays: (keyof IOperatingTime)[];
+  onDayToggle: (dayKey: keyof IOperatingTime) => void;
+  onBatchDayOffApply: () => void; // '휴무' 리모컨
+
+  // '일괄 시간' state
+  startHour: string;
+  setStartHour: (val: string) => void;
+  startMinute: string;
+  setStartMinute: (val: string) => void;
+  endHour: string;
+  setEndHour: (val: string) => void;
+  endMinute: string;
+  setEndMinute: (val: string) => void;
+  breakTime: boolean;
+  setBreakTime: (val: boolean) => void;
+  breakHourStart: string;
+  setBreakHourStart: (val: string) => void;
+  breakMinuteStart: string;
+  setBreakMinuteStart: (val: string) => void;
+  breakHourEnd: string;
+  setBreakHourEnd: (val: string) => void;
+  breakMinuteEnd: string;
+  setBreakMinuteEnd: (val: string) => void;
 }
-
-interface FileFormProps {
-  mainImage: File | null;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-// 폼 컴포넌트
-
-const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
-  return (
-    <div id="step1" className="flex flex-col gap-y-[24px] min-h-[290px]">
-      {/* 병원가입 폼-1 */}
-      <div className="flex flex-row justify-between">
-        <div>
-          병원명
-          <FormInput
-            label="form"
-            placeholder="병원명을 입력하세요"
-            name="hospitalName"
-            value={formData.hospitalName}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          {/* 드롭다운 선택지 */}
-          진료 과목
-          <FormInput
-            label="form"
-            placeholder="진료 과목을 입력하세요"
-            name="subject"
-            value={formData.subject}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
-      <div>
-        주소
-        <FormInput
-          label="form"
-          placeholder="병원 주소를 입력하세요"
-          name="address"
-          value={formData.address}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div>
-        연락처
-        <FormInput
-          label="form"
-          placeholder="병원 연락처를 입력하세요"
-          hint="숫자만 입력해주세요"
-          name="contactNumber"
-          value={formData.contactNumber}
-          onChange={handleInputChange}
-          onKeyDown={onKeyDown}
-        />
-      </div>{' '}
-      {/* 숫자만 입력하면 하이픈 형태로 저장 */}
-      {/* 다 입력하면 자동으로 페이지 넘어가게 */}
-    </div>
-  );
-};
-
-const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!mainImage) {
-      setPreviewImage(null);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(mainImage);
-    setPreviewImage(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [mainImage]);
-
-  return (
-    <>
-      <label
-        htmlFor="mainImageInput"
-        className="w-[208px] h-[208px] bg-[#F4F6F8] rounded-full flex flex-col items-center justify-center cursor-pointer mr-[80px]"
-      >
-        {previewImage ? (
-          <img
-            src={previewImage}
-            alt="병원 사진 미리보기"
-            className="w-full h-full object-cover rounded-full"
-          />
-        ) : (
-          <div className="flex flex-col items-center content-center justify-center gap-[8px]">
-            <img src="/camera.svg" alt="카메라 아이콘" className="w-[24px]" />
-            <span className="text-sm text-gray-500 mt-2 text-[#A9ACB2]">사진을 선택해주세요</span>
-          </div>
-        )}
-      </label>
-      <input
-        type="file"
-        id="mainImageInput"
-        name="mainImage"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="hidden" // 화면에서 숨김
-      />
-    </>
-  );
-};
 
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
+
+  // step2
+  const [startHour, setStartHour] = useState('');
+  const [startMinute, setStartMinute] = useState('');
+  const [endHour, setEndHour] = useState('');
+  const [endMinute, setEndMinute] = useState('');
+  const [breakTime, setBreakTime] = useState(false);
+  const [breakHourStart, setBreakHourStart] = useState('');
+  const [breakMinuteStart, setBreakMinuteStart] = useState('');
+  const [breakHourEnd, setBreakHourEnd] = useState('');
+  const [breakMinuteEnd, setBreakMinuteEnd] = useState('');
 
   //폼 데이터를 객체로 관리
   const [formData, setFormData] = useState<IFormData>({
@@ -157,7 +85,19 @@ const SignUpHosp = () => {
     formData.address !== '' &&
     formData.contactNumber.length >= 9;
 
-  const isStep2Valid = {};
+  const isTimeSaved = Object.values(formData.operatingTime).some((time) => time !== null);
+
+  // 2. (지금 입력 중인 값) '일괄 적용'을 위해 시간을 입력 중인가?
+  //    (선택된 요일이 있고, 시작/종료 시간을 모두 입력함)
+  const isTimePending =
+    selectedDays.length > 0 &&
+    startHour !== '' &&
+    startMinute !== '' &&
+    endHour !== '' &&
+    endMinute !== '';
+
+  // 3. [최종] 둘 중 하나라도 'true'이면 2단계는 유효한 것으로 간주
+  const isStep2Valid = isTimeSaved || isTimePending;
 
   // 이벤트 핸들러
   const handleDayToggle = (dayKey: keyof IOperatingTime) => {
@@ -174,7 +114,7 @@ const SignUpHosp = () => {
       selectedDays.forEach((dayKey) => {
         newTime[dayKey] = time;
       });
-      return { ...prev, opreratingTime: newTime };
+      return { ...prev, operatingTime: newTime };
     });
   };
 
@@ -184,10 +124,12 @@ const SignUpHosp = () => {
     setFormData((prev) => {
       const newTime = { ...prev.operatingTime };
       selectedDays.forEach((dayKey) => {
-        newTime[dayKey] = null;
+        newTime[dayKey] = '휴무';
       });
       return { ...prev, operatingTime: newTime };
     });
+
+    setSelectedDays([]); // 휴무 적용 후 선택 해제
   };
 
   const handleKeyDownEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -209,9 +151,36 @@ const SignUpHosp = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    let finalOperatingTime = { ...formData.operatingTime };
+
+    if (startHour && startMinute && endHour && endMinute && selectedDays.length > 0) {
+      let combinedTime = `${startHour} : ${startMinute} ~ ${endHour} : ${endMinute}`;
+      if (breakTime && breakHourStart && breakMinuteStart && breakHourEnd && breakMinuteEnd) {
+        combinedTime += ` (휴식시간: ${breakHourStart} : ${breakMinuteStart} ~ ${breakHourEnd} : ${breakMinuteEnd})`;
+      }
+      selectedDays.forEach((dayKey) => {
+        finalOperatingTime[dayKey] = combinedTime;
+      });
+    }
+
     if (isStep2Valid) {
       console.log('병원 가입 폼 데이터:', formData);
       alert('가입이 완료되었습니다!');
+    }
+
+    const isFinalStep2Valid = Object.values(finalOperatingTime).some((time) => time !== null);
+
+    // 4. 1단계 유효성 + '최종' 2단계 유효성 동시 체크
+    if (isStep1Valid && isFinalStep2Valid) {
+      // 5. [핵심] 백엔드로 보낼 '최종 데이터'를 여기서 조립
+      const finalDataToSend = {
+        ...formData, // hospitalName, subject 등
+        operatingTime: finalOperatingTime, // 👈 계산된 새 시간 객체로 덮어쓰기
+      };
+
+      console.log('병원 가입 폼 데이터:', finalDataToSend);
+      alert('가입이 완료되었습니다! (콘솔 확인)');
     }
   };
 
@@ -264,9 +233,27 @@ const SignUpHosp = () => {
                   onDayToggle={handleDayToggle}
                   onBatchTimeApply={applyBatchTime}
                   onBatchDayOffApply={applyBatchDayOff}
+                  startHour={startHour}
+                  setStartHour={setStartHour}
+                  startMinute={startMinute}
+                  setStartMinute={setStartMinute}
+                  endHour={endHour}
+                  setEndHour={setEndHour}
+                  endMinute={endMinute}
+                  setEndMinute={setEndMinute}
+                  breakTime={breakTime}
+                  setBreakTime={setBreakTime}
+                  breakHourStart={breakHourStart}
+                  setBreakHourStart={setBreakHourStart}
+                  breakMinuteStart={breakMinuteStart}
+                  setBreakMinuteStart={setBreakMinuteStart}
+                  breakHourEnd={breakHourEnd}
+                  setBreakHourEnd={setBreakHourEnd}
+                  breakMinuteEnd={breakMinuteEnd}
+                  setBreakMinuteEnd={setBreakMinuteEnd}
                 />
               )}
-              <div className="mt-[32px] flex flex-col">
+              <div className="flex flex-col">
                 <div>
                   <div className="flex flex-row gap-[12px] my-[32px] justify-center">
                     {/* 슬라이더 용 버튼 */}
