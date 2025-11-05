@@ -26,9 +26,47 @@ interface IFormData {
   mainImage: File | null;
 }
 
+interface Step2FormProps {
+  operatingTime: IOperatingTime;
+  selectedDays: (keyof IOperatingTime)[];
+  onDayToggle: (dayKey: keyof IOperatingTime) => void;
+  onBatchDayOffApply: () => void; // '휴무' 리모컨
+
+  // '일괄 시간' state
+  startHour: string;
+  setStartHour: (val: string) => void;
+  startMinute: string;
+  setStartMinute: (val: string) => void;
+  endHour: string;
+  setEndHour: (val: string) => void;
+  endMinute: string;
+  setEndMinute: (val: string) => void;
+  breakTime: boolean;
+  setBreakTime: (val: boolean) => void;
+  breakHourStart: string;
+  setBreakHourStart: (val: string) => void;
+  breakMinuteStart: string;
+  setBreakMinuteStart: (val: string) => void;
+  breakHourEnd: string;
+  setBreakHourEnd: (val: string) => void;
+  breakMinuteEnd: string;
+  setBreakMinuteEnd: (val: string) => void;
+}
+
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
+
+  // step2
+  const [startHour, setStartHour] = useState('');
+  const [startMinute, setStartMinute] = useState('');
+  const [endHour, setEndHour] = useState('');
+  const [endMinute, setEndMinute] = useState('');
+  const [breakTime, setBreakTime] = useState(false);
+  const [breakHourStart, setBreakHourStart] = useState('');
+  const [breakMinuteStart, setBreakMinuteStart] = useState('');
+  const [breakHourEnd, setBreakHourEnd] = useState('');
+  const [breakMinuteEnd, setBreakMinuteEnd] = useState('');
 
   //폼 데이터를 객체로 관리
   const [formData, setFormData] = useState<IFormData>({
@@ -47,7 +85,19 @@ const SignUpHosp = () => {
     formData.address !== '' &&
     formData.contactNumber.length >= 9;
 
-  const isStep2Valid = {};
+  const isTimeSaved = Object.values(formData.operatingTime).some((time) => time !== null);
+
+  // 2. (지금 입력 중인 값) '일괄 적용'을 위해 시간을 입력 중인가?
+  //    (선택된 요일이 있고, 시작/종료 시간을 모두 입력함)
+  const isTimePending =
+    selectedDays.length > 0 &&
+    startHour !== '' &&
+    startMinute !== '' &&
+    endHour !== '' &&
+    endMinute !== '';
+
+  // 3. [최종] 둘 중 하나라도 'true'이면 2단계는 유효한 것으로 간주
+  const isStep2Valid = isTimeSaved || isTimePending;
 
   // 이벤트 핸들러
   const handleDayToggle = (dayKey: keyof IOperatingTime) => {
@@ -64,7 +114,7 @@ const SignUpHosp = () => {
       selectedDays.forEach((dayKey) => {
         newTime[dayKey] = time;
       });
-      return { ...prev, opreratingTime: newTime };
+      return { ...prev, operatingTime: newTime };
     });
   };
 
@@ -74,10 +124,12 @@ const SignUpHosp = () => {
     setFormData((prev) => {
       const newTime = { ...prev.operatingTime };
       selectedDays.forEach((dayKey) => {
-        newTime[dayKey] = null;
+        newTime[dayKey] = '휴무';
       });
       return { ...prev, operatingTime: newTime };
     });
+
+    setSelectedDays([]); // 휴무 적용 후 선택 해제
   };
 
   const handleKeyDownEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -99,9 +151,36 @@ const SignUpHosp = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    let finalOperatingTime = { ...formData.operatingTime };
+
+    if (startHour && startMinute && endHour && endMinute && selectedDays.length > 0) {
+      let combinedTime = `${startHour} : ${startMinute} ~ ${endHour} : ${endMinute}`;
+      if (breakTime && breakHourStart && breakMinuteStart && breakHourEnd && breakMinuteEnd) {
+        combinedTime += ` (휴식시간: ${breakHourStart} : ${breakMinuteStart} ~ ${breakHourEnd} : ${breakMinuteEnd})`;
+      }
+      selectedDays.forEach((dayKey) => {
+        finalOperatingTime[dayKey] = combinedTime;
+      });
+    }
+
     if (isStep2Valid) {
       console.log('병원 가입 폼 데이터:', formData);
       alert('가입이 완료되었습니다!');
+    }
+
+    const isFinalStep2Valid = Object.values(finalOperatingTime).some((time) => time !== null);
+
+    // 4. 1단계 유효성 + '최종' 2단계 유효성 동시 체크
+    if (isStep1Valid && isFinalStep2Valid) {
+      // 5. [핵심] 백엔드로 보낼 '최종 데이터'를 여기서 조립
+      const finalDataToSend = {
+        ...formData, // hospitalName, subject 등
+        operatingTime: finalOperatingTime, // 👈 계산된 새 시간 객체로 덮어쓰기
+      };
+
+      console.log('병원 가입 폼 데이터:', finalDataToSend);
+      alert('가입이 완료되었습니다! (콘솔 확인)');
     }
   };
 
@@ -154,9 +233,27 @@ const SignUpHosp = () => {
                   onDayToggle={handleDayToggle}
                   onBatchTimeApply={applyBatchTime}
                   onBatchDayOffApply={applyBatchDayOff}
+                  startHour={startHour}
+                  setStartHour={setStartHour}
+                  startMinute={startMinute}
+                  setStartMinute={setStartMinute}
+                  endHour={endHour}
+                  setEndHour={setEndHour}
+                  endMinute={endMinute}
+                  setEndMinute={setEndMinute}
+                  breakTime={breakTime}
+                  setBreakTime={setBreakTime}
+                  breakHourStart={breakHourStart}
+                  setBreakHourStart={setBreakHourStart}
+                  breakMinuteStart={breakMinuteStart}
+                  setBreakMinuteStart={setBreakMinuteStart}
+                  breakHourEnd={breakHourEnd}
+                  setBreakHourEnd={setBreakHourEnd}
+                  breakMinuteEnd={breakMinuteEnd}
+                  setBreakMinuteEnd={setBreakMinuteEnd}
                 />
               )}
-              <div className="mt-[32px] flex flex-col">
+              <div className="flex flex-col">
                 <div>
                   <div className="flex flex-row gap-[12px] my-[32px] justify-center">
                     {/* 슬라이더 용 버튼 */}
@@ -182,9 +279,6 @@ const SignUpHosp = () => {
                   type="submit"
                   variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
                   disabled={!(isStep1Valid && isStep2Valid)}
-                  onClick={() => {
-                    console.log(formData);
-                  }}
                 >
                   완료
                 </Button>
