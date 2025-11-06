@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import React from 'react';
 import { type UseFormRegisterReturn } from 'react-hook-form';
+import { placeHolder, hintConfirmed, hintDisabled, hintError, Dirty } from '../styles/typography';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   register?: UseFormRegisterReturn;
@@ -20,7 +21,7 @@ const FormInput = ({
   isDirty,
   isConfirmed,
   type = 'text',
-  containerClassName = 'w-full',
+  containerClassName = 'w-full flex flex-col gap-y-[8px]',
   ...rest
 }: FormInputProps) => {
   // 상태 정의
@@ -33,7 +34,14 @@ const FormInput = ({
   const baseBorderColor = ' border-b border-[#A9ACB2] bg-transparent ';
   const foucusBorderColor = ' focus-within:border-b border-[#0F58FF] caret-[#0F58FF]';
   const errorBorderColor = ' border-b border-[#F8645D]';
-  const filledBorderColor = ' border-b border-[#666B76]';
+  const filledBorderColor = ' border-b border-[#0F58FF]';
+
+  // 상태별 타이포 정의
+  const TypoType = () => {
+    if (error) return hintError;
+    if (isConfirmPassword || isSuccess) return hintConfirmed;
+    return hintDisabled;
+  };
 
   // 최종 상태별 UI 결정
   let currentColor = hasError ? errorBorderColor : `${baseBorderColor} ${foucusBorderColor}`;
@@ -62,6 +70,7 @@ const FormInput = ({
           {...register}
           {...rest}
           className="flex-1 border-none outline-none bg-transparent"
+          style={isDirty ? Dirty : placeHolder && TypoType()}
         />
         {/* 아이콘 영역 */}
         <div className="w-[16px] h-[16px]">
@@ -71,8 +80,16 @@ const FormInput = ({
       </div>
 
       {/* 힌트/에러 메시지 영역 */}
-      {isPassword && <div className={messageClassName}>영문, 숫자 포함 8자 이상</div>}
-      {isConfirmPassword && <div className={confirmedMessageClassName}>비밀번호가 일치합니다</div>}
+      {isPassword && (
+        <div style={TypoType()} className={messageClassName}>
+          영문, 숫자 포함 8자 이상
+        </div>
+      )}
+      {isConfirmPassword && (
+        <div style={TypoType()} className={confirmedMessageClassName}>
+          비밀번호가 일치합니다
+        </div>
+      )}
       {label !== 'id' || 'pw' ? <div className={messageClassName}>{hint}</div> : <div></div>}
     </div>
   );

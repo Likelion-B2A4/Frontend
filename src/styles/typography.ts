@@ -21,3 +21,86 @@ export const logoText = {
   lineHeight: '150%',
   letterSpacing: '-0.32px',
 };
+
+// 서비스 안내 설명 텍스트
+export const expereinceText = {
+  color: '#666B76',
+  fontFamily: 'Pretendard',
+  fontSize: '14px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%',
+  letterSpacing: '-0.28px',
+};
+
+// 헤더 텍스트
+export const headerText = {
+  color: '#343841',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '20px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.4px',
+};
+
+// FormInput placeholder style
+export const placeHolder = {
+  color: ' #A9ACB2',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 400,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.32px',
+};
+export const Dirty = {
+  color: ' #1A1A1A',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 400,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.32px',
+};
+
+// hint props style
+export const hintDisabled = {
+  color: '#A9ACB2',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '12px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.24px',
+};
+export const hintConfirmed = {
+  color: '#0C58FF',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '12px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.24px',
+};
+export const hintError = {
+  color: '#F8645D',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '12px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.24px',
+};
