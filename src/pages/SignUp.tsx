@@ -10,6 +10,7 @@ type SignUpFormInputs = {
   id: string;
   password: string;
   passwordConfirm: string;
+  name: string;
 };
 
 const SignUp = () => {
@@ -38,7 +39,8 @@ const SignUp = () => {
     const payload = {
       id: data.id,
       password: data.password,
-      deviceType: isMobile ? 'mobile' : 'desktop', // isMobile 정보 추가
+      deviceType: isMobile ? 'mobile' : 'desktop',
+      name: data.name,
     };
 
     console.log('API로 전송할 최종 데이터:', payload);
@@ -64,7 +66,7 @@ const SignUp = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* 회원가입 폼 */}
-        <div className="flex flex-col gap-y-[24px]">
+        <div className="flex flex-col gap-y-[8px]">
           <div>
             <div className="text-[16px]">아이디</div>
             <FormInput
@@ -105,6 +107,13 @@ const SignUp = () => {
             />
           </div>
         </div>
+
+        {isMobile && (
+          <div>
+            <div>이름</div>
+            <FormInput label="" placeholder="이름을 입력하세요" />
+          </div>
+        )}
 
         <Button
           type="submit"
