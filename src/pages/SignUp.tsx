@@ -4,6 +4,7 @@ import FormInput from '../components/FormInput';
 import Button from '../components/Button';
 import { isValidPassword } from '../utils/validation';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 type SignUpFormInputs = {
   id: string;
@@ -13,6 +14,7 @@ type SignUpFormInputs = {
 
 const SignUp = () => {
   const nav = useNavigate();
+  const isMobile = useIsMobile();
 
   //폼 관리자 호출
   const {
@@ -33,14 +35,34 @@ const SignUp = () => {
     passwordValue === passwordConfirmValue;
 
   const onSubmit: SubmitHandler<SignUpFormInputs> = (data) => {
-    console.log('폼 데이터:', { id: data.id, password: data.password });
+    const payload = {
+      id: data.id,
+      password: data.password,
+      deviceType: isMobile ? 'mobile' : 'desktop', // isMobile 정보 추가
+    };
+
+    console.log('API로 전송할 최종 데이터:', payload);
+
+    // try {
+    //   // api 호출 추가...
+    //   console.log('회원가입 성공!');
+
+    //   if (isMobile) {
+    //     nav('/map');
+    //   } else {
+    //     nav('/signuphosp');
+    //   }
+    // } catch (error) {
+    //   console.error('회원가입 실패:', error);
+    //   alert('회원가입에 실패했습니다.');
+    // }
   };
 
   return (
     <div className="h-screen flex flex-col justify-center items-center gap-y-[132px]">
       <div className="text-[24px]">가입 정보를 입력해주세요</div>
 
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* 회원가입 폼 */}
         <div className="flex flex-col gap-y-[24px]">
           <div>
@@ -88,7 +110,7 @@ const SignUp = () => {
           type="submit"
           className="w-[320px] h-[48px] mt-[60px]"
           disabled={!isValid || !isPwConfirmed}
-          onClick={handleSubmit(onSubmit) && (() => nav('/signuphosp'))}
+          onClick={isMobile ? () => nav('/map') : () => nav('/signuphosp')}
         >
           확인
         </Button>
