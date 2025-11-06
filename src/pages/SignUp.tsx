@@ -110,7 +110,7 @@ const SignUp = () => {
           type="submit"
           className="w-[320px] h-[48px] mt-[60px]"
           disabled={!isValid || !isPwConfirmed}
-          onClick={isMobile ? () => nav('/map') : () => nav('/signuphosp')}
+          onClick={isMobile ? () => nav('/service') : () => nav('/signuphosp')}
         >
           확인
         </Button>
