@@ -21,3 +21,27 @@ export const logoText = {
   lineHeight: '150%',
   letterSpacing: '-0.32px',
 };
+
+// 설명 텍스트
+export const expereinceText = {
+  color: '#666B76',
+  fontFamily: 'Pretendard',
+  fontSize: '14px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%',
+  letterSpacing: '-0.28px',
+};
+
+// 헤더 텍스트
+export const headerText = {
+  color: '#343841',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '20px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.4px',
+};

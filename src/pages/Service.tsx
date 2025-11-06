@@ -1,15 +1,20 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
+import { expereinceText, headerText } from '../styles/typography';
 
 const FirstPage = () => {
   return (
-    <div className="flex w-screen flex-col justify-center items-center content-center">
+    <div className="flex  h-full w-screen flex-col justify-end items-center content-center">
       <img className="w-[96px] h-[96px]" src="/bit_1.svg" />
-      <div>{}님, 환영합니다.</div>
-      <div className="flex justify-center items-center text-center">
-        <div>
-          여러분의 빛이 꺼지지 않도록<br></br>손빛이 최선을 다해 진료를 도울게요
+      <div className="flex flex-col gap-y-[16px]">
+        <div style={headerText} className="text-center mt-[74px]">
+          {}님, 환영합니다.
+        </div>
+        <div className="flex justify-center items-center text-center">
+          <div style={expereinceText}>
+            여러분의 빛이 꺼지지 않도록<br></br>손빛이 최선을 다해 진료를 도울게요
+          </div>
         </div>
       </div>
     </div>
@@ -18,28 +23,39 @@ const FirstPage = () => {
 
 const SecondPage = () => {
   return (
-    <div className="flex w-screen flex-col justify-center items-center content-center">
-      <img src="serv_map.svg" />
+    <div className="flex h-full w-screen flex-col justify-end mb-[24px] gap-y-[54px] items-center content-center">
       <div>
-        <div>지도를 통해</div>
-        <div>
-          <div>손빛</div>이 닿는 병원을 찾아요
+        <img src="serv_map.svg" className="mb-[28px]" />
+        <div className="flex flex-col justify-center items-center text-center gap-y-[28px]">
+          <div style={headerText}>
+            <div>지도를 통해</div>
+            <div className="flex flex-row">
+              <div className="text-transparent font-alice bg-clip-text bg-gradient-to-br from-[#0F58FF] to-[#3FB6FF]">
+                손빛
+              </div>
+              이 닿는 병원을 찾아요
+            </div>
+          </div>
+          <div style={expereinceText}>현재 위치 근처를 탐색할 수 있어요</div>
         </div>
       </div>
-      <div>현재 위치 근처를 탐색할 수 있어요</div>
     </div>
   );
 };
 
 const ThirdPage = () => {
   return (
-    <div className="flex w-screen flex-col justify-center items-center content-center">
+    <div className="flex flex-1 h-full w-screen flex-col gap-y-[54px] justify-end mb-[45px] items-center content-center">
       <img src="serv_qr.svg" />
       <div>
-        QR코드를 스캔해서<br></br>진료를 시작해요
-      </div>
-      <div>
-        진료 중 의사와 내 대화를<br></br>화면을 통해 확인할 수 있어요
+        <div className="flex flex-col gap-y-[16px] justify-center items-center text-center">
+          <div style={headerText}>
+            QR코드를 스캔해서<br></br>진료를 시작해요
+          </div>
+          <div style={expereinceText}>
+            진료 중 의사와 내 대화를<br></br>화면을 통해 확인할 수 있어요
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -47,11 +63,15 @@ const ThirdPage = () => {
 
 const FourthPage = () => {
   return (
-    <div className="flex w-screen flex-col justify-center items-center content-center">
+    <div className="flex h-full w-screen flex-col justify-end mb-[45px] gap-y-[54px] items-center content-center">
       <img src="serv_calendar.svg" />
-      <div>지난 진료 기록을 확인해요</div>
       <div>
-        캘린더에서 진료 기록을 확인하고<br></br>복약 일정을 추가할 수 있어요
+        <div className="flex flex-col gap-y-[16px] justify-center items-center text-center">
+          <div style={headerText}>지난 진료 기록을 확인해요</div>
+          <div style={expereinceText}>
+            캘린더에서 진료 기록을 확인하고<br></br>복약 일정을 추가할 수 있어요
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -96,7 +116,7 @@ const Service = () => {
           ))}
         </div>
       </div>
-      <div id="하단 바">
+      <div id="하단 바" className="static mb-[24px] mt-[48px]">
         <div className="flex flex-row gap-[12px] my-[32px] justify-center">
           {/* 슬라이더 용 버튼 */}
           <div
@@ -128,7 +148,9 @@ const Service = () => {
             onClick={() => setCurrentPage(3)}
           />
         </div>
-        <Button variant={currentPage === 3 ? 'colored' : 'default'}>확인</Button>
+        <div className="flex justify-center items-center">
+          <Button variant={currentPage === 3 ? 'colored' : 'default'}>확인</Button>
+        </div>
       </div>
 
       <div></div>
