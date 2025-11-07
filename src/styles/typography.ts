@@ -104,3 +104,29 @@ export const hintError = {
   lineHeight: '150%' /* 24px */,
   letterSpacing: '-0.24px',
 };
+
+// 버튼 스타일
+export const defaultButtonText = {
+  color: '#343841',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '20px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.4px',
+};
+export const activateButtonText = {
+  color: '##FFF',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '20px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.4px',
+};
