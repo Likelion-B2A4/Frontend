@@ -130,3 +130,16 @@ export const activateButtonText = {
   lineHeight: '150%' /* 30px */,
   letterSpacing: '-0.4px',
 };
+
+// TopBar header Text
+export const topHeader = {
+  color: '#343841',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.32px',
+};
