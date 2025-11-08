@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -6,6 +6,16 @@ const Intro = () => {
   const isMobile = useIsMobile();
   // console.log('isMobile:', isMobile);
   const nav = useNavigate();
+
+  useEffect(() => {
+    const timeId = setTimeout(() => {
+      nav('/login');
+    }, 2000);
+
+    return () => {
+      clearTimeout(timeId);
+    };
+  }, [nav]);
 
   return (
     <>
@@ -40,7 +50,6 @@ const Intro = () => {
           <div>농인은 모바일을 사용해주세요</div>
         </div>
       )}
-      nav('/login');
     </>
   );
 };
