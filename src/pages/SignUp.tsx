@@ -60,6 +60,14 @@ const SignUp = () => {
     // }
   };
 
+  const handleNextPage = () => {
+    if (isMobile) {
+      nav('/service', { state: { fromSignup: true } });
+    } else {
+      nav('/signuphosp');
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col justify-center items-center gap-y-[132px]">
       <div className="text-[24px]">가입 정보를 입력해주세요</div>
@@ -119,7 +127,7 @@ const SignUp = () => {
           type="submit"
           className="w-[320px] h-[48px] mt-[60px]"
           disabled={!isValid || !isPwConfirmed}
-          onClick={isMobile ? () => nav('/service') : () => nav('/signuphosp')}
+          onClick={handleNextPage}
         >
           확인
         </Button>
