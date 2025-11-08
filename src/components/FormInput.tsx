@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import React from 'react';
-import { type UseFormRegisterReturn } from 'react-hook-form';
+import { type UseFormRegisterReturn, useWatch } from 'react-hook-form';
 import { placeHolder, hintConfirmed, hintDisabled, hintError, Dirty } from '../styles/typography';
+import { isValidPassword } from '../utils/validation';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   register?: UseFormRegisterReturn;
@@ -29,6 +30,7 @@ const FormInput = ({
   const isSuccess = isDirty && !hasError;
   const isPassword = label === 'pw';
   const isConfirmPassword = label === 'repw' && isConfirmed;
+  const isMismatch = (label === 'pw' || label === 'repw') && hasError && isDirty;
 
   // 상태별 색상 정의
   const baseBorderColor =
@@ -38,7 +40,7 @@ const FormInput = ({
 
   // 상태별 타이포 정의
   const TypoType = () => {
-    if (error) return hintError;
+    if (error || isMismatch) return hintError;
     if (isConfirmPassword || isSuccess) return hintConfirmed;
     return hintDisabled;
   };
@@ -79,7 +81,7 @@ const FormInput = ({
 
       {/* 힌트/에러 메시지 영역 */}
       {isPassword && (
-        <div style={TypoType()} className={messageClassName}>
+        <div style={TypoType()} className={isMismatch ? 'hidden' : `${messageClassName} `}>
           영문, 숫자 포함 8자 이상
         </div>
       )}
@@ -88,7 +90,16 @@ const FormInput = ({
           비밀번호가 일치합니다
         </div>
       )}
-      {label !== 'id' || 'pw' ? <div className={messageClassName}>{hint}</div> : <div></div>}
+      {isMismatch && (
+        <div style={TypoType()} className={messageClassName}>
+          비밀번호가 일치하지 않습니다
+        </div>
+      )}
+      {label !== 'id' && label !== 'pw' ? (
+        <div className={messageClassName}>{hint}</div>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };
