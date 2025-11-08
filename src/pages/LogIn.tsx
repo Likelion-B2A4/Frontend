@@ -129,6 +129,7 @@ const LogIn = () => {
               variant="colored"
               children="로그인"
               isMobile={isMobile}
+              onClick={() => nav('/hospitalmap')}
             />
           </div>
         </div>
