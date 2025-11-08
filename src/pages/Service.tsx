@@ -2,22 +2,46 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import { expereinceText, headerText } from '../styles/typography';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const FirstPage = () => {
+const FirstPage = ({ first = false }) => {
   return (
-    <div className="flex  h-full w-screen flex-col justify-end items-center content-center">
-      <img className="w-[96px] h-[96px]" src="/bit_1.svg" />
-      <div className="flex flex-col gap-y-[16px]">
-        <div style={headerText} className="text-center mt-[74px]">
-          {}님, 환영합니다.
-        </div>
-        <div className="flex justify-center items-center text-center">
-          <div style={expereinceText}>
-            여러분의 빛이 꺼지지 않도록<br></br>손빛이 최선을 다해 진료를 도울게요
+    <>
+      {first ? (
+        <div className="flex h-full w-screen flex-col justify-end items-center content-center">
+          <img className="w-[96px] h-[96px]" src="/bit_1.svg" />
+          <div className="flex flex-col gap-y-[16px]">
+            <div style={headerText} className="text-center mt-[74px]">
+              {}님, 환영합니다.
+            </div>
+            <div className="flex justify-center items-center text-center">
+              <div style={expereinceText}>
+                여러분의 빛이 꺼지지 않도록
+                <br />
+                손빛이 최선을 다해 진료를 도울게요
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="flex h-full w-screen flex-col justify-end items-center content-center">
+          <div>
+            <img className="w-[96px] h-[96px] mx-auto " src="/bit_1.svg" />
+            <div className="flex flex-col gap-y-[16px]">
+              <div style={headerText} className="text-center mt-[65px]">
+                농인 진료 도움 서비스 <br />
+                <div className="flex flex-row text-center justify-center">
+                  <div className="text-transparent font-alice bg-clip-text bg-gradient-to-br from-[#0F58FF] to-[#3FB6FF]">
+                    손빛
+                  </div>
+                  입니다
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -77,11 +101,12 @@ const FourthPage = () => {
   );
 };
 
-const pages = [<FirstPage />, <SecondPage />, <ThirdPage />, <FourthPage />];
-const totalPages = pages.length;
-
 const Service = () => {
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(0);
+  const isFirstVisit = (location.state as { fromSignup?: boolean })?.fromSignup === true;
+  const pages = [<FirstPage first={isFirstVisit} />, <SecondPage />, <ThirdPage />, <FourthPage />];
+  const totalPages = pages.length;
 
   const nextPage = () => {
     setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
@@ -104,19 +129,22 @@ const Service = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex-1 overflow-hidden" onClick={handleContainerClick}>
+      <div className={'flex-1 overflow-hidden'} onClick={handleContainerClick}>
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out"
+          className={'flex h-full transition-transform duration-500 ease-in-out'}
           style={{ transform: `translateX(-${currentPage * 100}%)` }}
         >
           {pages.map((page, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0">
+            <div key={index} className={'w-full h-full flex-shrink-0'}>
               {page}
             </div>
           ))}
         </div>
       </div>
-      <div id="하단 바" className="static mb-[24px] mt-[48px]">
+      <div
+        id="하단 바"
+        className={'static mb-[24px]' + (isFirstVisit ? ' mt-[48px]' : ' mt-[150px]')}
+      >
         <div className="flex flex-row gap-[12px] my-[32px] justify-center">
           {/* 슬라이더 용 버튼 */}
           <div
@@ -148,9 +176,13 @@ const Service = () => {
             onClick={() => setCurrentPage(3)}
           />
         </div>
-        <div className="flex justify-center items-center">
-          <Button variant={currentPage === 3 ? 'colored' : 'default'}>확인</Button>
-        </div>
+        {isFirstVisit ? (
+          <div className="flex justify-center items-center">
+            <Button variant={currentPage === 3 ? 'colored' : 'default'}>확인</Button>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div></div>

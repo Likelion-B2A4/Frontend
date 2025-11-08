@@ -21,7 +21,7 @@ const Button = ({
 
   const stylesByVariant = {
     default: 'bg-[#F4F6F8] text-black',
-    colored: 'bg-[#3D84FF] text-[#FFFFFF]',
+    colored: 'bg-[#3D84FF] text-[#FFF]',
   };
 
   const textStyles = {
