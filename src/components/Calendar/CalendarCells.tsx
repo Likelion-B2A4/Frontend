@@ -2,18 +2,18 @@ import { endOfMonth, startOfMonth, startOfWeek, format, addDays, isToday, isSame
 
 interface Props {
     currentDate : Date,
+    selectedMonth : string,
+    selectedDay : string,
+    onDateClick : (day: Date) => void,
+    mode: number
 }
 
-const CalendarCells = ({currentDate} : Props) => {
+const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mode = 0} : Props) => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
-    console.log(monthStart, monthEnd); // 11월 1일 - 30일
 
     const startDate = startOfWeek(monthStart);
     const endDate = startOfWeek(monthEnd);
-    console.log(startDate); // 10월 26일 일요일
-    console.log(endDate); // 11월 30일 일요일
-
 
     const rows = [];
     let days = [];
@@ -26,14 +26,22 @@ const CalendarCells = ({currentDate} : Props) => {
             const cloneDay = day;
             num++;
 
+            const isSelected = 
+                selectedMonth === format(cloneDay, "MM") &&
+                selectedDay === format(cloneDay, "dd") &&
+                isSameMonth(cloneDay, currentDate);
+
             let textColor = "";
             if (isSameDay(cloneDay, currentDate)) { // 오늘
                 textColor = "text-[#0C58FF]"
             } else if (isBefore(cloneDay, currentDate)) {
                 textColor = "text-black";
             } else {
-                textColor = "text-[#A9ACB2]"
+                if (mode == 1) textColor = "text-black";
+                else textColor = "text-[#A9ACB2]"
             }
+
+    
 
             const isOtherMonth = format(currentDate, "M") !== format(cloneDay, "M");
 
@@ -42,7 +50,9 @@ const CalendarCells = ({currentDate} : Props) => {
                     key={num} 
                     className={`w-full h-[52px] text-center
                         ${isOtherMonth ? "opacity-0" : `${textColor} cursor-pointer`}
+                        
                     `}
+                    onClick={() => {onDateClick(cloneDay)}}
                 >
                     {format(day, 'd')}
                 </div>
