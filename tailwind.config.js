@@ -8,8 +8,7 @@ export default {
       fontFamily: {
         alice: ['AliceDigitalLearning', 'sans-serif'],
         sans: ['Pretendard', 'sans-serif'],
-
-        pretendard: ['Pretendard', 'sans-serif'],
+        Pretendard: ['Pretendard', 'sans-serif'],
       },
     },
   },
