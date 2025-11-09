@@ -6,6 +6,8 @@ import Intro from './pages/Intro.tsx';
 import LogIn from './pages/LogIn.tsx';
 import SignUp from './pages/SignUp.tsx';
 import Calendar from './pages/Calendar.tsx';
+import AddSchedule from './pages/AddSchedule.tsx';
+import EditSchedule from './pages/EditSchedule.tsx';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/medical-records" element={<Calendar />} />
+        <Route path="/add-schedule" element={<AddSchedule />} />
+        <Route path="/edit-schedule" element={<EditSchedule />} />
       </Routes>
     </div>
   );
