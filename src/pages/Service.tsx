@@ -106,7 +106,7 @@ const Service = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const isFirstVisit = (location.state as { fromSignup?: boolean })?.fromSignup === true;
   const pages = [<FirstPage first={isFirstVisit} />, <SecondPage />, <ThirdPage />, <FourthPage />];
-  const totalPages = pages.length;
+  const totalPages = 3;
 
   const nextPage = () => {
     setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
