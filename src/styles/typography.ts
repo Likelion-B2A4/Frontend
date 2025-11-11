@@ -119,7 +119,7 @@ export const defaultButtonText = {
   letterSpacing: '-0.4px',
 };
 export const activateButtonText = {
-  color: '##FFF',
+  color: '#FFF',
   textalign: 'center',
 
   /* Body/L-Bold */
@@ -129,6 +129,56 @@ export const activateButtonText = {
   fontWeight: 600,
   lineHeight: '150%' /* 30px */,
   letterSpacing: '-0.4px',
+};
+export const disabledButtonText = {
+  color: '#A9ACB2',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '20px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.4px',
+};
+
+// 미니버튼
+export const defaultMiniButtonText = {
+  color: '#343841',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 700,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.32px',
+};
+export const activateMiniButtonText = {
+  color: '#FFF',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 700,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.32px',
+};
+export const disabledMiniButtonText = {
+  color: '#A9ACB2',
+  textalign: 'center',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 700,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.32px',
 };
 
 // TopBar header Text
@@ -141,5 +191,51 @@ export const topHeader = {
   fontStyle: 'normal',
   fontWeight: 600,
   lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.32px',
+};
+
+export const hospHeader = {
+  color: '#343841',
+
+  /* Body/L-Bold */
+  fontFamily: 'Pretendard',
+  fontSize: '24px',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  lineHeight: '150%' /* 30px */,
+  letterSpacing: '-0.48px',
+};
+export const photoSelect = {
+  color: '#A9ACB2',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '14px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.28px',
+};
+
+export const dateButton = {
+  color: '#A9ACB2',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 700,
+  lineHeight: '150%' /* 24px */,
+  letterSpacing: '-0.32px',
+};
+export const dateButtonSelected = {
+  color: '#FFF',
+
+  /* Body/M */
+  fontFamily: 'Pretendard',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 700,
+  lineHeight: '150%' /* 24px */,
   letterSpacing: '-0.32px',
 };

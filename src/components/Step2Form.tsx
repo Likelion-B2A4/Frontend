@@ -3,6 +3,8 @@ import WeeklyButton from './WeeklyButton';
 import FormInput from './FormInput';
 import { set } from 'date-fns';
 import { startOfHour } from 'date-fns/fp';
+import { Dirty, hintDisabled } from '../styles/typography';
+import Button from './Button';
 
 interface IOperatingTime {
   mon: string | null;
@@ -130,7 +132,7 @@ const Step2Form = ({
 
   return (
     <div className="min-h-[290px]">
-      <div>운영일 선택</div>
+      <div style={Dirty}>운영일 선택</div>
       <div className="flex flex-row gap-x-[2px] mb-[8px] mt-[16px]">
         {weeklist.map((day) => (
           <WeeklyButton
@@ -144,7 +146,7 @@ const Step2Form = ({
       <div className="flex flex-row gap-x-[50px]">
         {/* 진료시간 선택 */}
         <div className="flex flex-row gap-x-[4px] items-center mb-[24px]">
-          <div className="flex flex-col gap-y-[4px] items-center">
+          <div className="flex flex-col gap-y-[8px] items-center">
             <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
               <FormInput
                 label="form"
@@ -162,10 +164,12 @@ const Step2Form = ({
                 onChange={(e) => setStartMinute(e.target.value)}
               />
             </div>
-            <div className="text-[12px] text-[#666B76]">진료 시작 시간</div>
+            <div className="text-start justify-end" style={hintDisabled}>
+              진료 시작 시간
+            </div>
           </div>
           <div>—</div>
-          <div className="flex flex-col gap-y-[4px]  items-center">
+          <div className="flex flex-col gap-y-[8px]  items-center">
             <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
               <FormInput
                 label="form"
@@ -183,17 +187,13 @@ const Step2Form = ({
                 onChange={(e) => setEndMinute(e.target.value)}
               />
             </div>
-            <div className="text-[12px] text-[#666B76]">진료 종료 시간</div>
+            <div className="" style={hintDisabled}>
+              진료 종료 시간
+            </div>
           </div>
         </div>
         <div>
-          <div onClick={handleDayOffToggle} className="flex flex-row gap-x-[8px] items-center">
-            <img
-              src={dayOff ? '/check_filled.svg' : '/check_unfilled.svg'}
-              className="w-[32px] h-[32px] "
-            />
-            <div className="text-[16px]">휴무</div>
-          </div>
+          <Button size="mini" isMobile={false} children="입력 완료" disabled={dayOff} />
         </div>
       </div>
 
@@ -210,7 +210,9 @@ const Step2Form = ({
               className="w-[32px] h-[32px] "
             />
           </div>
-          <div className="tect-[16px] mb-0">휴게시간</div>
+          <div className="tect-[16px] mb-0" style={Dirty}>
+            휴게시간
+          </div>
         </div>
         {breakTime && (
           <div className="flex flex-row gap-x-[4px] items-center">
@@ -232,7 +234,9 @@ const Step2Form = ({
                   onChange={(e) => setBreakMinuteStart(e.target.value)}
                 />
               </div>
-              <div className="text-[12px] text-[#666B76]">휴게 시작 시간</div>
+              <div className="text-[12px] text-[#666B76]" style={hintDisabled}>
+                휴게 시작 시간
+              </div>
             </div>
             <div>—</div>
             <div className="flex flex-col gap-y-[4px] items-center">
@@ -253,10 +257,24 @@ const Step2Form = ({
                   onChange={(e) => setBreakMinuteEnd(e.target.value)}
                 />
               </div>
-              <div className="text-[12px] text-[#666B76]">휴게 종료 시간</div>
+              <div className="text-[12px] text-[#666B76]" style={hintDisabled}>
+                휴게 종료 시간
+              </div>
             </div>
           </div>
         )}
+      </div>
+      <div
+        onClick={handleDayOffToggle}
+        className="flex flex-row gap-x-[8px] mt-[24px] items-center"
+      >
+        <img
+          src={dayOff ? '/check_filled.svg' : '/check_unfilled.svg'}
+          className="w-[32px] h-[32px] "
+        />
+        <div className="" style={Dirty}>
+          휴무
+        </div>
       </div>
     </div>
   );

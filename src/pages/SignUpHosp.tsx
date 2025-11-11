@@ -6,6 +6,7 @@ import WeeklyButton from '../components/WeeklyButton';
 import Step2Form from '../components/Step2Form';
 import Step1Form from '../components/Step1Form';
 import FileForm from '../components/FileForm';
+import { hospHeader } from '../styles/typography';
 
 interface IOperatingTime {
   mon: string | null;
@@ -209,7 +210,7 @@ const SignUpHosp = () => {
   return (
     <div className="max-w-[688px] my-[120px] mx-auto">
       {/* 안내문구 */}
-      <div className="flex justify-center items-center mb-[105px] text-[24px]">
+      <div style={hospHeader} className="flex justify-center items-center mb-[105px] text-[24px]">
         등록할 병원 정보를 입력해주세요
       </div>
       {/* 폼 */}

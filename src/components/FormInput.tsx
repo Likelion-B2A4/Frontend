@@ -96,7 +96,9 @@ const FormInput = ({
         </div>
       )}
       {label !== 'id' && label !== 'pw' ? (
-        <div className={messageClassName}>{hint}</div>
+        <div style={TypoType()} className={messageClassName}>
+          {hint}
+        </div>
       ) : (
         <div></div>
       )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import FormInput from '../components/FormInput';
+import { Dirty, hintDisabled } from '../styles/typography';
 
 interface IOperatingTime {
   mon: string | null;
@@ -28,9 +29,9 @@ interface Step1FormProps {
 
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
   return (
-    <div id="step1" className="flex flex-col gap-y-[24px] min-h-[290px]">
+    <div id="step1" style={Dirty} className="flex flex-col gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between gap-x-[16px]">
         <div>
           병원명
           <FormInput

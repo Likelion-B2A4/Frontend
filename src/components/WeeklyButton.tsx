@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import { dateButton, dateButtonSelected } from '../styles/typography';
 
 interface WeeklyButtonProps {
   day: string;
@@ -10,8 +9,8 @@ interface WeeklyButtonProps {
 const WeeklyButton = ({ day, isSelected, onDayClick }: WeeklyButtonProps) => {
   const baseStyles =
     'w-[44px] aspect-square rounded-full  flex items-center justify-center m-[2px] cursor-pointer ';
-  const selectedStyles = 'bg-[#3D84FF] text-[#FFFFFF]';
-  const unSelectedStyles = 'bg-[#EEEFF2] text-black ';
+  const selectedStyles = 'bg-[#3D84FF] ';
+  const unSelectedStyles = 'bg-[#EEEFF2] ';
 
   const handleClick = () => {
     onDayClick(day);
@@ -22,6 +21,7 @@ const WeeklyButton = ({ day, isSelected, onDayClick }: WeeklyButtonProps) => {
       <div
         className={`${baseStyles} ${isSelected ? selectedStyles : unSelectedStyles}`}
         onClick={handleClick}
+        style={isSelected ? dateButtonSelected : dateButton}
       >
         {day}
       </div>
