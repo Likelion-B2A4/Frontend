@@ -63,9 +63,10 @@ const SignUp = () => {
     // }
   };
 
+  const nameValue = watch('name', '');
   const handleNextPage = () => {
     if (isMobile) {
-      nav('/service', { state: { fromSignup: true } });
+      nav('/service', { state: { fromSignup: true, userName: nameValue } });
     } else {
       nav('/signuphosp');
     }
