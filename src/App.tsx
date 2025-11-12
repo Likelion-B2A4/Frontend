@@ -11,6 +11,7 @@ import AddSchedule from './pages/AddSchedule.tsx';
 import EditSchedule from './pages/EditSchedule.tsx';
 import Service from './pages/Service.tsx';
 import Setting from './pages/Setting.tsx';
+import SelectDoctor from './pages/SelectDoctor.tsx';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/edit-schedule" element={<EditSchedule />} />
         <Route path="/service" element={<Service />} />
         <Route path="/setting" element={<Setting />} />
+        <Route path="/select-doctor" element={<SelectDoctor />} />
       </Routes>
     </div>
   );
