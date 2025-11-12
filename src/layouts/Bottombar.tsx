@@ -14,7 +14,7 @@ export default function Bottombar() {
   const { pathname } = useLocation();
 
   // Bottombar를 표시할 경로들
-  const showBottombarPaths = ['/map', '/qr-code', '/medical-records'];
+  const showBottombarPaths = ['/qr-code', '/medical-records', '/hospitalmap'];
   const shouldShow = showBottombarPaths.includes(pathname);
 
   if (!shouldShow) {
@@ -27,7 +27,7 @@ export default function Bottombar() {
     // 각 탭에 맞는 경로로 네비게이션
     switch (tab) {
       case 'map':
-        navigate('/map'); // 지도 경로를 여기에 입력
+        navigate('/hospitalmap'); // 지도 경로를 여기에 입력
         break;
       case 'qr':
         navigate('/qr-code'); // QR 코드 경로를 여기에 입력
@@ -39,13 +39,14 @@ export default function Bottombar() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200">
-      <div className="flex items-center justify-center h-[95px] max-w-full">
+    <nav className="relative w-full bg-white" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="flex items-center justify-center h-[95px] max-w-full" style={{ backgroundColor: '#FFFFFF' }}>
         {/* Map Tab */}
         <button
           onClick={() => handleTabClick('map')}
-          className="flex-1 flex flex-col items-center justify-center py-4 px-4 transition-all duration-200 cursor-pointer"
-          style={{ gap: '4px' }}
+          className="flex-1 flex flex-col items-center just
+          ify-center py-4 px-4 transition-all duration-200 cursor-pointer"
+          style={{ gap: '4px', backgroundColor: '#FFFFFF', border: 'none' }}
           aria-label="병원 찾기"
         >
           <img
@@ -78,7 +79,7 @@ export default function Bottombar() {
           onClick={() => handleTabClick('qr')}
           className="flex flex-col items-center justify-center mb-8 transition-all duration-200 cursor-pointer relative"
           aria-label="진료 QR"
-          style={{ width: '116px', height: '116px' }}
+          style={{ width: '116px', height: '116px', backgroundColor: 'transparent', border: 'none',zIndex: 20 }}
         >
           <div
             style={{
@@ -88,7 +89,8 @@ export default function Bottombar() {
               backgroundColor: '#FFF',
               filter: 'drop-shadow(0 -16px 20px rgba(0, 0, 0, 0.03))',
               position: 'absolute',
-              zIndex: 0
+              zIndex: 0,
+              border: '3px solid #FFF'
             }}
           />
           <img
@@ -112,7 +114,7 @@ export default function Bottombar() {
         <button
           onClick={() => handleTabClick('record')}
           className="flex-1 flex flex-col items-center justify-center py-4 px-4 transition-all duration-200 cursor-pointer"
-          style={{ gap: '4px' }}
+          style={{ gap: '4px', backgroundColor: '#FFFFFF', border: 'none' }}
           aria-label="진료 기록"
         >
           <img
