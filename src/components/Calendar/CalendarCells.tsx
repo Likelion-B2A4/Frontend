@@ -1,4 +1,7 @@
-import { endOfMonth, startOfMonth, startOfWeek, format, addDays, isToday, isSameMonth, isSameDay, isPast, isFuture, isBefore } from "date-fns";
+import { endOfMonth, startOfMonth, startOfWeek, format, addDays, isSameMonth, isSameDay, isBefore } from "date-fns";
+import recordImg from "../../assets/calendar/record.svg";
+import med_notAll from "../../assets/calendar/med_notall.svg";
+import med_All from "../../assets/calendar/med_all.svg";
 
 interface Props {
     currentDate : Date,
@@ -50,11 +53,14 @@ const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mo
                     key={num} 
                     className={`w-full h-[52px] text-center
                         ${isOtherMonth ? "opacity-0" : `${textColor} cursor-pointer`}
-                        
                     `}
                     onClick={() => {onDateClick(cloneDay)}}
                 >
                     {format(day, 'd')}
+                    <div className="flex flex-row gap-0.5 mx-[5px] justify-center">
+                        <img src={recordImg} alt="" />
+                        <img src={med_All} alt="" />
+                    </div>
                 </div>
             )
             day = addDays(day, 1);

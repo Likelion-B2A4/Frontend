@@ -25,13 +25,18 @@ const Calendar = () => {
     return (
         
     <div className="flex flex-col min-h-screen">
-        <Topbar title="진료 기록"/>
+        <div className="flex justify-center">
+            <Topbar title="진료 기록" />
+        </div>
         <div className="flex flex-col mx-[20px] gap-[8px]">
             <CalendarDays />
             <CalendarCells currentDate={currentDate} onDateClick={onDateClick} selectedMonth={selectedMonth} selectedDay={selectedDay} mode={0}/>
             <DailyRecord selectedMonth={selectedMonth} selectedDay={selectedDay} onDateClick={onDateClick} isClicked={isClicked} />
         </div>
         
+        <div>
+            <Bottombar />
+        </div>
 
     </div> 
         
