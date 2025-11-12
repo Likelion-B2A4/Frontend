@@ -79,7 +79,7 @@ export default function Bottombar() {
           onClick={() => handleTabClick('qr')}
           className="flex flex-col items-center justify-center mb-8 transition-all duration-200 cursor-pointer relative"
           aria-label="진료 QR"
-          style={{ width: '116px', height: '116px', backgroundColor: 'transparent', border: 'none', zIndex: 50 }}
+          style={{ width: '116px', height: '116px', backgroundColor: 'transparent', border: 'none',zIndex: 20 }}
         >
           <div
             style={{

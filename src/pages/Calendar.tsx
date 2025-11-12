@@ -26,7 +26,7 @@ const Calendar = () => {
         
     <div className="flex flex-col min-h-screen">
         <Topbar title="진료 기록"/>
-        <div className="flex flex-col mx-[20px] gap-[8px]">
+        <div className="flex flex-col mx-5 gap-2">
             <CalendarDays />
             <CalendarCells currentDate={currentDate} onDateClick={onDateClick} selectedMonth={selectedMonth} selectedDay={selectedDay} mode={0}/>
             <DailyRecord selectedMonth={selectedMonth} selectedDay={selectedDay} onDateClick={onDateClick} isClicked={isClicked} />
