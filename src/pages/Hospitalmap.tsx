@@ -10,21 +10,7 @@ declare global {
 }
 
 const Hospitalmap = () => {
-  const [modal1Open, setModal1Open] = useState(true);
-  const [modal2Open, setModal2Open] = useState(false);
-  const [modal3Open, setModal3Open] = useState(false);
-  const [selectedMedicines, setSelectedMedicines] = useState<string[]>([]);
-
-  const medicines = [
-    { id: '1', name: '진통제', times: ['아침', '점심', '저녁', '취침 전'] },
-    { id: '2', name: '감기약', times: ['아침', '점심', '저녁'] },
-  ];
-
-  const handleSelectMedicine = (id: string) => {
-    setSelectedMedicines((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
+  const [modalOpen, setModalOpen] = useState(true);
 
   useEffect(() => {
     let container = document.getElementById(`map`); // 지도를 담을 영역의 DOM 레퍼런스
@@ -53,9 +39,9 @@ const Hospitalmap = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* 모달 1: 기본 모달 (위치 권한) */}
+      {/*위치 권한 모달*/}
       <Modal
-        isOpen={modal1Open}
+        isOpen={modalOpen}
         title="위치 정보 권한"
         description={
           <>
@@ -65,11 +51,10 @@ const Hospitalmap = () => {
         }
         cancelButtonText="취소"
         confirmButtonText="허용"
-        onCancel={() => setModal1Open(false)}
+        onCancel={() => setModalOpen(false)}
         onConfirm={() => {
           console.log('위치 권한이 승인되었습니다!');
-          setModal1Open(false);
-          setModal2Open(true);
+          setModalOpen(false);
         }}
       />
 
