@@ -1,6 +1,7 @@
 import searchImg from "../../assets/doctor/search.svg";
 import addImg from "../../assets/doctor/add_doctor.svg";
 import { useState } from "react";
+import Modal from "../Modal";
 
 export interface mockData {
     doctorId: number;
@@ -10,7 +11,10 @@ export interface mockData {
 
 const DoctorList = () => {
     const [name, setName] = useState("");
+    const [isButtonClicked, setIsButtonClicked] = useState(false);
     const [selectDocId, setSelectDocId] = useState<number | null>(null);
+    const [pw, setPw] = useState("");
+    const [isValid, setIsValid] = useState(true);
 
     const data = [
         {
@@ -38,10 +42,14 @@ const DoctorList = () => {
 
     const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value)
-        console.log(name);
+        //console.log(name);
     }
 
-    const handleInput = (e: React.MouseEvent<HTMLImageElement>) => {
+    const onChangePw = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPw(e.target.value);
+    }
+
+    const handleInput = () => {
         console.log(name, "클릭")
     }
 
@@ -49,7 +57,24 @@ const DoctorList = () => {
         setSelectDocId(id);
     }
 
+    const onClickButton = () => {
+        setIsButtonClicked(true);
+    }
+
     const isButtonActive = selectDocId !== null;
+
+    const handleConfirm = () => {
+        console.log("암호 확인", pw);
+        setIsButtonClicked(false);
+    }
+
+    const singleButton = [
+        {
+            label: '확인',
+            onClick: handleConfirm,
+            variant: 'default' as const,
+        }
+    ]
     
     return (
         <div className="w-[400px] mx-auto flex flex-col gap-8 justify-center items-center">
@@ -116,15 +141,67 @@ const DoctorList = () => {
                         <button 
                             className={`w-full h-14 rounded-xl text-[20px] font-semibold 
                             ${isButtonActive ? 'bg-[#3D84FF] text-white' : 'bg-[#F4F6F8] text-[#A9ACB2]'}`}
-                            
+                            onClick={onClickButton}
                         >
                             확인
                         </button>
                     </div>
                 </div>
-
-
             </div>
+            <Modal 
+                isOpen={isButtonClicked}
+                title="의사 암호를 입력해주세요"
+                children = {
+                    <>
+                        <div className="w-[344px] flex flex-col gap-4">
+                            <div className="h-22 flex flex-row gap-4 items-center">
+                                <div className="w-22 h-22 rounded-full bg-[#F4F6F8] flex flex-col items-center content-center justify-center">
+                                    <img src="/camera.svg" alt="카메라 아이콘" className="w-6" />
+                                </div>
+
+                                <div className="flex flex-col justify-center h-fit gap-1">
+                                    <div className="flex flex-row items-end gap-2">
+                                        <div className="text-[#343841] font-semibold text-[20px]">다살려 의사</div>
+                                        <div className="text-[#666B76] text-[12px] font-medium ">외과 전문의</div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-1 text-[#666B76] text-[12px] font-medium">
+                                        <p>최근 진료</p>
+                                        <p>10월 10일 09:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {isValid ? (
+                                <div className="flex flex-col w-full justify-center gap-2">
+                                    <input 
+                                        type="text" 
+                                        placeholder="의사 암호를 입력하세요"  
+                                        onChange={onChangePw}
+                                        value={pw}
+                                        className="h-12 pl-2 placeholder-[#A9ACB2] border border-b-[#A9ACB2] border-t-0 border-x-0"  
+                                    />
+                                    <p className="font-medium text-[12px] text-[#A9ACB2] pl-2">영문, 숫자 포함 8자 이상</p>
+                            </div>
+                            ) : (
+                                <div className="flex flex-col w-full justify-center gap-2">
+                                    <input 
+                                        type="text" 
+                                        placeholder="의사 암호를 입력하세요"  
+                                        onChange={onChangePw}
+                                        value={pw}
+                                        className="h-12 pl-2 placeholder-[#A9ACB2] border border-b-[#F8645D] border-t-0 border-x-0"  
+                                    />
+                                    <p className="font-medium text-[12px] text-[#F8645D] pl-2">암호가 잘못되었어요</p>
+                            </div>
+                            )}
+                                
+                        </div>
+                    </>
+                }
+                onCancel={() => setIsButtonClicked(false)}
+                isMobile={false}
+                buttons={singleButton}
+            />
         </div>
     )
 }
