@@ -5,8 +5,8 @@ const minutes = Array.from({length: 60}, (_, i) => String(i).padStart(2, '0'));
 const daynight = ['AM', 'PM'];
 const ITEM_HEIGHT = 56;
 
-console.log(hours);
-console.log(minutes);
+// console.log(hours);
+// console.log(minutes);
 
 interface WheelItemProps {
   label: string;

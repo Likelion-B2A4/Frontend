@@ -1,8 +1,8 @@
 import { useState } from "react";
 import dotsImg from "../../assets/calendar/dots.svg";
 import vectorImg from "../../assets/calendar/right_vector.svg";
-import { Icon } from "@iconify/react";
-import { tr } from "date-fns/locale";
+import checkImg from "../../assets/calendar/check.svg";
+import defaultImg from "../../assets/calendar/check_default.svg";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -17,7 +17,7 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked} : Props) => {
     const mockData = ["아침", "점심", "저녁"];
     const [isOpen, setIsOpen] = useState(false);
     const [hasMedicalRecord, setHasMedicalRecord] = useState(true);
-    const [hasMed, setHasMed] = useState(false);
+    const [hasMed, setHasMed] = useState(true);
 
     const [isChecked, setIsChecked] = useState(
         new Array(mockData.length).fill(false)
@@ -73,7 +73,7 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked} : Props) => {
                                 <div>
                                     복통 및 어지러움 호소
                                 </div>
-                                <div className="text-[#666B76]">
+                                <div className="text-[#666B76] text-[12px]">
                                     09:00
                                 </div>
                             </div>
@@ -107,13 +107,14 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked} : Props) => {
                                 {mockData.map((time, index) => (
                                     <div 
                                     key={index} 
-                                    className="w-[32px] h-[32px]"
+                                    className="w-[32px] h-[32px] items-center flex cursor-pointer"
                                     onClick={onClickCheck(index)}
                                     >
-                                        <Icon 
-                                            icon="simple-line-icons:check"
-                                            className={`iconify w-[26px] h-[26px] rounded-full ${isChecked[index] ? 'bg-[#3D84FF] text-[#ffffff]' : 'text-[#A9ACB2]'}`}
-                                        />
+                                        {isChecked[index] ? (
+                                            <img src={checkImg} alt="" />
+                                        ) : (
+                                            <img src={defaultImg} alt="" />
+                                        )}
                                     </div>
                                 ))}
                             </div>
