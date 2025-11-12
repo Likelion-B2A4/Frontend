@@ -10,4 +10,9 @@ export const isValidPassword = (password: string): boolean => {
   return hasLetter && hasNumber;
 };
 
-// 로그인 폼 유효성 검사
+// 이름 유효성 검사
+export const isNameValid = (name: string): boolean => {
+  if (name.length >= 2) {
+    return true;
+  } else return false;
+};

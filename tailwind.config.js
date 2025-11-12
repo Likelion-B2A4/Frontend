@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import scrollbarHide from 'tailwind-scrollbar-hide';
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -6,10 +8,9 @@ export default {
       fontFamily: {
         alice: ['AliceDigitalLearning', 'sans-serif'],
         sans: ['Pretendard', 'sans-serif'],
-
-        pretendard: ['Pretendard', 'sans-serif'],
+        Pretendard: ['Pretendard', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [scrollbarHide],
 };
