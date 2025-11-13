@@ -60,9 +60,38 @@ const SignUpHosp = () => {
 
     setFormData((prev) => {
       const newTime = { ...prev.operatingTime };
-      selectedDays.forEach((dayKey) => {
-        if (prev.operatingTime[dayKey] === null) newTime[dayKey] = time;
-      });
+
+      if (selectedDays.length === 1) {
+        // 1. 단일 수정 모드: 무조건 덮어쓰기
+        const dayKey = selectedDays[0];
+        newTime[dayKey] = time;
+      } else {
+        // 2. 다중 선택 모드
+
+        // 선택된 요일들의 현재 데이터를 가져옴
+        const currentDatas = selectedDays.map((dayKey) => prev.operatingTime[dayKey]);
+
+        // 'locked' (데이터 있음)와 'unlocked' (null 또는 '휴무')가 섞여있는지 확인
+        const hasLocked = currentDatas.some((data) => data !== null && data !== '휴무');
+        const hasUnlocked = currentDatas.some((data) => data === null || data === '휴무');
+
+        if (hasLocked && hasUnlocked) {
+          // 3. (Case C) 섞인 경우: '잠기지 않은' 요일에만 적용 (새로 추가)
+          selectedDays.forEach((dayKey) => {
+            const currentData = prev.operatingTime[dayKey];
+            const isLocked = currentData !== null && currentData !== '휴무';
+            if (!isLocked) {
+              newTime[dayKey] = time;
+            }
+          });
+        } else {
+          // 4. (Case A or B) 섞이지 않은 경우: '모두 null/휴무' 이거나 '모두 잠김'
+          //    -> 모든 요일에 덮어쓰기 (새로 추가 또는 일괄 수정)
+          selectedDays.forEach((dayKey) => {
+            newTime[dayKey] = time;
+          });
+        }
+      }
       return { ...prev, operatingTime: newTime };
     });
   };

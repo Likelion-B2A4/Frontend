@@ -119,11 +119,69 @@ const Step2Form = ({
   const buildBreakTimeString = () =>
     `${breakHourStart} : ${breakMinuteStart} ~ ${breakHourEnd} : ${breakMinuteEnd}`;
 
+  // useEffect(() => {
+  //   if (selectedDays.length === 1) {
+  //     const dayKey = selectedDays[0];
+  //     const savedTime = operatingTime[dayKey];
+
+  //     const parsed = parseTime(savedTime);
+
+  //     setStartHour(parsed.start.hour);
+  //     setStartMinute(parsed.start.minute);
+  //     setEndHour(parsed.end.hour);
+  //     setEndMinute(parsed.end.minute);
+
+  //     setBreakTime(parsed.isBreak);
+  //     setBreakHourStart(parsed.break.start.hour);
+  //     setBreakMinuteStart(parsed.break.start.minute);
+  //     setBreakHourEnd(parsed.break.end.hour);
+  //     setBreakMinuteEnd(parsed.break.end.minute);
+
+  //     setDayOff(parsed.isDayOff);
+  //     setClinicLocked(!!savedTime && !parsed.isDayOff);
+  //     setBreakLocked(parsed.isBreak);
+  //   } else if(operatingTime) {
+  //     setStartHour('');
+  //     setStartMinute('');
+  //     setEndHour('');
+  //     setEndMinute('');
+  //     setBreakTime(false);
+  //     setBreakHourStart('');
+  //     setBreakMinuteStart('');
+  //     setBreakHourEnd('');
+  //     setBreakMinuteEnd('');
+  //     setDayOff(false);
+  //     setClinicLocked(false);
+  //     setBreakLocked(false);
+  //   }
+  // }, [selectedDays, operatingTime]);
+
+  // 핸들러 함수
+
   useEffect(() => {
-    if (selectedDays.length === 1) {
+    // 공통 폼 리셋 함수
+    const resetForm = () => {
+      setStartHour('');
+      setStartMinute('');
+      setEndHour('');
+      setEndMinute('');
+      setBreakTime(false);
+      setBreakHourStart('');
+      setBreakMinuteStart('');
+      setBreakHourEnd('');
+      setBreakMinuteEnd('');
+      setDayOff(false);
+      setClinicLocked(false);
+      setBreakLocked(false);
+    };
+
+    if (selectedDays.length === 0) {
+      // 0. 선택 없음: 폼 리셋
+      resetForm();
+    } else if (isSingleSelection) {
+      // 1. 단일 선택: 폼에 데이터 로드 (개별 수정)
       const dayKey = selectedDays[0];
       const savedTime = operatingTime[dayKey];
-
       const parsed = parseTime(savedTime);
 
       setStartHour(parsed.start.hour);
@@ -138,25 +196,42 @@ const Step2Form = ({
       setBreakMinuteEnd(parsed.break.end.minute);
 
       setDayOff(parsed.isDayOff);
-      setClinicLocked(!!savedTime && !parsed.isDayOff);
-      setBreakLocked(parsed.isBreak);
+      setClinicLocked(!!savedTime && !parsed.isDayOff); // '휴무'가 아니면 잠금
+      setBreakLocked(parsed.isBreak); // 휴게 시간이 있으면 잠금
     } else {
-      setStartHour('');
-      setStartMinute('');
-      setEndHour('');
-      setEndMinute('');
-      setBreakTime(false);
-      setBreakHourStart('');
-      setBreakMinuteStart('');
-      setBreakHourEnd('');
-      setBreakMinuteEnd('');
-      setDayOff(false);
-      setClinicLocked(false);
-      setBreakLocked(false);
-    }
-  }, [selectedDays, operatingTime]);
+      // 2. 다중 선택 (일괄 적용)
+      const firstDayKey = selectedDays[0];
+      const firstTime = operatingTime[firstDayKey];
 
-  // 핸들러 함수
+      // '월수금'처럼 모두 동일한 데이터가 있는지, '화목토'처럼 모두 비어있는지 확인
+      const allSame = selectedDays.every((dayKey) => operatingTime[dayKey] === firstTime);
+
+      if (allSame) {
+        // (A) '월수금' (모두 동일) 또는 '화목토' (모두 null)
+        const parsed = parseTime(firstTime); // firstTime이 null이어도 parseTime이 처리함
+
+        setStartHour(parsed.start.hour);
+        setStartMinute(parsed.start.minute);
+        setEndHour(parsed.end.hour);
+        setEndMinute(parsed.end.minute);
+
+        setBreakTime(parsed.isBreak);
+        setBreakHourStart(parsed.break.start.hour);
+        setBreakMinuteStart(parsed.break.start.minute);
+        setBreakHourEnd(parsed.break.end.hour);
+        setBreakMinuteEnd(parsed.break.end.minute);
+
+        setDayOff(parsed.isDayOff);
+        // '화목토'(firstTime === null)가 아니거나, '휴무'가 아닐 때 잠금
+        setClinicLocked(!!firstTime && !parsed.isDayOff);
+        setBreakLocked(parsed.isBreak);
+      } else {
+        // (B) '월, 화'처럼 데이터가 섞인 경우: 폼 리셋
+        resetForm();
+      }
+    }
+  }, [selectedDays, operatingTime, isSingleSelection]);
+
   const handleClinicTimeApplyClick = () => {
     if (selectedDays.length === 0) {
       console.error('요일을 먼저 선택해주세요.');
@@ -175,16 +250,20 @@ const Step2Form = ({
 
     let combinedTime = buildMainTimeString();
 
-    // ★ 수정: '휴게 시간' 폼을 확인하는 대신,
-    // '이미 저장된' 휴게 시간이 있다면 그것을 보존합니다.
+    // ★★★ (버그 수정) 주석 해제: 휴게 시간 보존 로직 ★★★
     if (isSingleSelection) {
+      // 단일 모드: '이미 저장된' 휴게 시간을 보존합니다.
       const parsed = parseTime(operatingTime[selectedDays[0]]);
       if (parsed.isBreak && parsed.breakTimeString) {
         combinedTime += ` 휴게: ${parsed.breakTimeString}`;
       }
     }
-    // (일괄 적용 모드에서는 휴게 시간을 보존하지 않고 덮어씁니다)
-    setClinicLocked(true);
+    // (일괄 적용 모드에서는 '진료 시간'만 덮어씁니다)
+
+    // ★★★ (버그 수정) '잠금'은 단일 선택일 때만 적용 ★★★
+    if (isSingleSelection) {
+      setClinicLocked(true);
+    }
     onBatchTimeApply(combinedTime);
   };
 
@@ -193,7 +272,7 @@ const Step2Form = ({
 
     // ★ 추가: 개별 수정 모드에서는 진료 시간이 먼저 잠겨있어야 합니다.
     if (isSingleSelection && !clinicLocked) {
-      console.error('진료 시간을 먼저 입력 완료(잠금)해주세요.');
+      console.error('진료 시간을 먼저 입력 완료해주세요.');
       return;
     }
 
@@ -221,10 +300,10 @@ const Step2Form = ({
       return;
     }
 
-    if (breakLocked && isSingleSelection) {
+    if (breakLocked) {
       setBreakLocked(false); // 수정 모드
       return;
-    }
+    } else setBreakLocked(true);
 
     if (isSingleSelection && !clinicLocked) {
       console.error('진료 시간을 먼저 입력 완료하세요.');
@@ -252,26 +331,26 @@ const Step2Form = ({
     }
 
     const newDayOffState = !dayOff;
+    // setDayOff(newDayOffState);
 
-    if (selectedDays)
-      if (newDayOffState) {
-        setBreakTime(false);
-        setBreakLocked(false);
-        onBatchDayOffApply(true);
-      } else {
-        // if (isSingleSelection) {
-        //   setClinicLocked(false);
-        //   setBreakLocked(false);
-        // }
-        onBatchDayOffApply(false);
-      }
+    if (newDayOffState) {
+      setBreakTime(false);
+      setBreakLocked(false);
+      onBatchDayOffApply(true);
+    } else {
+      // if (isSingleSelection) {
+      //   setClinicLocked(false);
+      //   setBreakLocked(false);
+      // }
+      onBatchDayOffApply(false);
+    }
   };
 
   const isClinicDisabled = dayOff || (clinicLocked && selectedDays.length > 0);
   const isBreakDisabled = dayOff || !breakTime || (breakLocked && selectedDays.length > 0);
   // ★ 수정: 버튼 라벨 로직 수정 (isSingleSelection 추가)
-  const clinicButtonLabel = clinicLocked && isSingleSelection ? '수정' : '입력 완료';
-  const breakButtonLabel = breakLocked && isSingleSelection ? '수정' : '입력 완료';
+  const clinicButtonLabel = clinicLocked ? '수정' : '입력 완료';
+  const breakButtonLabel = breakLocked ? '수정' : '입력 완료';
 
   return (
     <div className="min-h-[290px]">
@@ -291,8 +370,6 @@ const Step2Form = ({
                 isSaved={isSaved}
                 isSelected={selectedDays.includes(dayKey)}
                 onDayClick={() => onDayToggle(dayKey)}
-                // disabled prop이 WeeklyButton 컴포넌트에 필요합니다.
-                // @ts-ignore
                 disabled={false}
               />
             );
