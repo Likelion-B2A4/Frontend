@@ -143,3 +143,14 @@ export const topHeader = {
   lineHeight: '150%' /* 30px */,
   letterSpacing: '-0.32px',
 };
+
+// Hospital Detail - Address, Time, Phone Text
+export const hospitalDetailText = {
+  color: '#343841',
+  fontFamily: 'Pretendard',
+  fontSize: '12px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%',
+  letterSpacing: '-0.24px',
+};
