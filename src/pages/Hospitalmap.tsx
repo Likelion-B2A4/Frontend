@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Topbar from "../layouts/Topbar";
 import Bottombar from "../layouts/Bottombar";
 import Modal from "../components/Modal";
+import HospitalDetailBottomSheet from "../components/HospitalMap/HospitalDetailBottomSheet";
+import hospitalImage from "../assets/hospitalmap/hospitalimage.png";
 
 declare global {
   interface Window {
@@ -9,53 +12,122 @@ declare global {
   }
 }
 
-const Hospitalmap = () => {
-  const [modal1Open, setModal1Open] = useState(true);
-  const [modal2Open, setModal2Open] = useState(false);
-  const [modal3Open, setModal3Open] = useState(false);
-  const [selectedMedicines, setSelectedMedicines] = useState<string[]>([]);
-
-  const medicines = [
-    { id: '1', name: '진통제', times: ['아침', '점심', '저녁', '취침 전'] },
-    { id: '2', name: '감기약', times: ['아침', '점심', '저녁'] },
-  ];
-
-  const handleSelectMedicine = (id: string) => {
-    setSelectedMedicines((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+interface Hospital {
+  id: number;
+  lat: number;
+  lng: number;
+  image: string;
+  name: string;
+  department: string;
+  address: string;
+  hours: {
+    day: string;
+    startTime: string;
+    endTime: string;
   };
+  phone: string;
+  isFavorite?: boolean;
+}
 
+// 샘플 병원 데이터
+const HOSPITAL_DATA: Hospital[] = [
+  {
+    id: 1,
+    lat: 37.5560379420754,
+    lng: 126.924462416982,
+    image: hospitalImage,
+    name: "농인사랑병원",
+    department: "외과·정형외과",
+    address: "서울특별시 마포구 양화로 188 (동교동)",
+    hours: { day: "월", startTime: "09:00", endTime: "18:00" },
+    phone: "02-789-9800",
+  },
+  {
+    id: 2,
+    lat: 37.5553020767532,
+    lng: 126.923590029183,
+    image: hospitalImage,
+    name: "마포의료센터",
+    department: "내과·외과",
+    address: "서울특별시 마포구 양화로 200",
+    hours: { day: "월", startTime: "08:00", endTime: "19:00" },
+    phone: "02-789-9801",
+  },
+  {
+    id: 3,
+    lat: 37.5545808852364,
+    lng: 126.922708589618,
+    image: hospitalImage,
+    name: "동교병원",
+    department: "정형외과",
+    address: "서울특별시 마포구 양화로 180",
+    hours: { day: "월", startTime: "09:30", endTime: "18:30" },
+    phone: "02-789-9802",
+  },
+];
+
+const Hospitalmap = () => {
+  const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(true);
+  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
+  const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const mapRef = useRef<any>(null);
+
+  // 지도 초기화 (한 번만)
   useEffect(() => {
-    let container = document.getElementById(`map`); // 지도를 담을 영역의 DOM 레퍼런스
-    let options = {
-      center: new window.kakao.maps.LatLng(37.55561, 126.9234), // 지도 중심 좌표
-      level: 3, // 지도의 레벨(확대, 축소 정도)
+    if (mapRef.current) return; // 이미 초기화됨
+
+    const container = document.getElementById(`map`);
+    if (!container) return;
+
+    const options = {
+      center: new window.kakao.maps.LatLng(37.55561, 126.9234),
+      level: 3,
     };
 
-    let map = new window.kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
-
-    // 마커 위치 데이터
-    const hospitalLocations = [
-      { lat: 37.5560379420754, lng: 126.924462416982 },
-      { lat: 37.5553020767532, lng: 126.923590029183 },
-      { lat: 37.5545808852364, lng: 126.922708589618 },
-    ];
+    const map = new window.kakao.maps.Map(container, options);
+    mapRef.current = map;
 
     // 마커 생성
-    hospitalLocations.forEach((location) => {
+    HOSPITAL_DATA.forEach((hospital) => {
       const marker = new window.kakao.maps.Marker({
-        position: new window.kakao.maps.LatLng(location.lat, location.lng),
+        position: new window.kakao.maps.LatLng(hospital.lat, hospital.lng),
         map: map,
       });
+
+      // 마커 클릭 이벤트
+      window.kakao.maps.event.addListener(marker, "click", () => {
+        console.log("마커 클릭:", hospital.name);
+        setSelectedHospital({
+          ...hospital,
+          isFavorite: favorites.has(hospital.id),
+        });
+      });
     });
-  }, []);
+  }, [favorites]);
+
+  const handleFavoriteToggle = () => {
+    if (selectedHospital) {
+      const newFavorites = new Set(favorites);
+      if (newFavorites.has(selectedHospital.id)) {
+        newFavorites.delete(selectedHospital.id);
+      } else {
+        newFavorites.add(selectedHospital.id);
+      }
+      setFavorites(newFavorites);
+      // selectedHospital의 isFavorite 상태 즉시 업데이트
+      setSelectedHospital({
+        ...selectedHospital,
+        isFavorite: !selectedHospital.isFavorite,
+      });
+    }
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* 모달 1: 기본 모달 (위치 권한) */}
+    <div className="flex flex-col items-center">
+      {/*위치 권한 모달*/}
       <Modal
-        isOpen={modal1Open}
+        isOpen={modalOpen}
         title="위치 정보 권한"
         description={
           <>
@@ -65,19 +137,28 @@ const Hospitalmap = () => {
         }
         cancelButtonText="취소"
         confirmButtonText="허용"
-        onCancel={() => setModal1Open(false)}
+        onCancel={() => setModalOpen(false)}
         onConfirm={() => {
           console.log('위치 권한이 승인되었습니다!');
-          setModal1Open(false);
-          setModal2Open(true);
+          setModalOpen(false);
         }}
       />
 
-      <Topbar showLogo={true} />
-      <div style={{ width: "360px", height: "50px", backgroundColor: "#FFFFFF", display: "flex", alignItems: "center" }}>
-        <span style={{ fontSize: "14px", color: "#1A1A1A", fontFamily: "Pretendard", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "10px" }}>손빛이 닿는 병원을 찾아보세요</span>
+      {/* Hospital Detail Bottom Sheet */}
+      {selectedHospital && (
+        <HospitalDetailBottomSheet
+          isOpen={!!selectedHospital}
+          onClose={() => setSelectedHospital(null)}
+          hospital={selectedHospital}
+          onFavoriteToggle={handleFavoriteToggle}
+        />
+      )}
+
+      <Topbar showLogo={true} onStarClick={() => navigate('/favorite-hospitals')} />
+      <div className="w-[360px] h-[50px] bg-white flex items-center px-5 py-2.5">
+        <span className="text-sm text-[#1A1A1A] font-['Pretendard']">손빛이 닿는 병원을 찾아보세요</span>
       </div>
-      <div id="map" style={{ width: "360px", height: "510px" }} />
+      <div id="map" className="w-[360px] h-[510px]" />
       <Bottombar />
     </div>
   );
