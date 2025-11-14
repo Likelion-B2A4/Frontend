@@ -31,7 +31,7 @@ const HospitalFavoriteContent: React.FC<HospitalFavoriteContentProps> = ({
   onFavoriteToggle,
 }) => {
   return (
-    <div className="flex gap-4 items-center border-b border-[#f4f6f8] pb-4 px-5">
+    <div className="flex gap-4 items-center border-b border-[#f4f6f8] pb-4 px-5 pt-4" style={{ height: '132px' }}>
       {/* 병원 이미지 */}
       <div className="shrink-0 rounded-full overflow-hidden" style={{ width: '93px', height: '93px' }}>
         <img

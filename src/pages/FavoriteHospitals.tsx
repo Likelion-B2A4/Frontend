@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Topbar from "../layouts/Topbar";
 import Bottombar from "../layouts/Bottombar";
 import HospitalFavoriteContent from "../components/HospitalMap/HospitalFavoriteContent";
-import StarOnIcon from '../assets/hospitalmap/star-on.svg';
+import HospitalIamge from '../assets/hospitalmap/hospitalimage.png';
 
 interface Hospital {
   id: number;
@@ -26,7 +25,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 1,
     lat: 37.5560379420754,
     lng: 126.924462416982,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: HospitalIamge,
     name: "농인사랑병원",
     department: "외과·정형외과",
     address: "서울특별시 마포구 양화로 188 (동교동)",
@@ -37,7 +36,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 2,
     lat: 37.5553020767532,
     lng: 126.923590029183,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: HospitalIamge,
     name: "마포의료센터",
     department: "내과·외과",
     address: "서울특별시 마포구 양화로 200",
@@ -48,7 +47,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 3,
     lat: 37.5545808852364,
     lng: 126.922708589618,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: HospitalIamge,
     name: "동교병원",
     department: "정형외과",
     address: "서울특별시 마포구 양화로 180",
@@ -58,7 +57,6 @@ const HOSPITAL_DATA: Hospital[] = [
 ];
 
 const FavoriteHospitals = () => {
-  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<number>>(new Set([1, 2]));
 
   // localStorage에서 즐겨찾기 불러오기
@@ -92,7 +90,6 @@ const FavoriteHospitals = () => {
 
       <div style={{
         width: "360px",
-        height: "582px",
         overflowY: "auto",
         padding: "16px 0"
       }}>
