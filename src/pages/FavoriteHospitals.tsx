@@ -85,27 +85,16 @@ const FavoriteHospitals = () => {
   const favoriteHospitals = HOSPITAL_DATA.filter(hospital => favorites.has(hospital.id));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div className="flex flex-col items-center">
       <Topbar type="header" title="즐겨찾기" />
 
-      <div style={{
-        width: "360px",
-        overflowY: "auto",
-        padding: "16px 0"
-      }}>
+      <div className="w-[360px] overflow-y-auto py-4">
         {favoriteHospitals.length === 0 ? (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            color: '#999',
-            fontSize: '14px'
-          }}>
+          <div className="flex justify-center items-center h-full text-gray-600 text-sm">
             즐겨찾기 병원이 없습니다.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0', width: '100%' }}>
+          <div className="flex flex-col gap-0 w-full">
             {favoriteHospitals.map((hospital) => (
               <div key={hospital.id}>
                 <HospitalFavoriteContent

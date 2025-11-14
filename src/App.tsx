@@ -14,26 +14,32 @@ import Setting from './pages/Setting.tsx';
 import Hospitalmap from './pages/Hospitalmap.tsx';
 import SelectDoctor from './pages/SelectDoctor.tsx';
 import FavoriteHospitals from './pages/FavoriteHospitals.tsx';
+import QrCheckIn from './pages/QrCheckIn.tsx';
 
 function App() {
   return (
-    <div style={{ width: "360px", height: "680px", margin: "0 auto" }}>
-      <Routes>
-        <Route path="/" element={<SplashPageWeb />} />
-        <Route path="/logointro" element={<Intro />} />
-        <Route path="/login" element={<LogIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signuphosp" element={<SignUpHosp />} />
-        <Route path="/medical-records" element={<Calendar />} />
-        <Route path="/add-schedule" element={<AddSchedule />} />
-        <Route path="/edit-schedule" element={<EditSchedule />} />
-        <Route path="/service" element={<Service />} />
-        <Route path="/setting" element={<Setting />} />
-        <Route path="/hospitalmap" element={<Hospitalmap/>}/>
-        <Route path="/favorite-hospitals" element={<FavoriteHospitals/>}/>
-        <Route path="/select-doctor" element={<SelectDoctor />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/qr-checkin" element={<QrCheckIn />} />
+      <Route path="*" element={
+        <div style={{ width: "360px", height: "680px", margin: "0 auto" }}>
+          <Routes>
+            <Route path="/" element={<SplashPageWeb />} />
+            <Route path="/logointro" element={<Intro />} />
+            <Route path="/login" element={<LogIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signuphosp" element={<SignUpHosp />} />
+            <Route path="/medical-records" element={<Calendar />} />
+            <Route path="/add-schedule" element={<AddSchedule />} />
+            <Route path="/edit-schedule" element={<EditSchedule />} />
+            <Route path="/service" element={<Service />} />
+            <Route path="/setting" element={<Setting />} />
+            <Route path="/hospitalmap" element={<Hospitalmap/>}/>
+            <Route path="/favorite-hospitals" element={<FavoriteHospitals/>}/>
+            <Route path="/select-doctor" element={<SelectDoctor />} />
+          </Routes>
+        </div>
+      } />
+    </Routes>
   );
 }
 
