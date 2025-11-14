@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Topbar from "../layouts/Topbar";
 import Bottombar from "../layouts/Bottombar";
 import Modal from "../components/Modal";
 import HospitalDetailBottomSheet from "../components/HospitalMap/HospitalDetailBottomSheet";
+import hospitalImage from "../assets/hospitalmap/hospitalimage.png";
 
 declare global {
   interface Window {
@@ -33,7 +35,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 1,
     lat: 37.5560379420754,
     lng: 126.924462416982,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: hospitalImage,
     name: "농인사랑병원",
     department: "외과·정형외과",
     address: "서울특별시 마포구 양화로 188 (동교동)",
@@ -44,7 +46,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 2,
     lat: 37.5553020767532,
     lng: 126.923590029183,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: hospitalImage,
     name: "마포의료센터",
     department: "내과·외과",
     address: "서울특별시 마포구 양화로 200",
@@ -55,7 +57,7 @@ const HOSPITAL_DATA: Hospital[] = [
     id: 3,
     lat: 37.5545808852364,
     lng: 126.922708589618,
-    image: "http://localhost:3845/assets/de9e150e1fd0f458360f8452f66febbc1b92ee02.png",
+    image: hospitalImage,
     name: "동교병원",
     department: "정형외과",
     address: "서울특별시 마포구 양화로 180",
@@ -65,6 +67,7 @@ const HOSPITAL_DATA: Hospital[] = [
 ];
 
 const Hospitalmap = () => {
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(true);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
@@ -112,6 +115,11 @@ const Hospitalmap = () => {
         newFavorites.add(selectedHospital.id);
       }
       setFavorites(newFavorites);
+      // selectedHospital의 isFavorite 상태 즉시 업데이트
+      setSelectedHospital({
+        ...selectedHospital,
+        isFavorite: !selectedHospital.isFavorite,
+      });
     }
   };
 
@@ -146,7 +154,7 @@ const Hospitalmap = () => {
         />
       )}
 
-      <Topbar showLogo={true} />
+      <Topbar showLogo={true} onStarClick={() => navigate('/favorite-hospitals')} />
       <div style={{ width: "360px", height: "50px", backgroundColor: "#FFFFFF", display: "flex", alignItems: "center" }}>
         <span style={{ fontSize: "14px", color: "#1A1A1A", fontFamily: "Pretendard", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "10px" }}>손빛이 닿는 병원을 찾아보세요</span>
       </div>

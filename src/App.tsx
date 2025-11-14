@@ -13,6 +13,7 @@ import Service from './pages/Service.tsx';
 import Setting from './pages/Setting.tsx';
 import Hospitalmap from './pages/Hospitalmap.tsx';
 import SelectDoctor from './pages/SelectDoctor.tsx';
+import FavoriteHospitals from './pages/FavoriteHospitals.tsx';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/service" element={<Service />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/hospitalmap" element={<Hospitalmap/>}/>
+        <Route path="/favorite-hospitals" element={<FavoriteHospitals/>}/>
         <Route path="/select-doctor" element={<SelectDoctor />} />
       </Routes>
     </div>

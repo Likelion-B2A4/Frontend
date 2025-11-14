@@ -1,8 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { headerText, Dirty, hospitalDetailText } from '../../styles/typography';
-import LocationIcon from '../../assets/hospitalmap/location.svg';
-import PhoneCallIcon from '../../assets/hospitalmap/phonecall.svg';
-import TimeIcon from '../../assets/hospitalmap/time.svg';
+import HospitalDetailContent from './HospitalDetailContent';
 import './HospitalDetailBottomSheet.css';
 
 interface HospitalDetailBottomSheetProps {
@@ -106,84 +103,17 @@ const HospitalDetailBottomSheet: React.FC<HospitalDetailBottomSheetProps> = ({
         </div>
 
         {/* 내용 */}
-        <div className="flex flex-col gap-4 items-start px-5 pb-8">
-          {/* 병원 사진 */}
-          <div className="h-40 relative rounded-3xl shrink-0 w-full overflow-hidden">
-            <img
-              alt={hospital.name}
-              className="w-full h-full object-cover"
-              src={hospital.image}
-            />
-          </div>
-
-          {/* 헤더 */}
-          <div className="w-full flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-end gap-2">
-                <h2 style={headerText} className="text-[#343841] text-xl font-semibold">
-                  {hospital.name}
-                </h2>
-                <p style={Dirty}>
-                  {hospital.department}
-                </p>
-              </div>
-            </div>
-            {/* 즐겨찾기 */}
-            <button
-              onClick={onFavoriteToggle}
-              className="shrink-0 text-2xl cursor-pointer transition-transform hover:scale-110"
-              aria-label="Toggle favorite"
-            >
-              {hospital.isFavorite ? '⭐' : '☆'}
-            </button>
-          </div>
-
-          {/* 병원 정보 */}
-          <div className="w-full max-w-xs flex flex-col gap-2">
-            {/* Location */}
-            <div className="flex gap-2 items-start w-full">
-              <div className="shrink-0 mt-0.5">
-                <img
-                  src={LocationIcon}
-                  alt="location"
-                  className="w-4 h-4"
-                />
-              </div>
-              <p style={hospitalDetailText}>
-                {hospital.address}
-              </p>
-            </div>
-
-            {/* Time */}
-            <div className="flex gap-2 items-start w-full">
-              <div className="shrink-0 mt-0.5">
-                <img
-                  src={TimeIcon}
-                  alt="time"
-                  className="w-4 h-4"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <p style={hospitalDetailText}>
-                  {hospital.hours.day} {hospital.hours.startTime} - {hospital.hours.endTime}
-                </p>
-              </div>
-            </div>
-
-            {/* Phonecall */}
-            <div className="flex gap-2 items-center w-full">
-              <div className="shrink-0">
-                <img
-                  src={PhoneCallIcon}
-                  alt="phone"
-                  className="w-4 h-4"
-                />
-              </div>
-              <p style={hospitalDetailText}>
-                {hospital.phone}
-              </p>
-            </div>
-          </div>
+        <div className="px-5 pb-8 w-full">
+          <HospitalDetailContent
+            image={hospital.image}
+            name={hospital.name}
+            department={hospital.department}
+            address={hospital.address}
+            hours={hospital.hours}
+            phone={hospital.phone}
+            isFavorite={hospital.isFavorite}
+            onFavoriteToggle={onFavoriteToggle}
+          />
         </div>
         </div>
       </div>
