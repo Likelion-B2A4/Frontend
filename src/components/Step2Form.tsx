@@ -170,7 +170,7 @@ const Step2Form = ({
       setBreakMinuteStart('');
       setBreakHourEnd('');
       setBreakMinuteEnd('');
-      setDayOff(false);
+      // setDayOff(false);
       setClinicLocked(false);
       setBreakLocked(false);
     };
@@ -331,17 +331,13 @@ const Step2Form = ({
     }
 
     const newDayOffState = !dayOff;
-    // setDayOff(newDayOffState);
+    setDayOff(newDayOffState);
 
     if (newDayOffState) {
       setBreakTime(false);
       setBreakLocked(false);
       onBatchDayOffApply(true);
     } else {
-      // if (isSingleSelection) {
-      //   setClinicLocked(false);
-      //   setBreakLocked(false);
-      // }
       onBatchDayOffApply(false);
     }
   };
@@ -351,6 +347,16 @@ const Step2Form = ({
   // ★ 수정: 버튼 라벨 로직 수정 (isSingleSelection 추가)
   const clinicButtonLabel = clinicLocked ? '수정' : '입력 완료';
   const breakButtonLabel = breakLocked ? '수정' : '입력 완료';
+
+  const isClinicButtonDisabled = () => {
+    if (dayOff || selectedDays.length === 0) return true; // 휴무거나, 선택된 요일이 없으면 비활성
+    if (clinicLocked && isSingleSelection) return false; // '수정' 모드는 항상 활성
+    if (!hasValidMainTime()) return true; // ★★★ 폼이 비어있으면 비활성 ★★★
+    return false; // 그 외 (폼이 유효한 '입력 완료')는 활성
+  };
+
+  // JSX에서 사용하기 위해 변수에 할당
+  const clinicDisabled = isClinicButtonDisabled();
 
   return (
     <div className="min-h-[290px]">
@@ -397,6 +403,7 @@ const Step2Form = ({
                   value={startHour}
                   onChange={(e) => setStartHour(e.target.value)}
                   disabled={isClinicDisabled}
+                  maxLength={2}
                 />
                 <div className="text-[16px]">:</div>
                 <FormInput
@@ -406,6 +413,7 @@ const Step2Form = ({
                   value={startMinute}
                   onChange={(e) => setStartMinute(e.target.value)}
                   disabled={isClinicDisabled}
+                  maxLength={2}
                 />
               </div>
               <div className="text-start justify-end ml-2" style={hintDisabled}>
@@ -422,6 +430,7 @@ const Step2Form = ({
                   value={endHour}
                   onChange={(e) => setEndHour(e.target.value)}
                   disabled={isClinicDisabled}
+                  maxLength={2}
                 />
                 <div className="text-[16px]">:</div>
                 <FormInput
@@ -431,6 +440,7 @@ const Step2Form = ({
                   value={endMinute}
                   onChange={(e) => setEndMinute(e.target.value)}
                   disabled={isClinicDisabled}
+                  maxLength={2}
                 />
               </div>
               <div className="ml-2" style={hintDisabled}>
@@ -447,9 +457,7 @@ const Step2Form = ({
               disabled={dayOff}
               onClick={handleClinicTimeApplyClick}
               variant={
-                (!clinicLocked || !isClinicDisabled) && selectedDays.length > 0
-                  ? 'colored'
-                  : 'default'
+                clinicDisabled || (clinicLocked && isSingleSelection) ? 'default' : 'colored'
               }
             />
           </div>
@@ -473,9 +481,9 @@ const Step2Form = ({
             </div>
           </div>
           {breakTime && (
-            <div className="flex flex-row gap-x-[50px] ">
+            <div className="flex flex-row gap-[50px]">
               <div className="flex flex-row">
-                <div className="flex flex-col gap-[4px]">
+                <div className="flex flex-col gap-y-[4px]">
                   <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
                     <FormInput
                       label="form"
@@ -484,6 +492,7 @@ const Step2Form = ({
                       value={breakHourStart}
                       onChange={(e) => setBreakHourStart(e.target.value)}
                       disabled={isBreakDisabled}
+                      maxLength={2}
                     />
                     <div className="text-[16px]">:</div>
                     <FormInput
@@ -493,6 +502,7 @@ const Step2Form = ({
                       value={breakMinuteStart}
                       onChange={(e) => setBreakMinuteStart(e.target.value)}
                       disabled={isBreakDisabled}
+                      maxLength={2}
                     />
                   </div>
                   <div className="text-[12px] text-[#666B76] ml-2" style={hintDisabled}>
@@ -509,6 +519,7 @@ const Step2Form = ({
                       value={breakHourEnd}
                       onChange={(e) => setBreakHourEnd(e.target.value)}
                       disabled={isBreakDisabled}
+                      maxLength={2}
                     />
                     <div className="text-[16px]">:</div>
                     <FormInput
@@ -518,6 +529,7 @@ const Step2Form = ({
                       value={breakMinuteEnd}
                       onChange={(e) => setBreakMinuteEnd(e.target.value)}
                       disabled={isBreakDisabled}
+                      maxLength={2}
                     />
                   </div>
                   <div className="text-[12px] text-[#666B76] ml-2" style={hintDisabled}>
