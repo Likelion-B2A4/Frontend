@@ -21,7 +21,7 @@ function App() {
     <Routes>
       <Route path="/qr-checkin" element={<QrCheckIn />} />
       <Route path="*" element={
-        <div style={{ width: "360px", height: "680px", margin: "0 auto" }}>
+        <div style={{ width: "360px", height: "740px", margin: "0 auto" }}>
           <Routes>
             <Route path="/" element={<SplashPageWeb />} />
             <Route path="/logointro" element={<Intro />} />
