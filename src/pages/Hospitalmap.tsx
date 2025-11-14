@@ -124,7 +124,7 @@ const Hospitalmap = () => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div className="flex flex-col items-center">
       {/*위치 권한 모달*/}
       <Modal
         isOpen={modalOpen}
@@ -155,10 +155,10 @@ const Hospitalmap = () => {
       )}
 
       <Topbar showLogo={true} onStarClick={() => navigate('/favorite-hospitals')} />
-      <div style={{ width: "360px", height: "50px", backgroundColor: "#FFFFFF", display: "flex", alignItems: "center" }}>
-        <span style={{ fontSize: "14px", color: "#1A1A1A", fontFamily: "Pretendard", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "10px" }}>손빛이 닿는 병원을 찾아보세요</span>
+      <div className="w-[360px] h-[50px] bg-white flex items-center px-5 py-2.5">
+        <span className="text-sm text-[#1A1A1A] font-['Pretendard']">손빛이 닿는 병원을 찾아보세요</span>
       </div>
-      <div id="map" style={{ width: "360px", height: "510px" }} />
+      <div id="map" className="w-[360px] h-[510px]" />
       <Bottombar />
     </div>
   );
