@@ -23,6 +23,7 @@ function App() {
   return (
     <Routes>
       <Route path="/qr-checkin" element={<QrCheckIn />} />
+      <Route path="/select-doctor" element={<SelectDoctor />} />
       <Route path="/pre-question1" element={<PreQuestion1/>} />
       <Route path="/pre-question2" element={<PreQuestion2/>} />
       <Route path="/pre-question3" element={<PreQuestion3/>} />
@@ -42,7 +43,7 @@ function App() {
             <Route path="/setting" element={<Setting />} />
             <Route path="/hospitalmap" element={<Hospitalmap/>}/>
             <Route path="/favorite-hospitals" element={<FavoriteHospitals/>}/>
-            <Route path="/select-doctor" element={<SelectDoctor />} />
+            
           </Routes>
         </div>
       } />
