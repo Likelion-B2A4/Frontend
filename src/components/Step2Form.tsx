@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form'; // 1. RHF import
 import WeeklyButton from './WeeklyButton';
 import FormInput from './FormInput';
-import { Dirty, hintDisabled } from '../styles/typography';
+import { Dirty, hintDisabled, placeHolder } from '../styles/typography';
 import Button from './Button';
-import { useRef } from 'react';
+import { is } from 'date-fns/locale';
 
 // --- (Interfaces and 'weeklist' remain unchanged) ---
 interface IOperatingTime {
@@ -154,22 +154,34 @@ const Step2Form = ({
     return `${breakHourStart} : ${breakMinuteStart} ~ ${breakHourEnd} : ${breakMinuteEnd}`;
   };
 
-  // 7. 핵심 로직: useEffect가 이제 개별 set* 대신 'reset'을 호출
   useEffect(() => {
-    // ★★★ 수정 2: 'selectedDays'가 실제로 변경되었는지 확인
+    // 'selectedDays'가 실제로 변경되었는지 확인
     const selectedDaysString = JSON.stringify(selectedDays.sort());
     const prevSelectedDaysString = JSON.stringify(prevSelectedDaysRef.current.sort());
     const selectedDaysChanged = selectedDaysString !== prevSelectedDaysString;
 
+    // 공통 폼 리셋 함수
     const resetForm = () => {
       reset(defaultValues);
       setClinicLocked(false);
       setBreakLocked(false);
     };
 
+    // ★★★ 1. (Problem 1: isDirty 보존 / Problem 2: '휴무' 버튼)
+    // '입력 완료' 또는 '휴무 토글' 등으로 prop이 바뀌었지만 요일 선택은 그대로일 때
+    if (!selectedDaysChanged && selectedDays.length > 0) {
+      // ★★★ '휴무' 버튼이 눌렸을 때, 이 로직이 폼 상태를 되돌리지 않도록
+      //     (isDirty 보존을 위해) 그냥 return만 합니다.
+      //     'handleDayOffToggle'의 setValue()가 UI를 즉시 변경할 수 있게 합니다.
+      return;
+    }
+
+    // --- (이 하단은 selectedDays가 0이거나, selectedDays가 변경됐을 때만 실행) ---
+
     if (selectedDays.length === 0) {
       resetForm();
     } else if (isSingleSelection) {
+      // (단일 선택: 데이터 로드)
       const dayKey = selectedDays[0];
       const savedTime = operatingTime[dayKey];
       const parsed = parseTime(savedTime);
@@ -184,8 +196,7 @@ const Step2Form = ({
         breakMinuteStart: parsed.break.start.minute,
         breakHourEnd: parsed.break.end.hour,
         breakMinuteEnd: parsed.break.end.minute,
-        // ★★★ 수정 3: 'selectedDays'가 변경되었을 때만 dayOff 값을 props에서 로드
-        dayOff: selectedDaysChanged ? parsed.isDayOff : getValues('dayOff'),
+        dayOff: parsed.isDayOff, // (selectedDays가 바뀌었으므로 prop 값으로 reset)
       });
 
       setClinicLocked(!!savedTime && !parsed.isDayOff);
@@ -194,39 +205,40 @@ const Step2Form = ({
       // (다중 선택)
       const firstDayKey = selectedDays[0];
       const firstTime = operatingTime[firstDayKey];
-      const parsed = parseTime(firstTime);
 
-      reset({
-        startHour: parsed.start.hour,
-        startMinute: parsed.start.minute,
-        endHour: parsed.end.hour,
-        endMinute: parsed.end.minute,
-        breakTime: parsed.isBreak,
-        breakHourStart: parsed.break.start.hour,
-        breakMinuteStart: parsed.break.start.minute,
-        breakHourEnd: parsed.break.end.hour,
-        breakMinuteEnd: parsed.break.end.minute,
-        // ★★★ 수정 4: 'selectedDays'가 변경되었을 때만 dayOff 값을 props에서 로드
-        dayOff: selectedDaysChanged ? parsed.isDayOff : getValues('dayOff'),
-      });
-
+      // ★★★ 3. (Problem 3: 폼 초기화) - 이것도 해결됨
       const allSame = selectedDays.every((dayKey) => operatingTime[dayKey] === firstTime);
 
       if (allSame) {
+        // (A) '월수금' (모두 09시) -> 데이터 로드
+        const parsed = parseTime(firstTime);
+        reset({
+          startHour: parsed.start.hour,
+          startMinute: parsed.start.minute,
+          endHour: parsed.end.hour,
+          endMinute: parsed.end.minute,
+          breakTime: parsed.isBreak,
+          breakHourStart: parsed.break.start.hour,
+          breakMinuteStart: parsed.break.start.minute,
+          breakHourEnd: parsed.break.end.hour,
+          breakMinuteEnd: parsed.break.end.minute,
+          dayOff: parsed.isDayOff,
+        });
         setClinicLocked(!!firstTime && !parsed.isDayOff);
         setBreakLocked(parsed.isBreak);
       } else {
-        setClinicLocked(false);
-        setBreakLocked(false);
+        // (B) '월'(09시) + '화'(null) -> 폼을 비움
+        resetForm();
       }
     }
 
-    // ★★★ 수정 5: effect가 끝난 후, '이전' 선택일을 현재로 업데이트
+    // '이전' 선택일을 현재로 업데이트
     if (selectedDaysChanged) {
       prevSelectedDaysRef.current = selectedDays;
     }
-    // 'getValues'를 dependency array에 추가
   }, [selectedDays, operatingTime, isSingleSelection, reset, getValues]);
+
+  // 핸들러 함수
   const handleClinicTimeApplyClick = () => {
     if (selectedDays.length === 0) {
       console.error('요일을 먼저 선택해주세요.');
@@ -352,8 +364,15 @@ const Step2Form = ({
     if (!hasValidMainTime()) return true;
     return false;
   };
-
   const clinicDisabled = isClinicButtonDisabled();
+
+  const isBreakButtonDisabled = () => {
+    if (dayOff || selectedDays.length === 0) return true;
+    if (breakLocked) return false;
+    if (!hasValidBreakTime()) return true;
+    return false;
+  };
+  const breakDisabled = isBreakButtonDisabled();
 
   // 11. JSX: FormInput을 Controller로 래핑
   return (
@@ -370,8 +389,7 @@ const Step2Form = ({
               <WeeklyButton
                 key={day.key}
                 day={day.name}
-                // @ts-ignore
-                isSaved={isSaved}
+                // isSaved={isSaved}
                 isSelected={selectedDays.includes(dayKey)}
                 onDayClick={() => onDayToggle(dayKey)}
                 disabled={false}
@@ -382,14 +400,14 @@ const Step2Form = ({
         <div
           className={
             `flex flex-row gap-x-[50px] ` +
-            `${isClinicDisabled ? 'opacity-50 cursor-not-allowed' : ' '}`
+            `${isClinicDisabled ? ' cursor-not-allowed' : ' cursor-pointer'}`
           }
         >
           {/* 진료시간 선택 */}
           <div
             className={
               `flex flex-row gap-x-[4px] items-center mb-[24px]` +
-              `${isClinicDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
+              `${isClinicDisabled ? ' opacity-50' : 'cursor-pointer'}`
             }
           >
             <div className="flex flex-col gap-y-[4px]">
@@ -397,7 +415,7 @@ const Step2Form = ({
                 <Controller
                   name="startHour"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormInput
                       {...field}
                       label="form"
@@ -405,6 +423,7 @@ const Step2Form = ({
                       containerClassName="w-[56px]"
                       disabled={isClinicDisabled}
                       maxLength={2}
+                      isDirty={fieldState.isDirty}
                     />
                   )}
                 />
@@ -412,7 +431,7 @@ const Step2Form = ({
                 <Controller
                   name="startMinute"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormInput
                       {...field}
                       label="form"
@@ -420,6 +439,7 @@ const Step2Form = ({
                       containerClassName="w-[56px]"
                       disabled={isClinicDisabled}
                       maxLength={2}
+                      isDirty={fieldState.isDirty}
                     />
                   )}
                 />
@@ -434,7 +454,7 @@ const Step2Form = ({
                 <Controller
                   name="endHour"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormInput
                       {...field}
                       label="form"
@@ -442,6 +462,7 @@ const Step2Form = ({
                       containerClassName="w-[56px]"
                       disabled={isClinicDisabled}
                       maxLength={2}
+                      isDirty={fieldState.isDirty}
                     />
                   )}
                 />
@@ -449,7 +470,7 @@ const Step2Form = ({
                 <Controller
                   name="endMinute"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormInput
                       {...field}
                       label="form"
@@ -457,6 +478,7 @@ const Step2Form = ({
                       containerClassName="w-[56px]"
                       disabled={isClinicDisabled}
                       maxLength={2}
+                      isDirty={fieldState.isDirty}
                     />
                   )}
                 />
@@ -476,16 +498,17 @@ const Step2Form = ({
               disabled={dayOff} // 'dayOff'는 watch된 값
               onClick={handleClinicTimeApplyClick}
               variant={
-                clinicDisabled || (clinicLocked && isSingleSelection) ? 'default' : 'colored'
+                clinicDisabled ||
+                // (clinicLocked && isSingleSelection) ||
+                !hasValidMainTime()
+                  ? 'default'
+                  : 'colored'
               }
+              className={isBreakDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             />
           </div>
         </div>
         <div>
-          {/* 12. 커스텀 체크박스 로직: 
-             'watch'된 값(breakTime)과 'RHF를 쓰도록 수정된' 핸들러를 사용하므로
-             JSX 변경이 필요 없음.
-          */}
           <div className="flex flex-row justify-start items-center gap-x-[8px] mt-[24px]">
             <div
               onClick={handleBreakTimeCheckboxToggle}
@@ -510,7 +533,7 @@ const Step2Form = ({
                     <Controller
                       name="breakHourStart"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field, fieldState }) => (
                         <FormInput
                           {...field}
                           label="form"
@@ -518,6 +541,7 @@ const Step2Form = ({
                           containerClassName="w-[56px]"
                           disabled={isBreakDisabled}
                           maxLength={2}
+                          isDirty={fieldState.isDirty}
                         />
                       )}
                     />
@@ -525,7 +549,7 @@ const Step2Form = ({
                     <Controller
                       name="breakMinuteStart"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field, fieldState }) => (
                         <FormInput
                           {...field}
                           label="form"
@@ -533,6 +557,7 @@ const Step2Form = ({
                           containerClassName="w-[56px]"
                           disabled={isBreakDisabled}
                           maxLength={2}
+                          isDirty={fieldState.isDirty}
                         />
                       )}
                     />
@@ -547,7 +572,7 @@ const Step2Form = ({
                     <Controller
                       name="breakHourEnd"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field, fieldState }) => (
                         <FormInput
                           {...field}
                           label="form"
@@ -555,6 +580,7 @@ const Step2Form = ({
                           containerClassName="w-[56px]"
                           disabled={isBreakDisabled}
                           maxLength={2}
+                          isDirty={fieldState.isDirty}
                         />
                       )}
                     />
@@ -562,7 +588,7 @@ const Step2Form = ({
                     <Controller
                       name="breakMinuteEnd"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field, fieldState }) => (
                         <FormInput
                           {...field}
                           label="form"
@@ -570,6 +596,7 @@ const Step2Form = ({
                           containerClassName="w-[56px]"
                           disabled={isBreakDisabled}
                           maxLength={2}
+                          isDirty={fieldState.isDirty}
                         />
                       )}
                     />
@@ -581,12 +608,13 @@ const Step2Form = ({
               </div>
               <div>
                 <Button
-                  size="mini"
                   type="button"
+                  size="mini"
                   isMobile={false}
                   children={breakButtonLabel}
-                  disabled={dayOff || !breakTime} // 'watch'된 값 사용
+                  disabled={dayOff} // 'dayOff'는 watch된 값
                   onClick={handleBreakApplyClick}
+                  variant={breakDisabled || !hasValidBreakTime() ? 'default' : 'colored'}
                 />
               </div>
             </div>
@@ -596,7 +624,7 @@ const Step2Form = ({
 
       <div
         onClick={handleDayOffToggle}
-        className="flex flex-row gap-x-[8px] mt-[24px] items-center"
+        className="flex flex-row gap-x-[8px] mt-[24px] items-center cursor-pointer"
       >
         <img
           src={dayOff ? '/check_filled.svg' : '/check_unfilled.svg'}
