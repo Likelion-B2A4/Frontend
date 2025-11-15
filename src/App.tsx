@@ -15,11 +15,17 @@ import Hospitalmap from './pages/Hospitalmap.tsx';
 import SelectDoctor from './pages/SelectDoctor.tsx';
 import FavoriteHospitals from './pages/FavoriteHospitals.tsx';
 import QrCheckIn from './pages/QrCheckIn.tsx';
+import PreQuestion1 from './pages/PreQuestion1.tsx';
+import PreQuestion2 from './pages/PreQuestion2.tsx';
+import PreQuestion3 from './pages/PreQuestion3.tsx';
 
 function App() {
   return (
     <Routes>
       <Route path="/qr-checkin" element={<QrCheckIn />} />
+      <Route path="/pre-question1" element={<PreQuestion1/>} />
+      <Route path="/pre-question2" element={<PreQuestion2/>} />
+      <Route path="/pre-question3" element={<PreQuestion3/>} />
       <Route path="*" element={
         <div style={{ width: "360px", height: "680px", margin: "0 auto" }}>
           <Routes>
