@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { photoSelect } from '../styles/typography';
 
 interface FileFormProps {
   mainImage: File | null;
@@ -34,7 +35,9 @@ const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
         ) : (
           <div className="flex flex-col items-center content-center justify-center gap-[8px]">
             <img src="/camera.svg" alt="카메라 아이콘" className="w-[24px]" />
-            <span className="text-sm text-gray-500 mt-2 text-[#A9ACB2]">사진을 선택해주세요</span>
+            <span style={photoSelect} className="text-sm mt-2 ">
+              사진을 선택해주세요
+            </span>
           </div>
         )}
       </label>
