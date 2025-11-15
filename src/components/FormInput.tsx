@@ -30,7 +30,7 @@ const FormInput = ({
   const isSuccess = (label === 'pw' || label === 'repw') && isDirty && !hasError;
   const isPassword = label === 'pw';
   const isConfirmPassword = label === 'repw' && isConfirmed;
-  const isMismatch = (label === 'pw' || label === 'repw') && hasError && isDirty;
+  const isMismatch = (label === 'loginpw' || label === 'repw') && hasError && isDirty;
 
   // 상태별 색상 정의
   const baseBorderColor =

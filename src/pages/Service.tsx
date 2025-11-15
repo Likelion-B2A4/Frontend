@@ -4,16 +4,20 @@ import Button from '../components/Button';
 import { expereinceText, headerText } from '../styles/typography';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const FirstPage = ({ first = false }) => {
+const FirstPage = ({ first = false, name = '' }) => {
   return (
     <>
       {first ? (
         <div className="flex h-full w-screen flex-col justify-end items-center content-center">
           <img className="w-[96px] h-[96px]" src="/bit_1.svg" />
           <div className="flex flex-col gap-y-[16px]">
-            <div style={headerText} className="text-center mt-[74px]">
-              {}님, 환영합니다.
+            <div style={headerText} className="text-center mt-[74px] flex flex-row">
+              <div className="text-transparent font-alice bg-clip-text bg-gradient-to-br from-[#0F58FF] to-[#3FB6FF]">
+                {name}
+              </div>
+              <div>님, 환영합니다.</div>
             </div>
+
             <div className="flex justify-center items-center text-center">
               <div style={expereinceText}>
                 여러분의 빛이 꺼지지 않도록
@@ -104,9 +108,15 @@ const FourthPage = () => {
 const Service = () => {
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState(0);
+  const receivedName = (location.state as { fromSignup?: boolean; userName?: string })?.userName;
   const isFirstVisit = (location.state as { fromSignup?: boolean })?.fromSignup === true;
-  const pages = [<FirstPage first={isFirstVisit} />, <SecondPage />, <ThirdPage />, <FourthPage />];
-  const totalPages = pages.length;
+  const pages = [
+    <FirstPage first={isFirstVisit} name={receivedName} />,
+    <SecondPage />,
+    <ThirdPage />,
+    <FourthPage />,
+  ];
+  const totalPages = 3;
 
   const nextPage = () => {
     setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));

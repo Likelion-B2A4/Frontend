@@ -122,6 +122,9 @@ const AddSchedule = () => {
         <div className="flex flex-col min-h-screen items-center px-[20px]">
             <div className="fixed">
                 <Topbar title="복약 일정 수정"/>
+                <div>
+                    <img src="/goback.svg" alt="prev" className="fixed top-[14px] cursor-pointer" onClick={() => nav(-1)}/>
+                </div>
             </div>
             <form className="flex flex-col w-full gap-[32px] mt-[70px]">
                 <div className="flex flex-col">

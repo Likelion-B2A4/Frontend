@@ -2,20 +2,42 @@ import React from 'react';
 import TypoLogo from '../components/TypoLogo';
 import { topHeader } from '../styles/typography';
 import { useNavigate } from 'react-router-dom';
+import StarOffIcon from '../assets/hospitalmap/star-off.svg';
 
 interface TopbarProps {
   title?: string;
   showLogo?: boolean;
   type?: string;
+  onStarClick?: () => void;
 }
 
-const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '' }) => {
+const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '', onStarClick }) => {
   const nav = useNavigate();
 
   return type === 'header' ? (
-    <div className="mx-[20px] my-[14px]">
-      <div className="flex flex-row justify-center">
-        <img src="/goback.svg" className="w-[24px] absolute left-[20px]" onClick={() => nav(-1)} />
+    <div style={{
+      width: '360px',
+      margin: '0 auto',
+      padding: '14px 20px',
+      position: 'relative'
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        <img
+          src="/goback.svg"
+          onClick={() => nav(-1)}
+          style={{
+            position: 'absolute',
+            left: '0',
+            width: '24px',
+            height: '24px',
+            cursor: 'pointer'
+          }}
+        />
         <div style={topHeader}>{title}</div>
       </div>
     </div>
@@ -29,10 +51,27 @@ const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '' }) =
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'relative',
       }}
     >
       {showLogo ? (
-        <TypoLogo width={48} height={27} />
+        <>
+          <TypoLogo width={48} height={27} />
+          <img
+            src={StarOffIcon}
+            alt="star"
+            onClick={onStarClick}
+            style={{
+              position: 'absolute',
+              right: '20px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '24px',
+              height: '24px',
+              cursor: 'pointer',
+            }}
+          />
+        </>
       ) : (
         <span
           style={{

@@ -30,7 +30,7 @@ const Button = ({
     ' h-[56px] rounded-[12px] border-0 text-[20px] fontweight-600 cursor-pointer ';
 
   const stylesByVariant = {
-    default: 'bg-[#F4F6F8]',
+    default: 'bg-[#F4F6F8] ',
     colored: 'bg-[#3D84FF] ',
   };
 
