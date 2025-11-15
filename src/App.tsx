@@ -1,6 +1,5 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import React from 'react';
+import {Route, Routes } from 'react-router-dom';
 import SplashPageWeb from './pages/Splash.tsx';
 import Intro from './pages/Intro.tsx';
 import LogIn from './pages/LogIn.tsx';
@@ -18,6 +17,7 @@ import QrCheckIn from './pages/QrCheckIn.tsx';
 import PreQuestion1 from './pages/PreQuestion1.tsx';
 import PreQuestion2 from './pages/PreQuestion2.tsx';
 import PreQuestion3 from './pages/PreQuestion3.tsx';
+import PatientChat from './pages/PatientChat.tsx';
 
 function App() {
   return (
@@ -26,6 +26,7 @@ function App() {
       <Route path="/pre-question1" element={<PreQuestion1/>} />
       <Route path="/pre-question2" element={<PreQuestion2/>} />
       <Route path="/pre-question3" element={<PreQuestion3/>} />
+      <Route path="/patientchat" element={<PatientChat/>} />
       <Route path="*" element={
         <div style={{ width: "360px", height: "680px", margin: "0 auto" }}>
           <Routes>

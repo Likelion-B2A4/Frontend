@@ -1,6 +1,19 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PreQuestion3 = () => {
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const timeId = setTimeout(() => {
+      nav('/patientchat');
+    }, 2000);
+
+    return () => {
+      clearTimeout(timeId);
+    };
+  }, [nav]);
+
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
       <div className="pt-[300px] flex flex-col items-center">
