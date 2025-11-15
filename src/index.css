@@ -98,3 +98,7 @@
   font-weight: 900;
   font-display: swap;
 }
+
+html {
+  overflow-y: scroll;
+}

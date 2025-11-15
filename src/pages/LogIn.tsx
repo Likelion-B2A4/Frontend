@@ -31,7 +31,8 @@ const LogIn = () => {
   const isMobile = useIsMobile();
 
   const handleSinup = () => {
-    nav('/signup');
+    if (isMobile) nav('/signup');
+    else nav('/signuphosp');
   };
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {

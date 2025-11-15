@@ -1,5 +1,7 @@
 import React from 'react';
 import FormInput from '../components/FormInput';
+import { Dirty, placeHolder } from '../styles/typography';
+import SubjectDropdown from './SubjectDropdown';
 
 interface IOperatingTime {
   mon: string | null;
@@ -24,14 +26,24 @@ interface Step1FormProps {
   formData: IFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleSubjectChange: (value: string) => void;
 }
 
-const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
+const Step1Form = ({
+  formData,
+  handleInputChange,
+  onKeyDown,
+  handleSubjectChange,
+}: Step1FormProps) => {
+  const isHospitalNameFilled = formData.hospitalName.trim() !== '';
+  const isSubjectFilled = formData.subject.trim() !== '';
+  const isAddressFilled = formData.address.trim() !== '';
+  const isContactNumberFilled = formData.contactNumber.trim() !== '';
   return (
-    <div id="step1" className="flex flex-col gap-y-[24px] min-h-[290px]">
+    <div id="step1" style={Dirty} className="flex flex-col w-[400px] gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
-      <div className="flex flex-row justify-between">
-        <div>
+      <div className="flex  gap-x-[16px]">
+        <div className="w-1/2">
           병원명
           <FormInput
             label="form"
@@ -39,18 +51,28 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
             name="hospitalName"
             value={formData.hospitalName}
             onChange={handleInputChange}
+            isDirty={isHospitalNameFilled}
           />
         </div>
-        <div>
+        <div className="w-1/2">
           {/* 드롭다운 선택지 */}
           진료 과목
-          <FormInput
+          <SubjectDropdown
+            placeholder="진료 과목을 입력하세요"
+            // name="subject"
+            value={formData.subject}
+            onChange={handleSubjectChange}
+            isDirty={isSubjectFilled}
+            style={isSubjectFilled ? Dirty : placeHolder}
+          />
+          {/* <FormInput
             label="form"
             placeholder="진료 과목을 입력하세요"
             name="subject"
             value={formData.subject}
             onChange={handleInputChange}
-          />
+            isDirty={isSubjectFilled}
+          /> */}
         </div>
       </div>
       <div>
@@ -61,6 +83,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
           name="address"
           value={formData.address}
           onChange={handleInputChange}
+          isDirty={isAddressFilled}
         />
       </div>
       <div>
@@ -73,6 +96,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
           value={formData.contactNumber}
           onChange={handleInputChange}
           onKeyDown={onKeyDown}
+          isDirty={isContactNumberFilled}
         />
       </div>{' '}
       {/* 숫자만 입력하면 하이픈 형태로 저장 */}

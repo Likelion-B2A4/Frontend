@@ -26,8 +26,8 @@ const FormInput = ({
   ...rest
 }: FormInputProps) => {
   // 상태 정의
-  const hasError = !!error;
-  const isSuccess = isDirty && !hasError;
+  const hasError = (label === 'pw' || label === 'repw') && !!error;
+  const isSuccess = (label === 'pw' || label === 'repw') && isDirty && !hasError;
   const isPassword = label === 'pw';
   const isConfirmPassword = label === 'repw' && isConfirmed;
   const isMismatch = (label === 'loginpw' || label === 'repw') && hasError && isDirty;
@@ -64,12 +64,14 @@ const FormInput = ({
   // 렌더링
   return (
     <div className={containerClassName}>
-      <div className={`flex h-[48px] pl-[8px] pr-[16px] items-center outline-none ${currentColor}`}>
+      <div
+        className={`flex h-[48px] pl-[8px] pr-[16px] items-center outline-none   ${currentColor}`}
+      >
         <input
           type={type}
           {...register}
           {...rest}
-          className="flex-1 border-none outline-none bg-transparent"
+          className={`flex-1 border-none outline-none bg-transparent placeholder:text-[#A9ACB2]`}
           style={isDirty ? Dirty : placeHolder}
         />
         {/* 아이콘 영역 */}
@@ -96,7 +98,9 @@ const FormInput = ({
         </div>
       )}
       {label !== 'id' && label !== 'pw' ? (
-        <div className={messageClassName}>{hint}</div>
+        <div style={TypoType()} className={messageClassName}>
+          {hint}
+        </div>
       ) : (
         <div></div>
       )}
