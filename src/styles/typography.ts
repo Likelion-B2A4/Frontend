@@ -230,7 +230,6 @@ export const dateButton = {
 };
 export const dateButtonSelected = {
   color: '#FFF',
-
   /* Body/M */
   fontFamily: 'Pretendard',
   fontSize: '16px',
@@ -238,6 +237,7 @@ export const dateButtonSelected = {
   fontWeight: 700,
   lineHeight: '150%' /* 24px */,
   letterSpacing: '-0.32px',
+};
 // Hospital Detail - Address, Time, Phone Text
 export const hospitalDetailText = {
   color: '#343841',
