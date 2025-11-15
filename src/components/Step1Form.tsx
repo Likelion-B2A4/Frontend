@@ -1,7 +1,9 @@
 import React from 'react';
 import FormInput from '../components/FormInput';
-import { Dirty, hintDisabled } from '../styles/typography';
+import { Dirty, hintDisabled, placeHolder } from '../styles/typography';
 import { useState, useMemo } from 'react';
+import SubjectDropdown from './SubjectDropdown';
+import { pl } from 'date-fns/locale';
 
 interface IOperatingTime {
   mon: string | null;
@@ -26,6 +28,7 @@ interface Step1FormProps {
   formData: IFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleSubjectChange: (value: string) => void;
 }
 
 // const [formData, setFormData] = useState({
@@ -46,16 +49,21 @@ interface Step1FormProps {
 //   );
 // }, [formData]);
 
-const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
+const Step1Form = ({
+  formData,
+  handleInputChange,
+  onKeyDown,
+  handleSubjectChange,
+}: Step1FormProps) => {
   const isHospitalNameFilled = formData.hospitalName.trim() !== '';
   const isSubjectFilled = formData.subject.trim() !== '';
   const isAddressFilled = formData.address.trim() !== '';
   const isContactNumberFilled = formData.contactNumber.trim() !== '';
   return (
-    <div id="step1" style={Dirty} className="flex flex-col gap-y-[24px] min-h-[290px]">
+    <div id="step1" style={Dirty} className="flex flex-col w-[400px] gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
-      <div className="flex flex-row justify-between gap-x-[16px]">
-        <div>
+      <div className="flex  gap-x-[16px]">
+        <div className="w-1/2">
           병원명
           <FormInput
             label="form"
@@ -64,19 +72,28 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
             value={formData.hospitalName}
             onChange={handleInputChange}
             isDirty={isHospitalNameFilled}
+            style={isHospitalNameFilled ? Dirty : placeHolder}
           />
         </div>
-        <div>
+        <div className="w-1/2">
           {/* 드롭다운 선택지 */}
           진료 과목
-          <FormInput
+          <SubjectDropdown
+            placeholder="진료 과목을 입력하세요"
+            // name="subject"
+            value={formData.subject}
+            onChange={handleSubjectChange}
+            isDirty={isSubjectFilled}
+            style={isSubjectFilled ? Dirty : placeHolder}
+          />
+          {/* <FormInput
             label="form"
             placeholder="진료 과목을 입력하세요"
             name="subject"
             value={formData.subject}
             onChange={handleInputChange}
             isDirty={isSubjectFilled}
-          />
+          /> */}
         </div>
       </div>
       <div>

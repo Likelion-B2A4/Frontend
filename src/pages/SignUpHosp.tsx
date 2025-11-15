@@ -151,6 +151,13 @@ const SignUpHosp = () => {
     }
   };
 
+  const handleSubjectChange = (subjectValue: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      subject: subjectValue,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -182,6 +189,7 @@ const SignUpHosp = () => {
                   formData={formData}
                   handleInputChange={handleInputChange}
                   onKeyDown={handleKeyDownEnter}
+                  handleSubjectChange={handleSubjectChange}
                 />
               )}
               {currentStep === 2 && (
