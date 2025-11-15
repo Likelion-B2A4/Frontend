@@ -44,9 +44,10 @@ const SignUpHosp = () => {
     formData.hospitalName !== '' &&
     formData.subject !== '' &&
     formData.address !== '' &&
-    formData.contactNumber.length >= 9;
+    formData.contactNumber.length >= 9 &&
+    formData.mainImage! == null;
 
-  const isStep2Valid = Object.values(formData.operatingTime).some((time) => time !== null);
+  const isStep2Valid = Object.values(formData.operatingTime).every((time) => time !== null);
 
   // 이벤트 핸들러
   const handleDayToggle = (dayKey: keyof IOperatingTime) => {

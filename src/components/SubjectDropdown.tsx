@@ -55,7 +55,7 @@ const SubjectDropdown = ({
   };
 
   const baseBorderColor = ' border-b border-[#A9ACB2] bg-transparent focus-within:border-[#0F58FF]';
-  const filledBorderColor = ' border-b border-[#0F58FF]';
+  const filledBorderColor = ' border-b border-[#A9ACB2]';
 
   const currentColor = isDirty ? filledBorderColor : baseBorderColor;
 
@@ -69,7 +69,9 @@ const SubjectDropdown = ({
           {value || placeholder}
         </div>
         <div className="w-[16px] h-[16px] flex items-center justify-center">
-          <span className={` transition-transform ${isOpen ? 'rotate-180' : ''}`}>^</span>
+          <span className={` transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+            <img src="/dropdown.svg" className="w-[16px]" />
+          </span>
         </div>
       </div>
       {isOpen && (

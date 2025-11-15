@@ -64,12 +64,14 @@ const FormInput = ({
   // 렌더링
   return (
     <div className={containerClassName}>
-      <div className={`flex h-[48px] pl-[8px] pr-[16px] items-center outline-none ${currentColor}`}>
+      <div
+        className={`flex h-[48px] pl-[8px] pr-[16px] items-center outline-none   ${currentColor}`}
+      >
         <input
           type={type}
           {...register}
           {...rest}
-          className="flex-1 border-none outline-none bg-transparent"
+          className={`flex-1 border-none outline-none bg-transparent placeholder:text-[#A9ACB2]`}
           style={isDirty ? Dirty : placeHolder}
         />
         {/* 아이콘 영역 */}

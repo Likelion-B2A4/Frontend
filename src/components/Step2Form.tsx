@@ -124,33 +124,59 @@ const Step2Form = ({
     defaultValues,
   });
 
-  // 5. UI 로직을 위해 RHF state를 'watch'
-  const dayOff = watch('dayOff');
-  const breakTime = watch('breakTime');
+  const [
+    dayOff,
+    breakTime,
+    startHour,
+    startMinute,
+    endHour,
+    endMinute,
+
+    breakHourStart,
+    breakMinuteStart,
+    breakHourEnd,
+    breakMinuteEnd,
+  ] = watch([
+    'dayOff',
+    'breakTime',
+    'startHour',
+    'startMinute',
+    'endHour',
+    'endMinute',
+
+    'breakHourStart',
+    'breakMinuteStart',
+    'breakHourEnd',
+    'breakMinuteEnd',
+  ]);
+
+  // // 5. UI 로직을 위해 RHF state를 'watch'
+  // const dayOff = watch('dayOff');
+  // const breakTime = watch('breakTime');
   const prevSelectedDaysRef = useRef<string[]>([]);
 
   const isSingleSelection = selectedDays.length === 1;
 
   // 6. RHF state를 읽도록 헬퍼 함수 수정 (getValues 사용)
   const hasValidMainTime = () => {
-    const { startHour, startMinute, endHour, endMinute } = getValues();
+    // const { startHour, startMinute, endHour, endMinute } = getValues();
     return [startHour, startMinute, endHour, endMinute].every((value) => value.trim() !== '');
   };
 
   const hasValidBreakTime = () => {
-    const { breakHourStart, breakMinuteStart, breakHourEnd, breakMinuteEnd } = getValues();
+    // const { breakHourStart, breakMinuteStart, breakHourEnd, breakMinuteEnd } = getValues();
     return [breakHourStart, breakMinuteStart, breakHourEnd, breakMinuteEnd].every(
       (value) => value.trim() !== ''
     );
   };
 
   const buildMainTimeString = () => {
-    const { startHour, startMinute, endHour, endMinute } = getValues();
+    // const { startHour, startMinute, endHour, endMinute } = getValues();
     return `${startHour} : ${startMinute} ~ ${endHour} : ${endMinute}`;
   };
 
   const buildBreakTimeString = () => {
-    const { breakHourStart, breakMinuteStart, breakHourEnd, breakMinuteEnd } = getValues();
+    // const { breakHourStart, breakMinuteStart, breakHourEnd, breakMinuteEnd } = getValues();
     return `${breakHourStart} : ${breakMinuteStart} ~ ${breakHourEnd} : ${breakMinuteEnd}`;
   };
 
@@ -361,8 +387,8 @@ const Step2Form = ({
   const isClinicButtonDisabled = () => {
     if (dayOff || selectedDays.length === 0) return true;
     if (clinicLocked && isSingleSelection) return false;
-    if (!hasValidMainTime()) return true;
-    return false;
+    if (hasValidMainTime()) return false;
+    return true;
   };
   const clinicDisabled = isClinicButtonDisabled();
 
@@ -399,7 +425,7 @@ const Step2Form = ({
         </div>
         <div
           className={
-            `flex flex-row gap-x-[50px] ` +
+            `flex flex-row gap-x-[24px] ` +
             `${isClinicDisabled ? ' cursor-not-allowed' : ' cursor-pointer'}`
           }
         >
@@ -488,7 +514,7 @@ const Step2Form = ({
               </div>
             </div>
           </div>
-          <div>
+          <div className={dayOff ? 'cursor-not-allowed' : 'cursor-pointer'}>
             {/* --- (버튼 로직은 동일) --- */}
             <Button
               type="button"
@@ -498,13 +524,11 @@ const Step2Form = ({
               disabled={dayOff} // 'dayOff'는 watch된 값
               onClick={handleClinicTimeApplyClick}
               variant={
-                clinicDisabled ||
-                // (clinicLocked && isSingleSelection) ||
-                !hasValidMainTime()
-                  ? 'default'
+                clinicDisabled || !hasValidMainTime() || clinicLocked
+                  ? // ( && isSingleSelection) ||
+                    'default'
                   : 'colored'
               }
-              className={isBreakDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             />
           </div>
         </div>
@@ -526,8 +550,12 @@ const Step2Form = ({
             </div>
           </div>
           {breakTime && (
-            <div className="flex flex-row gap-[50px]">
-              <div className={`flex flex-row ` + (breakLocked ? ' opacity-50' : ' ')}>
+            <div className="flex flex-row gap-[24px]">
+              <div
+                className={
+                  `flex flex-row items-center gap-[4px]` + (breakLocked ? ' opacity-50' : ' ')
+                }
+              >
                 <div className="flex flex-col gap-y-[4px]">
                   <div className="flex flex-row gap-x-[8px] px-[8px] items-center">
                     <Controller

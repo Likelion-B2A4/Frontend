@@ -1,9 +1,7 @@
 import React from 'react';
 import FormInput from '../components/FormInput';
-import { Dirty, hintDisabled, placeHolder } from '../styles/typography';
-import { useState, useMemo } from 'react';
+import { Dirty, placeHolder } from '../styles/typography';
 import SubjectDropdown from './SubjectDropdown';
-import { pl } from 'date-fns/locale';
 
 interface IOperatingTime {
   mon: string | null;
@@ -31,24 +29,6 @@ interface Step1FormProps {
   handleSubjectChange: (value: string) => void;
 }
 
-// const [formData, setFormData] = useState({
-//   hospitalName: '',
-//   subject: '',
-//   address: '',
-//   contactNumber: '',
-//   // ...
-// });
-
-// // 1. 'isDirty' 상태 계산
-// const isDirty = useMemo(() => {
-//   return (
-//     formData.hospitalName !== '' ||
-//     formData.subject !== '' ||
-//     formData.address !== '' ||
-//     formData.contactNumber !== ''
-//   );
-// }, [formData]);
-
 const Step1Form = ({
   formData,
   handleInputChange,
@@ -72,7 +52,6 @@ const Step1Form = ({
             value={formData.hospitalName}
             onChange={handleInputChange}
             isDirty={isHospitalNameFilled}
-            style={isHospitalNameFilled ? Dirty : placeHolder}
           />
         </div>
         <div className="w-1/2">
