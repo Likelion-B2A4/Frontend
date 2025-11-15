@@ -26,8 +26,8 @@ const FormInput = ({
   ...rest
 }: FormInputProps) => {
   // 상태 정의
-  const hasError = !!error;
-  const isSuccess = isDirty && !hasError;
+  const hasError = (label === 'pw' || label === 'repw') && !!error;
+  const isSuccess = (label === 'pw' || label === 'repw') && isDirty && !hasError;
   const isPassword = label === 'pw';
   const isConfirmPassword = label === 'repw' && isConfirmed;
   const isMismatch = (label === 'pw' || label === 'repw') && hasError && isDirty;

@@ -1,6 +1,7 @@
 import React from 'react';
 import FormInput from '../components/FormInput';
 import { Dirty, hintDisabled } from '../styles/typography';
+import { useState, useMemo } from 'react';
 
 interface IOperatingTime {
   mon: string | null;
@@ -27,7 +28,29 @@ interface Step1FormProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
+// const [formData, setFormData] = useState({
+//   hospitalName: '',
+//   subject: '',
+//   address: '',
+//   contactNumber: '',
+//   // ...
+// });
+
+// // 1. 'isDirty' 상태 계산
+// const isDirty = useMemo(() => {
+//   return (
+//     formData.hospitalName !== '' ||
+//     formData.subject !== '' ||
+//     formData.address !== '' ||
+//     formData.contactNumber !== ''
+//   );
+// }, [formData]);
+
 const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) => {
+  const isHospitalNameFilled = formData.hospitalName.trim() !== '';
+  const isSubjectFilled = formData.subject.trim() !== '';
+  const isAddressFilled = formData.address.trim() !== '';
+  const isContactNumberFilled = formData.contactNumber.trim() !== '';
   return (
     <div id="step1" style={Dirty} className="flex flex-col gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
@@ -40,6 +63,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
             name="hospitalName"
             value={formData.hospitalName}
             onChange={handleInputChange}
+            isDirty={isHospitalNameFilled}
           />
         </div>
         <div>
@@ -51,6 +75,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
             name="subject"
             value={formData.subject}
             onChange={handleInputChange}
+            isDirty={isSubjectFilled}
           />
         </div>
       </div>
@@ -62,6 +87,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
           name="address"
           value={formData.address}
           onChange={handleInputChange}
+          isDirty={isAddressFilled}
         />
       </div>
       <div>
@@ -74,6 +100,7 @@ const Step1Form = ({ formData, handleInputChange, onKeyDown }: Step1FormProps) =
           value={formData.contactNumber}
           onChange={handleInputChange}
           onKeyDown={onKeyDown}
+          isDirty={isContactNumberFilled}
         />
       </div>{' '}
       {/* 숫자만 입력하면 하이픈 형태로 저장 */}
