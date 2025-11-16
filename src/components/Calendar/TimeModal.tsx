@@ -65,9 +65,9 @@ const TimeModal: React.FC<TimeModalProps> = ({onChangeTime}) => {
                     className="w-full h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory"
                     onScroll={(e) => handleScroll(e, setSelectedHourIndex, hours.length)}
                 >
-                    <div className={`h-[calc(50%-${ITEM_HEIGHT/2}px)]`}></div> 
+                    <div className="h-[calc(50%-28px)]"></div> 
                     {hours.map((h, idx) => <WheelItem key={h} label={h} isSelected={idx === selectedHourIndex} />)}
-                    <div className={`h-[calc(50%-${ITEM_HEIGHT/2}px)]`}></div>
+                    <div className="h-[calc(50%-28px)]"></div>
                 </div>
             </div>
 
