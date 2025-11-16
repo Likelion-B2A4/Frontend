@@ -6,6 +6,47 @@ import defaultImg from "../../assets/calendar/check_default.svg";
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
+const mapPeriod = (period: string) : string => {
+    switch (period.toLowerCase()) {
+        case 'morning': return '아침';
+        case 'lunch' : return '점심';
+        case 'dinner' : return '저녁';
+        case 'bedtime' : return '취침 전';
+        default : return period;
+    }
+}
+
+const MedicationSelectionModalContent = ({medicationRecords, handleModalMedicationClick, modalCheckedStatus}: any) => {
+    return (
+        <>
+            {medicationRecords.map((medication: any) => (
+                <div key={medication.recordId} className="py-4"
+                    onClick={handleModalMedicationClick(medication.recordId)}
+                >
+                    <div className="flex flex-row gap-4 items-center">
+                        <div>
+                            {modalCheckedStatus[medication.recordId] ? (
+                                <img src={checkImg} alt="checked" />
+                            ) : (
+                                <img src={defaultImg} alt="not_checked" />
+                            )}
+                        </div>
+
+                        <div className="flex flex-col">
+                            <div>
+                                {medication.name}
+                            </div>
+                            <div className="font-medium text-[12px] text-[#666B76]">
+                                {medication.schedules.map((s: any) => mapPeriod(s.period)).join('. ')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </>
+    )
+}
+
 interface Props {
     selectedMonth : String,
     selectedDay : String,
@@ -25,10 +66,9 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
     const [hasMedicalRecord, setHasMedicalRecord] = useState(true);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDelModal, setOpenDelModal] = useState(false);
+    const [openSubModal, setSubModal] = useState(false);
 
-    // ⭐ 모달에서 '수정'할 약물의 recordId를 저장하는 상태
     const [selectedMedicationId, setSelectedMedicationId] = useState<number | null>(null);
-    // ⭐ 모달에서 선택된 약물의 체크 상태 (recordId 기준)
     const [modalCheckedStatus, setModalCheckedStatus] = useState<Record<number, boolean>>({});
 
     const handleConfirm = () => {
@@ -40,11 +80,21 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
         }
     }
 
+    const handleDelete = () => {
+        setOpenDelModal(false);
+        setSubModal(true);
+    }
+
+    const handleDeleteAll = () => {
+        setSubModal(false);
+    }
+
+    const handleDeleteOnly = () => {
+        setSubModal(false);
+    }
+
     const handleModalMedicationClick = (recordId: number) => () => {
-        // 단일 선택만 가능하도록 로직 수정
         setSelectedMedicationId(prevId => prevId === recordId ? null : recordId);
-        
-        // 시각적 피드백을 위한 modalCheckedStatus 업데이트 (선택된 항목만 true)
         setModalCheckedStatus({ [recordId]: !(selectedMedicationId === recordId) });
     };
    
@@ -57,6 +107,32 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
         {
             label: '수정',
             onClick: handleConfirm,
+            variant: 'colored' as const,
+        }
+    ]
+
+    const double1Button = [
+        {
+            label: '취소',
+            onClick: () => setOpenDelModal(false),
+            variant: 'default' as const,
+        },
+        {
+            label: '삭제',
+            onClick: handleDelete,
+            variant: 'colored' as const,
+        }
+    ]
+
+    const double2Button = [
+        {
+            label: '모든 일정 삭제',
+            onClick: handleDeleteAll,
+            variant: 'default' as const,
+        },
+        {
+            label: '이 일정만 삭제',
+            onClick: handleDeleteOnly,
             variant: 'colored' as const,
         }
     ]
@@ -75,15 +151,6 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
 
     }, [recordData]);
 
-    const mapPeriod = (period: string) : string => {
-        switch (period.toLowerCase()) {
-            case 'morning': return '아침';
-            case 'lunch' : return '점심';
-            case 'dinner' : return '저녁';
-            case 'bedtime' : return '취침 전';
-            default : return period;
-        }
-    }
 
     const onToggle = () => setIsOpen(!isOpen);
     const onOptionClick = (value: string, index: number) => () => {
@@ -223,34 +290,50 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
                 <p>수정할 일정을 선택해주세요</p>
             }
             children={
-                <>
-                    {medicationRecords.map((medication: any) => (
-                        <div key={medication.recordId} className="py-4"
-                            onClick={handleModalMedicationClick(medication.recordId)}
-                        >
-                            <div className="flex flex-row gap-4 items-center">
-                                <div>
-                                    {modalCheckedStatus[medication.recordId] ? (
-                                        <img src={checkImg} alt="checked" />
-                                    ) : (
-                                        <img src={defaultImg} alt="not_checked" />
-                                    )}
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <div>
-                                        {medication.name}
-                                    </div>
-                                    <div className="font-medium text-[12px] text-[#666B76]">
-                                        {medication.schedules.map((s: any) => mapPeriod(s.period)).join('. ')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </>
+                <MedicationSelectionModalContent
+                    medicationRecords={medicationRecords}
+                    handleModalMedicationClick={handleModalMedicationClick}
+                    modalCheckedStatus={modalCheckedStatus}
+                />
             }
             buttons={doubleButton}
+        />}
+
+        {<Modal 
+            isOpen={openDelModal}
+            title="복약 일정 삭제"
+            onCancel={() => {
+                setOpenDelModal(false); 
+                setSelectedMedicationId(null);
+                setModalCheckedStatus({});
+            }}
+            description={
+                <p>삭제할 일정을 선택해주세요</p>
+            }
+            children={
+                <MedicationSelectionModalContent
+                    medicationRecords={medicationRecords}
+                    handleModalMedicationClick={handleModalMedicationClick}
+                    modalCheckedStatus={modalCheckedStatus}
+                />
+            }
+            buttons={double1Button}
+        />}
+
+        {<Modal 
+            isOpen={openSubModal}
+            title="복약 일정 삭제"
+            onCancel={() => {
+                setSubModal(false); 
+                setSelectedMedicationId(null);
+            }}
+            description={
+                <>
+                    <p>이 일정만 삭제할까요,</p>
+                    <p>앞으로 반복되는 모든 일정을 삭제할까요?</p>
+                </>
+            }
+            buttons={double2Button}
         />}
 
         </div>
