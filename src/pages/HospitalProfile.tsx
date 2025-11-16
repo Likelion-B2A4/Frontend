@@ -3,6 +3,7 @@ import FileForm from '../components/FileForm';
 import { hospHeader, logoText, hospitalProfileText } from '../styles/typography';
 import Button from '../components/Button';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { de } from 'date-fns/locale';
 
 const mockData = {
@@ -26,6 +27,7 @@ const defaultTime = mockData.operatingTime[0];
 
 const HospitalProfile = () => {
   const [isTimeOpen, setIsTimeOpen] = useState(false);
+  const nav = useNavigate();
 
   return (
     <div className="w-screen max-h-screen">
@@ -103,7 +105,12 @@ const HospitalProfile = () => {
             </div>
           </div>
           <div className=" w-[400px] absolute bottom-4">
-            <Button children="수정" variant="default" className="w-full " />
+            <Button
+              children="수정"
+              variant="default"
+              className="w-full"
+              onClick={() => nav('/hospital-profile-edit')}
+            />
           </div>
         </div>
       </div>

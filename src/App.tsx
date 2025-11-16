@@ -19,6 +19,7 @@ import PreQuestion2 from './pages/PreQuestion2.tsx';
 import PreQuestion3 from './pages/PreQuestion3.tsx';
 import PatientChat from './pages/PatientChat.tsx';
 import HospitalProfile from './pages/HospitalProfile.tsx';
+import HospitalProfileEdit from './pages/HospitalProfileEdit.tsx';
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
       <Route path="/pre-question3" element={<PreQuestion3 />} />
       <Route path="/patientchat" element={<PatientChat />} />
       <Route path="/hospital-profile" element={<HospitalProfile />} />
+      <Route path="/hospital-profile-edit" element={<HospitalProfileEdit />} />
+
       <Route
         path="*"
         element={
