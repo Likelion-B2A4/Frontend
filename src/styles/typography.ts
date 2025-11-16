@@ -230,7 +230,6 @@ export const dateButton = {
 };
 export const dateButtonSelected = {
   color: '#FFF',
-
   /* Body/M */
   fontFamily: 'Pretendard',
   fontSize: '16px',
@@ -238,7 +237,8 @@ export const dateButtonSelected = {
   fontWeight: 700,
   lineHeight: '150%' /* 24px */,
   letterSpacing: '-0.32px',
-}
+};
+
 // Hospital Detail - Address, Time, Phone Text
 export const hospitalDetailText = {
   color: '#343841',
@@ -248,4 +248,14 @@ export const hospitalDetailText = {
   fontWeight: 500,
   lineHeight: '150%',
   letterSpacing: '-0.24px',
+};
+
+export const hospitalProfileText = {
+  color: '#343841',
+  fontFamily: 'Pretendard',
+  fontSize: '14px',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  lineHeight: '150%',
+  letterSpacing: '-0.28px',
 };
