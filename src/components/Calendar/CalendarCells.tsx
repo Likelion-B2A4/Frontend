@@ -8,10 +8,11 @@ interface Props {
     selectedMonth : string,
     selectedDay : string,
     onDateClick : (day: Date) => void,
-    mode: number
+    mode: number,
+    calendarMedData: Record<string, {hasMed: boolean}>
 }
 
-const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mode = 0} : Props) => {
+const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mode = 0, calendarMedData} : Props) => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
 
@@ -48,6 +49,9 @@ const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mo
 
             const isOtherMonth = format(currentDate, "M") !== format(cloneDay, "M");
 
+            const medStatus = calendarMedData[formattedDate] || {hasMed: false};
+            const hasRecord = true;
+
             days.push(
                 <div 
                     key={num} 
@@ -58,8 +62,8 @@ const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mo
                 >
                     {format(day, 'd')}
                     <div className="flex flex-row gap-0.5 mx-[5px] justify-center">
-                        <img src={recordImg} alt="" />
-                        <img src={med_All} alt="" />
+                        {hasRecord && <img src={recordImg} alt="" />}
+                        {medStatus.hasMed && <img src={med_All} alt="" />}
                     </div>
                 </div>
             )
