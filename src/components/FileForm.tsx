@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { photoSelect } from '../styles/typography';
 
 interface FileFormProps {
-  mainImage: File | null;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  mainImage?: File | null;
+  handleFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
 }
 
 // 폼 컴포넌트
 
-const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
+const FileForm = ({ mainImage, handleFileChange, type }: FileFormProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +25,10 @@ const FileForm = ({ mainImage, handleFileChange }: FileFormProps) => {
     <>
       <label
         htmlFor="mainImageInput"
-        className="w-[208px] h-[208px] bg-[#F4F6F8] rounded-full flex flex-col items-center justify-center cursor-pointer mr-[80px]"
+        className={
+          (type === 'profile' ? '' : ' mr-[80px]') +
+          ' w-[208px] h-[208px] bg-[#F4F6F8] rounded-full flex flex-col items-center justify-center cursor-pointer'
+        }
       >
         {previewImage ? (
           <img

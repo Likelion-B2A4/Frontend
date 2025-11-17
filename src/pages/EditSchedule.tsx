@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Topbar from "../layouts/Topbar";
 import { Icon } from "@iconify/react";
 import Button from "../components/Button";
@@ -7,11 +7,74 @@ import checkImg from "../assets/calendar/check.svg";
 import defaultImg from "../assets/calendar/check_default.svg";
 import CalendarModal from "../components/Calendar/CalendarModal";
 import TimeModal from "../components/Calendar/TimeModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { dayMap, mockDailyRecord } from "../mock/MedicationData";
 
-const AddSchedule = () => {
+const mapPeriod = (period: string) : string => {
+    switch (period.toLowerCase()) {
+        case 'morning': return '아침';
+        case 'lunch' : return '점심';
+        case 'dinner' : return '저녁';
+        case 'bedtime' : return '취침 전';
+        default : return period;
+    }
+}
+
+const EditSchedule = () => {
     const nav = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const recordId = queryParams.get('recordId');
     const [medName, setMedName] = useState("");
+    console.log(medName);
+    
+    useEffect(() => {
+        if (recordId) {
+            const id = parseInt(recordId);
+            const data = mockDailyRecord.find(med => med.recordId === id);
+
+            if (data) {
+                setMedName(data.name);
+                const initialDayCheck = new Array(7).fill(false);
+                data.daysOfWeek.forEach((day: string) => {
+                    const index = dayMap[day];
+                    
+                    if (index !== undefined) {
+                        initialDayCheck[index] = true;
+                    }
+                })
+                setDayCheck(initialDayCheck);
+
+                setStartMonth(data.startDate.split('-')[1]);
+                setStartDay(data.startDate.split('-')[2]);
+                setEndMonth(data.endDate.split('-')[1]);
+                setEndDay(data.endDate.split('-')[2]);
+
+                const initialIsChecked = new Array(4).fill(false);
+                const initialSelectedTime = new Array(4).fill("");
+
+                data.schedules.forEach((schedule: any) => {
+                    const periodLabel = mapPeriod(schedule.period);
+                    const index = ["아침", "점심", "저녁", "취침 전"].indexOf(periodLabel);
+
+                    if (index !== -1) {
+                        initialIsChecked[index] = schedule.enabled;
+                        initialSelectedTime[index] = `${schedule.time}`;
+                    }
+
+                })
+
+                setIsChecked(initialIsChecked);
+                setSelectedTimes(initialSelectedTime);
+                setNotify(data.alarmEnabled);
+            } else {
+                console.error(`Record ID ${recordId}에 해당하는 데이터를 찾을 수 없습니다.`);
+            }
+        }
+    }, [recordId])
+
+    //console.log(medName);
 
     const [isChecked, setIsChecked] = useState(
         new Array(4).fill(false)
@@ -66,7 +129,6 @@ const AddSchedule = () => {
         }
         
     }
-    //console.log(isCalendarOpen);
 
     const handleSelectedDate = (childMonth: string, childDay: string) => {
         if (isCalendarOpen[0]) {
@@ -77,7 +139,6 @@ const AddSchedule = () => {
             setEndDay(childDay);
         }
     }
-    //console.log(startMonth, startDay);
 
     const handleSelectionChange = (hasSelected: boolean) => {
         setIsDateSelected(hasSelected);
@@ -110,7 +171,6 @@ const AddSchedule = () => {
     console.log(selectedTimes);
 
     const isFormValid =
-        medName.trim() !== "" && 
         dayCheck.some(Boolean) && 
         startMonth && startDay && 
         endMonth && endDay && 
@@ -119,25 +179,14 @@ const AddSchedule = () => {
 
     return (
         <>
-        <div className="flex flex-col min-h-screen items-center px-[20px]">
+        <div className="flex flex-col min-h-screen items-center px-5">
             <div className="fixed">
                 <Topbar title="복약 일정 수정"/>
                 <div>
                     <img src="/goback.svg" alt="prev" className="fixed top-[14px] cursor-pointer" onClick={() => nav(-1)}/>
                 </div>
             </div>
-            <form className="flex flex-col w-full gap-[32px] mt-[70px]">
-                <div className="flex flex-col">
-                    <p>약 이름</p>
-                    <input 
-                        type="text" 
-                        placeholder="약 이름을 입력하세요" 
-                        className="h-[48px] border border-b-[#A9ACB2] border-t-0 border-x-0 pl-[8px]"
-                        value={medName}
-                        onChange={(e) => setMedName(e.target.value)}
-                    />
-                </div>
-
+            <form className="flex flex-col w-full gap-8 mt-[70px]">
                 <div className="flex flex-col gap-2">
                     <p>복용 주기</p>
                     <div className="flex flex-row text-[#666B76] justify-between">
@@ -151,44 +200,43 @@ const AddSchedule = () => {
                             </div>
                         ))}
                     </div>
-                    <div className="h-[48px] flex flex-row gap-[8px] justify-between">
+                    <div className="h-12 flex flex-row gap-2 justify-between">
                         <div 
-                            className="flex flex-row w-full justify-between py-[12px] px-[8px] border border-b-[#A9ACB2] border-t-0 border-x-0"
+                            className="flex flex-row w-full justify-between py-3 px-2 border border-b-[#A9ACB2] border-t-0 border-x-0"
                             onClick={onClickCalendar(0)}
                         >
                             <div className={`w-full ${startDay ? 'text-[#1A1A1A]' : 'text-[#A9ACB2]'}`}>{formatDate(startMonth, startDay, "시작일")}</div>
-                            <div className="w-[16px] h-[16px] cursor-pointer">
+                            <div className="w-4 h-4 cursor-pointer">
                                 <Icon 
                                     icon="lets-icons:date-today"
-                                    className="w-[16px] h-[16px] text-[#666B76]"
+                                    className="w-4 h-4 text-[#666B76]"
                                 />
                             </div>
                         </div>
                         <div 
-                            className="flex flex-row w-full justify-between py-[12px] px-[8px] border border-b-[#A9ACB2] border-t-0 border-x-0"
+                            className="flex flex-row w-full justify-between py-3 px-2 border border-b-[#A9ACB2] border-t-0 border-x-0"
                             onClick={onClickCalendar(1)}
                         >
                             <div className={`w-full ${startDay ? 'text-[#1A1A1A]' : 'text-[#A9ACB2]'}`}>{formatDate(endMonth, endDay, "종료일")}</div>
-                            <div className="w-[16px] h-[16px] cursor-pointer">
+                            <div className="w-4 h-4 cursor-pointer">
                                 <Icon 
                                     icon="lets-icons:date-today"
-                                    className="w-[16px] h-[16px] text-[#666B76]"
+                                    className="w-4 h-4 text-[#666B76]"
                                 />
                             </div>
                         </div>
                     </div>
-                    
                 </div>
 
                 <div className="flex flex-col">
                     <p>복약 시간</p>
-                    <div className="flex flex-col gap-[8px] text-[#666B76]">
+                    <div className="flex flex-col gap-2 text-[#666B76]">
                         {["아침", "점심", "저녁", "취침 전"].map((label, i) => (
                             <div key={i}
-                                className="flex flex-row h-[48px] items-center justify-between">
-                                    <div className="flex flex-row gap-[8px] items-center">
+                                className="flex flex-row h-12 items-center justify-between">
+                                    <div className="flex flex-row gap-2 items-center">
                                         <div
-                                            className="w-[32px] h-[32px] items-center flex cursor-pointer"
+                                            className="w-8 h-8 items-center flex cursor-pointer"
                                             onClick={onClickCheck(i)}
                                         >
                                             {isChecked[i] ? (
@@ -239,7 +287,7 @@ const AddSchedule = () => {
 
             <div className="fixed bottom-8 w-[320px]">
                 <Button 
-                    children="등록" 
+                    children="완료" 
                     disabled={!isFormValid} 
                     variant={isFormValid ? "colored" : "default"} 
                     onClick={() => {alert("등록되었습니다."); nav("/medical-records")}}
@@ -251,7 +299,6 @@ const AddSchedule = () => {
                     content={<CalendarModal onSelectDate={handleSelectedDate} onSelectionChange={handleSelectionChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={!isDateSelected}
-                    variant="default"
             />}
 
             {isTimeModalOpen && (
@@ -260,13 +307,11 @@ const AddSchedule = () => {
                     content={<TimeModal onChangeTime={handleTimeChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={false}
-                    variant="default"
                 />
             )}
         </div>
-    
         </>
     )
 }
 
-export default AddSchedule;
+export default EditSchedule;

@@ -9,7 +9,11 @@ export interface mockData {
     specialty: string;
 }
 
-const DoctorList = () => {
+interface DoctorListProps {
+    onAddDoctor: () => void;
+}
+
+const DoctorList: React.FC<DoctorListProps> = ({onAddDoctor}) => {
     const [name, setName] = useState("");
     const [isButtonClicked, setIsButtonClicked] = useState(false);
     const [selectDocId, setSelectDocId] = useState<number | null>(null);
@@ -42,11 +46,13 @@ const DoctorList = () => {
 
     const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value)
+
         //console.log(name);
     }
 
     const onChangePw = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPw(e.target.value);
+        setIsValid(false);
     }
 
     const handleInput = () => {
@@ -72,7 +78,7 @@ const DoctorList = () => {
         {
             label: '확인',
             onClick: handleConfirm,
-            variant: 'default' as const,
+            variant: 'colored' as const,
         }
     ]
     
@@ -99,7 +105,7 @@ const DoctorList = () => {
                             className="w-6 h-6 absolute right-4 cursor-pointer"/>
                     </div>
                     <div className="flex justify-center items-center">
-                        <img src={addImg} alt="add_doctor" className="cursor-pointer" />
+                        <img src={addImg} alt="add_doctor" className="cursor-pointer" onClick={onAddDoctor}/>
                     </div>
                 </div>
 

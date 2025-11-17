@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 
 const hours = Array.from({length: 12}, (_, i) => String(i+1).padStart(2, '0'));
 const minutes = Array.from({length: 60}, (_, i) => String(i).padStart(2, '0'));
@@ -65,9 +65,9 @@ const TimeModal: React.FC<TimeModalProps> = ({onChangeTime}) => {
                     className="w-full h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory"
                     onScroll={(e) => handleScroll(e, setSelectedHourIndex, hours.length)}
                 >
-                    <div className={`h-[calc(50%-${ITEM_HEIGHT/2}px)]`}></div> 
+                    <div className="h-[calc(50%-28px)]"></div> 
                     {hours.map((h, idx) => <WheelItem key={h} label={h} isSelected={idx === selectedHourIndex} />)}
-                    <div className={`h-[calc(50%-${ITEM_HEIGHT/2}px)]`}></div>
+                    <div className="h-[calc(50%-28px)]"></div>
                 </div>
             </div>
 
