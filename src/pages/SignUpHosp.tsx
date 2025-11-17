@@ -5,6 +5,7 @@ import Step2Form from '../components/Step2Form';
 import Step1Form from '../components/Step1Form';
 import FileForm from '../components/FileForm';
 import { hospHeader } from '../styles/typography';
+import { useNavigate } from 'react-router-dom';
 
 interface IOperatingTime {
   mon: string | null;
@@ -28,6 +29,7 @@ interface IFormData {
 const SignUpHosp = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
+  const nav = useNavigate();
 
   //폼 데이터를 객체로 관리
   const [formData, setFormData] = useState<IFormData>({
@@ -45,7 +47,7 @@ const SignUpHosp = () => {
     formData.subject !== '' &&
     formData.address !== '' &&
     formData.contactNumber.length >= 9 &&
-    formData.mainImage! == null;
+    formData.mainImage !== null;
 
   const isStep2Valid = Object.values(formData.operatingTime).every((time) => time !== null);
 
@@ -228,6 +230,7 @@ const SignUpHosp = () => {
                   type="submit"
                   variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
                   disabled={!(isStep1Valid && isStep2Valid)}
+                  onClick={() => nav('/select-doctor')}
                 >
                   완료
                 </Button>

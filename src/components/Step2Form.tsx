@@ -2,9 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form'; // 1. RHF import
 import WeeklyButton from './WeeklyButton';
 import FormInput from './FormInput';
-import { Dirty, hintDisabled, placeHolder } from '../styles/typography';
+import { Dirty, hintDisabled } from '../styles/typography';
 import Button from './Button';
-import { is } from 'date-fns/locale';
 
 // --- (Interfaces and 'weeklist' remain unchanged) ---
 interface IOperatingTime {
@@ -193,16 +192,9 @@ const Step2Form = ({
       setBreakLocked(false);
     };
 
-    // ★★★ 1. (Problem 1: isDirty 보존 / Problem 2: '휴무' 버튼)
-    // '입력 완료' 또는 '휴무 토글' 등으로 prop이 바뀌었지만 요일 선택은 그대로일 때
     if (!selectedDaysChanged && selectedDays.length > 0) {
-      // ★★★ '휴무' 버튼이 눌렸을 때, 이 로직이 폼 상태를 되돌리지 않도록
-      //     (isDirty 보존을 위해) 그냥 return만 합니다.
-      //     'handleDayOffToggle'의 setValue()가 UI를 즉시 변경할 수 있게 합니다.
       return;
     }
-
-    // --- (이 하단은 selectedDays가 0이거나, selectedDays가 변경됐을 때만 실행) ---
 
     if (selectedDays.length === 0) {
       resetForm();
@@ -236,7 +228,6 @@ const Step2Form = ({
       const allSame = selectedDays.every((dayKey) => operatingTime[dayKey] === firstTime);
 
       if (allSame) {
-        // (A) '월수금' (모두 09시) -> 데이터 로드
         const parsed = parseTime(firstTime);
         reset({
           startHour: parsed.start.hour,
@@ -291,17 +282,12 @@ const Step2Form = ({
         combinedTime += ` 휴게: ${parsed.breakTimeString}`;
       }
     }
-    // (일괄 적용 모드에서는 '진료 시간'만 덮어씁니다)
-
-    // ★★★ (수정 3) Problem 1: '입력 완료' 시 항상 잠급니다. (isSingleSelection 제거)
     setClinicLocked(true);
     onBatchTimeApply(combinedTime);
   };
 
-  // 8. RHF state를 변경하도록 핸들러 수정 (setValue 사용)
   const handleBreakTimeCheckboxToggle = () => {
     if (dayOff) return; // 'dayOff'는 watch된 값
-
     if (isSingleSelection && !clinicLocked) {
       console.error('진료 시간을 먼저 입력 완료해주세요.');
       return;
@@ -409,7 +395,6 @@ const Step2Form = ({
           {/* --- (요일 버튼 로직은 동일) --- */}
           {weeklist.map((day) => {
             const dayKey = day.key as keyof IOperatingTime;
-            const isSaved = !!operatingTime[dayKey];
 
             return (
               <WeeklyButton
@@ -545,7 +530,7 @@ const Step2Form = ({
                 className="w-[32px] h-[32px] "
               />
             </div>
-            <div className="tect-[16px] mb-0" style={Dirty}>
+            <div className="mb-0" style={Dirty}>
               휴게시간
             </div>
           </div>
@@ -642,7 +627,9 @@ const Step2Form = ({
                   children={breakButtonLabel}
                   disabled={dayOff} // 'dayOff'는 watch된 값
                   onClick={handleBreakApplyClick}
-                  variant={breakDisabled || !hasValidBreakTime() ? 'default' : 'colored'}
+                  variant={
+                    breakDisabled || !hasValidBreakTime() || breakLocked ? 'default' : 'colored'
+                  }
                 />
               </div>
             </div>

@@ -39,6 +39,10 @@ const Step1Form = ({
   const isSubjectFilled = formData.subject.trim() !== '';
   const isAddressFilled = formData.address.trim() !== '';
   const isContactNumberFilled = formData.contactNumber.trim() !== '';
+
+  const isContactNumberVaild =
+    formData.contactNumber.trim() === '' || formData.contactNumber.trim().length >= 9;
+
   return (
     <div id="step1" style={Dirty} className="flex flex-col w-[400px] gap-y-[24px] min-h-[290px]">
       {/* 병원가입 폼-1 */}
@@ -65,14 +69,6 @@ const Step1Form = ({
             isDirty={isSubjectFilled}
             style={isSubjectFilled ? Dirty : placeHolder}
           />
-          {/* <FormInput
-            label="form"
-            placeholder="진료 과목을 입력하세요"
-            name="subject"
-            value={formData.subject}
-            onChange={handleInputChange}
-            isDirty={isSubjectFilled}
-          /> */}
         </div>
       </div>
       <div>
@@ -91,12 +87,13 @@ const Step1Form = ({
         <FormInput
           label="form"
           placeholder="병원 연락처를 입력하세요"
-          hint="숫자만 입력해주세요"
+          hint={!isContactNumberVaild ? '연락처는 9자 이상이어야 합니다' : '숫자만 입력해주세요'}
           name="contactNumber"
           value={formData.contactNumber}
           onChange={handleInputChange}
           onKeyDown={onKeyDown}
           isDirty={isContactNumberFilled}
+          error={!isContactNumberVaild}
         />
       </div>{' '}
       {/* 숫자만 입력하면 하이픈 형태로 저장 */}
