@@ -1,8 +1,8 @@
 import React from 'react';
 import Button from '../components/Button';
-import { useState, useEffect } from 'react';
-import Step2Form from '../components/Step2Form';
-import Step1Form from '../components/Step1Form';
+import { useState } from 'react';
+import Step2Form from '../components/HospitalProfile/Step2Form';
+import Step1Form from '../components/HospitalProfile/Step1Form';
 import FileForm from '../components/FileForm';
 import { hospHeader } from '../styles/typography';
 import { useNavigate } from 'react-router-dom';

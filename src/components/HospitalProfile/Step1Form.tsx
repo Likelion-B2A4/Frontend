@@ -1,6 +1,6 @@
 import React from 'react';
-import FormInput from '../components/FormInput';
-import { Dirty, placeHolder } from '../styles/typography';
+import FormInput from '../FormInput';
+import { Dirty, placeHolder } from '../../styles/typography';
 import SubjectDropdown from './SubjectDropdown';
 
 interface IOperatingTime {

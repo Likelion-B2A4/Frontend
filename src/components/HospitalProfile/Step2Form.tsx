@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form'; // 1. RHF import
-import WeeklyButton from './WeeklyButton';
-import FormInput from './FormInput';
-import { Dirty, hintDisabled } from '../styles/typography';
-import Button from './Button';
+import WeeklyButton from '../WeeklyButton';
+import FormInput from '../FormInput';
+import { Dirty, hintDisabled } from '../../styles/typography';
+import Button from '../Button';
 
 // --- (Interfaces and 'weeklist' remain unchanged) ---
 interface IOperatingTime {
