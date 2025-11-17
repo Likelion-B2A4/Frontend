@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Dirty, placeHolder } from '../styles/typography';
+import { Dirty } from '../styles/typography';
 
 interface SubjectDropdownProps {
   value: string;

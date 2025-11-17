@@ -34,7 +34,6 @@ const Modal = ({
   onConfirm,
   closeIcon = true,
   isMobile = true,
-  variant = 'default',
 }: ModalProps) => {
   if (!isOpen) return null;
 
@@ -50,7 +49,11 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className={`bg-white rounded-xl w-[90%] ${isMobile ? 'max-w-[320px]' : 'max-w-[400px]'} p-6 flex flex-col gap-6`}>
+      <div
+        className={`bg-white rounded-xl w-[90%] ${
+          isMobile ? 'max-w-[320px]' : 'max-w-[400px]'
+        } p-6 flex flex-col gap-6`}
+      >
         {/* Header */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">

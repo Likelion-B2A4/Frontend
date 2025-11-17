@@ -4,7 +4,6 @@ import { hospHeader, logoText, hospitalProfileText } from '../styles/typography'
 import Button from '../components/Button';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { de } from 'date-fns/locale';
 
 const mockData = {
   image: './data/hospital.jpg',

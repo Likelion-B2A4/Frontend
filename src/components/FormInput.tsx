@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import React from 'react';
-import { type UseFormRegisterReturn, useWatch } from 'react-hook-form';
+import { type UseFormRegisterReturn } from 'react-hook-form';
 import { placeHolder, hintConfirmed, hintDisabled, hintError, Dirty } from '../styles/typography';
-import { isValidPassword } from '../utils/validation';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   register?: UseFormRegisterReturn;
