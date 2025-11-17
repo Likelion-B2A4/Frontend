@@ -20,6 +20,7 @@ import PreQuestion3 from './pages/PreQuestion3.tsx';
 import PatientChat from './pages/PatientChat.tsx';
 import HospitalProfile from './pages/HospitalProfile.tsx';
 import HospitalProfileEdit from './pages/HospitalProfileEdit.tsx';
+import CamQR from './pages/CamQR.tsx';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
               <Route path="/hospitalmap" element={<Hospitalmap />} />
               <Route path="/favorite-hospitals" element={<FavoriteHospitals />} />
               <Route path="/select-doctor" element={<SelectDoctor />} />
+              <Route path="/camqr" element={<CamQR />} />
             </Routes>
           </div>
         }
