@@ -1,7 +1,7 @@
 import Topbar from '../layouts/Topbar';
 import { topHeader } from '../styles/typography';
 import ToggleSwitch from '../components/ToggleSwitch';
-import { useState, type ReactEventHandler } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Setting = () => {
