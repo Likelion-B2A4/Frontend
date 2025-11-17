@@ -1,8 +1,8 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../components/Button';
 import { expereinceText, headerText } from '../styles/typography';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Topbar from '../layouts/Topbar';
 
 const FirstPage = ({ first = false, name = '' }) => {
