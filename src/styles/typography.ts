@@ -238,6 +238,7 @@ export const dateButtonSelected = {
   lineHeight: '150%' /* 24px */,
   letterSpacing: '-0.32px',
 };
+
 // Hospital Detail - Address, Time, Phone Text
 export const hospitalDetailText = {
   color: '#343841',
