@@ -6,6 +6,13 @@ import defaultImg from "../../assets/calendar/check_default.svg";
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
+export interface MedicalTreatment {
+  year: number;
+  month: number;
+  dates: string[];
+}
+
+
 const mapPeriod = (period: string) : string => {
     switch (period.toLowerCase()) {
         case 'morning': return '아침';
@@ -52,10 +59,11 @@ interface Props {
     selectedDay : String,
     onDateClick : (day: Date) => void,
     isClicked : boolean,
-    recordData: any[]
+    recordData: any[],
+    calendarMedTreat?: MedicalTreatment | null;
 }
 
-const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props) => {
+const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData, calendarMedTreat} : Props) => {
     const nav = useNavigate();
 
     const medicationRecords = recordData || [];
@@ -63,7 +71,7 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
 
     const [checkedStatus, setCheckedStatus] = useState<Record<number, boolean>>({});
     const [isOpen, setIsOpen] = useState(false);
-    const [hasMedicalRecord, setHasMedicalRecord] = useState(true);
+    const [hasMedicalRecord, setHasMedicalRecord] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDelModal, setOpenDelModal] = useState(false);
     const [openSubModal, setSubModal] = useState(false);
@@ -99,42 +107,18 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
     };
    
     const doubleButton = [
-        {
-            label: '취소',
-            onClick: () => setOpenEditModal(false),
-            variant: 'default' as const,
-        },
-        {
-            label: '수정',
-            onClick: handleConfirm,
-            variant: 'colored' as const,
-        }
+        { label: '취소', onClick: () => setOpenEditModal(false), variant: 'default' as const,},
+        { label: '수정', onClick: handleConfirm, variant: 'colored' as const,}
     ]
 
     const double1Button = [
-        {
-            label: '취소',
-            onClick: () => setOpenDelModal(false),
-            variant: 'default' as const,
-        },
-        {
-            label: '삭제',
-            onClick: handleDelete,
-            variant: 'colored' as const,
-        }
+        { label: '취소', onClick: () => setOpenDelModal(false), variant: 'default' as const,},
+        { label: '삭제', onClick: handleDelete, variant: 'colored' as const,}
     ]
 
     const double2Button = [
-        {
-            label: '모든 일정 삭제',
-            onClick: handleDeleteAll,
-            variant: 'default' as const,
-        },
-        {
-            label: '이 일정만 삭제',
-            onClick: handleDeleteOnly,
-            variant: 'colored' as const,
-        }
+        { label: '모든 일정 삭제', onClick: handleDeleteAll, variant: 'default' as const,},
+        { label: '이 일정만 삭제', onClick: handleDeleteOnly, variant: 'colored' as const,}
     ]
 
     
@@ -150,6 +134,21 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
         setModalCheckedStatus({});
 
     }, [recordData]);
+
+    useEffect(() => {
+        let recordExists = false;
+
+        if (calendarMedTreat && selectedMonth && selectedDay) {
+            const currentYear = calendarMedTreat.year;
+            const formatMonth = String(selectedMonth).padStart(2, '0');
+            const formatDay = String(selectedDay).padStart(2, '0');
+
+            const selectedDate = `${currentYear}-${formatMonth}-${formatDay}`;
+
+            recordExists = calendarMedTreat.dates.includes(selectedDate);
+        }
+        setHasMedicalRecord(recordExists);
+    }, [calendarMedTreat, selectedMonth, selectedDay]);
 
 
     const onToggle = () => setIsOpen(!isOpen);
@@ -170,7 +169,6 @@ const DailyRecord = ({selectedMonth, selectedDay, isClicked, recordData} : Props
         }));
     }
     //console.log(checkedStatus);
-    
 
     return (
         <div className="h-[190px] flex justify-center">

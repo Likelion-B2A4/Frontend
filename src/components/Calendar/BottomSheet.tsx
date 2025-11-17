@@ -5,10 +5,9 @@ interface Props {
     content: React.ReactNode;
     onClick: () => void;
     isConfirmDisabled: boolean;
-    variant: string
 }
 
-const BottomSheet = ({title, content, onClick, isConfirmDisabled, variant} : Props) => {
+const BottomSheet = ({title, content, onClick, isConfirmDisabled} : Props) => {
 
     return (
         <div className="w-full h-full flex fixed inset-0 z-50 bg-[#000000]/50 backdrop-blur-sm items-end">
