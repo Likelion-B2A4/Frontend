@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import Button from '../components/Button';
@@ -20,7 +19,6 @@ const LogIn = () => {
   const {
     register,
     handleSubmit,
-    watch,
     setError,
     formState: { errors, dirtyFields, isValid },
   } = useForm<LoginFormInputs>({

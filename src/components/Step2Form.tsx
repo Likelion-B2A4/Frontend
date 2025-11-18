@@ -2,9 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form'; // 1. RHF import
 import WeeklyButton from './WeeklyButton';
 import FormInput from './FormInput';
-import { Dirty, hintDisabled, placeHolder } from '../styles/typography';
+import { Dirty, hintDisabled } from '../styles/typography';
 import Button from './Button';
-import { is } from 'date-fns/locale';
 
 // --- (Interfaces and 'weeklist' remain unchanged) ---
 interface IOperatingTime {
@@ -409,7 +408,6 @@ const Step2Form = ({
           {/* --- (요일 버튼 로직은 동일) --- */}
           {weeklist.map((day) => {
             const dayKey = day.key as keyof IOperatingTime;
-            const isSaved = !!operatingTime[dayKey];
 
             return (
               <WeeklyButton

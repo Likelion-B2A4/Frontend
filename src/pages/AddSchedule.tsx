@@ -252,7 +252,7 @@ const AddSchedule = () => {
                     content={<CalendarModal onSelectDate={handleSelectedDate} onSelectionChange={handleSelectionChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={!isDateSelected}
-                    variant="default"
+                    
             />}
 
             {isTimeModalOpen && (
@@ -261,7 +261,7 @@ const AddSchedule = () => {
                     content={<TimeModal onChangeTime={handleTimeChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={false}
-                    variant="default"
+                    
                 />
             )}
         </div>

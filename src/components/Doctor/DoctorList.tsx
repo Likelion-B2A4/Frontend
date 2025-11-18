@@ -46,11 +46,13 @@ const DoctorList: React.FC<DoctorListProps> = ({onAddDoctor}) => {
 
     const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value)
+
         //console.log(name);
     }
 
     const onChangePw = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPw(e.target.value);
+        setIsValid(false);
     }
 
     const handleInput = () => {
@@ -76,7 +78,7 @@ const DoctorList: React.FC<DoctorListProps> = ({onAddDoctor}) => {
         {
             label: '확인',
             onClick: handleConfirm,
-            variant: 'default' as const,
+            variant: 'colored' as const,
         }
     ]
     

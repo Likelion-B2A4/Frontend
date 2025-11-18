@@ -19,6 +19,7 @@ export const mockMedicationData: Record<string, { hasMed: boolean }> = {
     "2025-11-15": { hasMed: true },
     "2025-11-16": { hasMed: false }, 
     "2025-11-17": { hasMed: false }, 
+    "2025-10-26": { hasMed: false }, 
 };
 
 // DailyRecord에서 사용할 상세 목데이터 구조 (참고용)
@@ -68,3 +69,14 @@ export const mockDailyRecord = [
 export const dayMap: Record<string, number> = {
     "MON": 0, "TUE": 1, "WED": 2, "THU": 3, "FRI": 4, "SAT": 5, "SUN": 6
 };
+
+// 특정 달 진료 이력 날짜
+export const mockMedicalTreatment = {
+  "year": 2025,
+  "month": 10,
+  "dates": [
+    "2025-11-03",
+    "2025-11-11",
+    "2025-11-17"
+  ]
+}

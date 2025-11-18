@@ -8,7 +8,7 @@ import defaultImg from "../assets/calendar/check_default.svg";
 import CalendarModal from "../components/Calendar/CalendarModal";
 import TimeModal from "../components/Calendar/TimeModal";
 import { useNavigate, useLocation } from "react-router-dom";
-import { mockMedicationData, dayMap, mockDailyRecord } from "../mock/MedicationData";
+import { dayMap, mockDailyRecord } from "../mock/MedicationData";
 
 const mapPeriod = (period: string) : string => {
     switch (period.toLowerCase()) {
@@ -27,6 +27,7 @@ const EditSchedule = () => {
     const queryParams = new URLSearchParams(location.search);
     const recordId = queryParams.get('recordId');
     const [medName, setMedName] = useState("");
+    console.log(medName);
     
     useEffect(() => {
         if (recordId) {
@@ -128,7 +129,6 @@ const EditSchedule = () => {
         }
         
     }
-    //console.log(isCalendarOpen);
 
     const handleSelectedDate = (childMonth: string, childDay: string) => {
         if (isCalendarOpen[0]) {
@@ -139,7 +139,6 @@ const EditSchedule = () => {
             setEndDay(childDay);
         }
     }
-    //console.log(startMonth, startDay);
 
     const handleSelectionChange = (hasSelected: boolean) => {
         setIsDateSelected(hasSelected);
@@ -172,7 +171,6 @@ const EditSchedule = () => {
     console.log(selectedTimes);
 
     const isFormValid =
-        // medName.trim() !== "" && 
         dayCheck.some(Boolean) && 
         startMonth && startDay && 
         endMonth && endDay && 
@@ -228,7 +226,6 @@ const EditSchedule = () => {
                             </div>
                         </div>
                     </div>
-                    
                 </div>
 
                 <div className="flex flex-col">
@@ -302,7 +299,6 @@ const EditSchedule = () => {
                     content={<CalendarModal onSelectDate={handleSelectedDate} onSelectionChange={handleSelectionChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={!isDateSelected}
-                    variant="default"
             />}
 
             {isTimeModalOpen && (
@@ -311,11 +307,9 @@ const EditSchedule = () => {
                     content={<TimeModal onChangeTime={handleTimeChange}/>}
                     onClick={exitModal}
                     isConfirmDisabled={false}
-                    variant="default"
                 />
             )}
         </div>
-    
         </>
     )
 }

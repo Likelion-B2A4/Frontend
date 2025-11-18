@@ -1,8 +1,9 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../components/Button';
 import { expereinceText, headerText } from '../styles/typography';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import Topbar from '../layouts/Topbar';
 
 const FirstPage = ({ first = false, name = '' }) => {
   return (
@@ -139,6 +140,7 @@ const Service = () => {
 
   return (
     <div className="flex flex-col h-screen">
+      {isFirstVisit ? <></> : <Topbar title="서비스 안내" type="header" />}
       <div className={'flex-1 overflow-hidden'} onClick={handleContainerClick}>
         <div
           className={'flex h-full transition-transform duration-500 ease-in-out'}

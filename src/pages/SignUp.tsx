@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import FormInput from '../components/FormInput';
 import Button from '../components/Button';
@@ -24,7 +23,7 @@ const SignUp = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors, dirtyFields, isValid, isDirty },
+    formState: { errors, dirtyFields, isValid },
   } = useForm<SignUpFormInputs>({
     mode: 'onChange',
   });

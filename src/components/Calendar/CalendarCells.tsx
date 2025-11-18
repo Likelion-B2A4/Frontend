@@ -1,7 +1,13 @@
 import { endOfMonth, startOfMonth, startOfWeek, format, addDays, isSameMonth, isSameDay, isBefore } from "date-fns";
 import recordImg from "../../assets/calendar/record.svg";
-import med_notAll from "../../assets/calendar/med_notall.svg";
+// import med_notAll from "../../assets/calendar/med_notall.svg";
 import med_All from "../../assets/calendar/med_all.svg";
+
+export interface MedicalTreatment {
+  year: number;
+  month: number;
+  dates: string[];
+}
 
 interface Props {
     currentDate : Date,
@@ -9,10 +15,11 @@ interface Props {
     selectedDay : string,
     onDateClick : (day: Date) => void,
     mode: number,
-    calendarMedData: Record<string, {hasMed: boolean}>
+    calendarMedData?: Record<string, {hasMed: boolean}>
+    calendarMedTreat?: MedicalTreatment | null;
 }
 
-const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mode = 0, calendarMedData} : Props) => {
+const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mode = 0, calendarMedData, calendarMedTreat} : Props) => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
 
@@ -48,25 +55,47 @@ const CalendarCells = ({currentDate, selectedMonth, selectedDay, onDateClick, mo
     
 
             const isOtherMonth = format(currentDate, "M") !== format(cloneDay, "M");
-
+            
+            if (mode == 0 && calendarMedData) {
             const medStatus = calendarMedData[formattedDate] || {hasMed: false};
-            const hasRecord = true;
+            const hasRecord = calendarMedTreat && 
+                                isSameMonth(cloneDay, currentDate) &&
+                                calendarMedTreat.dates.includes(formattedDate);
 
             days.push(
                 <div 
                     key={num} 
-                    className={`w-full h-[52px] text-center
+                    className={`w-full h-[52px] text-center rounded-sm
                         ${isOtherMonth ? "opacity-0" : `${textColor} cursor-pointer`}
+                        ${isSelected ? "bg-[#F4F6F8]" : ""}
                     `}
                     onClick={() => {onDateClick(cloneDay)}}
                 >
                     {format(day, 'd')}
-                    <div className="flex flex-row gap-0.5 mx-[5px] justify-center">
+                    <div className="flex flex-row gap-0.5 mx-[5px] justify-between">
+                        <div>
                         {hasRecord && <img src={recordImg} alt="" />}
+                        </div>
+                        <div>
                         {medStatus.hasMed && <img src={med_All} alt="" />}
+                        </div>
                     </div>
                 </div>
-            )
+            )}
+            else if (mode == 1) {
+                days.push(
+                <div 
+                    key={num} 
+                    className={`w-full h-[52px] text-center rounded-sm
+                        ${isOtherMonth ? "opacity-0" : `${textColor} cursor-pointer`}
+                        ${isSelected ? "bg-[#F4F6F8]" : ""}
+                    `}
+                    onClick={() => {onDateClick(cloneDay)}}
+                >
+                    {format(day, 'd')}
+                    
+                </div>
+            )}
             day = addDays(day, 1);
         }
         rows.push(
