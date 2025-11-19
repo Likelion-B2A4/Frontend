@@ -8,6 +8,7 @@ import hospitalImage from "../assets/hospitalmap/hospitalimage.png";
 import MyLocation from "../assets/hospitalmap/mylocation.png";
 import LocationPin from "../assets/hospitalmap/locationpin.png";
 import { debounce } from "lodash";
+import { useKakaoMaps } from "../hooks/useKakaoMaps";
 declare global {
   interface Window {
     kakao: any;
@@ -75,6 +76,7 @@ const HOSPITAL_DATA: Hospital[] = [
 
 const Hospitalmap = () => {
   const navigate = useNavigate();
+  const { isReady: kakaoReady } = useKakaoMaps();
   const [modalOpen, setModalOpen] = useState(true);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
@@ -106,6 +108,8 @@ const Hospitalmap = () => {
 
   // 지도 초기화 (한 번만)
   useEffect(() => {
+    // Kakao Maps SDK가 로드될 때까지 기다림
+    if (!kakaoReady) return;
     if (mapRef.current) return; // 이미 초기화됨
 
     const container = document.getElementById(`map`);
@@ -142,7 +146,7 @@ const Hospitalmap = () => {
         });
       });
     });
-  }, []);
+  }, [kakaoReady]);
 
   // 위치 권한 허용
   const handleConfirmLocation = () => {
