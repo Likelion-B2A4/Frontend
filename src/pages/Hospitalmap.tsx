@@ -112,6 +112,11 @@ const Hospitalmap = () => {
     if (!kakaoReady) return;
     if (mapRef.current) return; // 이미 초기화됨
 
+    // 카카오맵 SDK가 완전히 로드되었는지 확인
+    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.LatLng) {
+      return;
+    }
+
     const container = document.getElementById(`map`);
     if (!container) return;
 
