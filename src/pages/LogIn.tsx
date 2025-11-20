@@ -4,6 +4,8 @@ import Button from '../components/Button';
 import { isValidPassword } from '../utils/validation';
 import FormInput from '../components/FormInput';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { loginPatientApi } from '../apis/auth';
+import { useAuthStore } from '../hooks/useAuthStore';
 
 type LoginFormInputs = {
   id: string;
@@ -27,6 +29,7 @@ const LogIn = () => {
 
   const nav = useNavigate();
   const isMobile = useIsMobile();
+  const { setTokens } = useAuthStore();
 
   const handleSinup = () => {
     if (isMobile) nav('/signup');
@@ -36,27 +39,27 @@ const LogIn = () => {
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     // e.preventDefault()는 rhfHandleSubmit이 자동으로 해줍니다.
 
-    console.log('아이디:', data.id); // 'id' 대신 'data.id'
-    console.log('비밀번호:', data.password); // 'password' 대신 'data.password'
+    // console.log('아이디:', data.id); // 'id' 대신 'data.id'
+    // console.log('비밀번호:', data.password); // 'password' 대신 'data.password'
 
-    if (data.id === mockData.id && data.password === mockData.password) {
-      const payload = {
-        id: data.id,
-        password: data.password,
-        deviceType: isMobile ? 'mobile' : 'desktop',
-      };
+    // if (data.id === mockData.id && data.password === mockData.password) {
+    //   const payload = {
+    //     id: data.id,
+    //     password: data.password,
+    //     deviceType: isMobile ? 'mobile' : 'desktop',
+    //   };
 
-      console.log('전송할 데이터:', payload); // try { ... API 호출 ... }
-    } else {
-      // window.alert('로그인 실패!');
-      // setError('id', {
-      //   type: 'unauthorized',
-      //   message: '아이디 또는 비밀번호가 일치하지 않습니다.',
-      // });
-      setError('password', {
-        type: 'unauthorized',
-      });
-    }
+    //   console.log('전송할 데이터:', payload); // try { ... API 호출 ... }
+    // } else {
+    //   // window.alert('로그인 실패!');
+    //   // setError('id', {
+    //   //   type: 'unauthorized',
+    //   //   message: '아이디 또는 비밀번호가 일치하지 않습니다.',
+    //   // });
+    //   setError('password', {
+    //     type: 'unauthorized',
+    //   });
+    // }
 
     // try {
     //   // API 엔드포인트는 하나만 있어도 됩니다.
@@ -69,6 +72,27 @@ const LogIn = () => {
     // } catch (error) {
     //   alert('로그인 실패');
     // }
+    try {
+      const response = await loginPatientApi({
+        loginId: data.id,
+        pwd: data.password,
+      });
+      console.log('로그인 성공');
+
+      const { accessToken, refreshToken } = response;
+      setTokens(accessToken, refreshToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      nav('/hospitalmap');
+    } catch (error: any) {
+      console.error('로그인 실패: ', error);
+
+      setError('password', {
+        type: 'unauthorized',
+        message: '아이디 또는 비밀번호를 확인해주세요.',
+      });
+    }
   };
 
   return (
