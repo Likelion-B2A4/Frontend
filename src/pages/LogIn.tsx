@@ -32,8 +32,8 @@ const LogIn = () => {
   const { setTokens } = useAuthStore();
 
   const handleSinup = () => {
-    if (isMobile) nav('/signup');
-    else nav('/signuphosp');
+    nav('/signup');
+    // else nav('/signuphosp');
   };
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {

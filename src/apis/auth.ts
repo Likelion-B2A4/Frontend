@@ -16,6 +16,31 @@ interface LoginResponse {
   imageUrl?: string;
 }
 
+interface SignupPatientPayload {
+  loginId: string;
+  pwd: string;
+  name?: string;
+}
+
+interface SignupPatientResponse {
+  isSuccess: boolean;
+  message: string;
+  patientId: string;
+  loginId: string;
+  name: string;
+}
+
+// interface SignupHospitalPayload{
+//     loginId: string;
+//     pwd: string;
+//     hospitalName:string;
+//     address: string;
+//     contact:string;
+//     specialties: string;
+//     image: string;
+//     operatingHours: multipart | form-data
+// }
+
 export const loginPatientApi = async (payload: LoginPayload) => {
   const response = await instance.post<LoginResponse>('/api/patients/login', payload);
   return response.data;
@@ -38,4 +63,18 @@ export const logoutHospitalApi = async () => {
   useAuthStore.getState().clearAuth();
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
+};
+
+export const signupPatientApi = async (payload: SignupPatientPayload) => {
+  await instance.post('/api/patients/signup', payload);
+  useAuthStore.getState().clearAuth();
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+};
+
+export const signUpHospitalApi = async (formData: FormData) => {
+  const response = await instance.post('/api/hospitals/signup', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 };
