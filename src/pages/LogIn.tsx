@@ -12,11 +12,6 @@ type LoginFormInputs = {
   password: string;
 };
 
-const mockData = {
-  id: 'user1',
-  password: 'user0000',
-};
-
 const LogIn = () => {
   const {
     register,

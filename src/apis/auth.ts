@@ -22,14 +22,6 @@ interface SignupPatientPayload {
   name?: string;
 }
 
-interface SignupPatientResponse {
-  isSuccess: boolean;
-  message: string;
-  patientId: string;
-  loginId: string;
-  name: string;
-}
-
 // interface SignupHospitalPayload{
 //     loginId: string;
 //     pwd: string;
