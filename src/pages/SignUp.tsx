@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { defaultButtonText, Dirty } from '../styles/typography';
 import Topbar from '../layouts/Topbar';
+import { signupPatientApi } from '../apis/auth';
 
 type SignUpFormInputs = {
   id: string;
@@ -36,24 +37,35 @@ const SignUp = () => {
     !errors.passwordConfirm &&
     passwordValue === passwordConfirmValue;
 
-  const onSubmit: SubmitHandler<SignUpFormInputs> = (data) => {
+  const onSubmit: SubmitHandler<SignUpFormInputs> = async (data) => {
+    const nameValue = watch('name', '');
+    console.log('API로 전송할 최종 데이터:', data);
+
     // const payload = {
     //   id: data.id,
     //   password: data.password,
     //   deviceType: isMobile ? 'mobile' : 'desktop',
     //   name: data.name,
     // };
-    const nameValue = watch('name', '');
-
-    console.log('API로 전송할 최종 데이터:', data);
 
     if (isMobile) {
-      nav('/service', {
-        state: {
-          fromSignup: true,
-          userName: nameValue,
-        },
-      });
+      try {
+        await signupPatientApi({
+          loginId: data.id,
+          pwd: data.password,
+          name: data.name,
+        });
+        alert('회원가입이 완료되었습니다.');
+        nav('/service', {
+          state: {
+            fromSignup: true,
+            userName: nameValue,
+          },
+        });
+      } catch (error) {
+        console.error('환자 가입 실패:', error);
+        alert('회원가입 중 오류가 발생했습니다.');
+      }
     } else {
       nav('/signuphosp', {
         state: {
