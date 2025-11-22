@@ -4,15 +4,12 @@ import Button from '../components/Button';
 import { isValidPassword } from '../utils/validation';
 import FormInput from '../components/FormInput';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { loginHospitalApi, loginPatientApi } from '../apis/auth';
+import { useAuthStore } from '../hooks/useAuthStore';
 
 type LoginFormInputs = {
   id: string;
   password: string;
-};
-
-const mockData = {
-  id: 'user1',
-  password: 'user0000',
 };
 
 const LogIn = () => {
@@ -27,48 +24,57 @@ const LogIn = () => {
 
   const nav = useNavigate();
   const isMobile = useIsMobile();
+  const { setTokens } = useAuthStore();
 
   const handleSinup = () => {
-    if (isMobile) nav('/signup');
-    else nav('/signuphosp');
+    nav('/signup');
+    // else nav('/signuphosp');
   };
 
+  // src/pages/LogIn.tsx 의 onSubmit 함수
+
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    // e.preventDefault()는 rhfHandleSubmit이 자동으로 해줍니다.
+    try {
+      let response;
 
-    console.log('아이디:', data.id); // 'id' 대신 'data.id'
-    console.log('비밀번호:', data.password); // 'password' 대신 'data.password'
+      // 1. API 호출
+      if (isMobile) {
+        response = await loginPatientApi({ loginId: data.id, pwd: data.password });
+      } else {
+        response = await loginHospitalApi({ loginId: data.id, pwd: data.password });
+      }
 
-    if (data.id === mockData.id && data.password === mockData.password) {
-      const payload = {
-        id: data.id,
-        password: data.password,
-        deviceType: isMobile ? 'mobile' : 'desktop',
-      };
+      // 📸 CCTV 1: 서버가 준 전체 응답 확인
+      console.log('1. 서버 응답 전체:', response);
 
-      console.log('전송할 데이터:', payload); // try { ... API 호출 ... }
-    } else {
-      // window.alert('로그인 실패!');
-      // setError('id', {
-      //   type: 'unauthorized',
-      //   message: '아이디 또는 비밀번호가 일치하지 않습니다.',
-      // });
-      setError('password', {
-        type: 'unauthorized',
-      });
+      // 2. 토큰 꺼내기 (구조에 따라 다를 수 있음)
+      // 만약 response.data가 없다면 여기서 에러가 날 겁니다.
+      const { accessToken, refreshToken } = response.data;
+
+      // 📸 CCTV 2: 꺼낸 토큰 확인
+      console.log('2. 꺼낸 토큰:', accessToken);
+
+      if (!accessToken) {
+        alert('큰일 났다! 토큰이 없어요!');
+        return;
+      }
+
+      // 3. 저장하기
+      localStorage.setItem('accessToken', accessToken);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+
+      // 📸 CCTV 3: 저장 직후 확인
+      console.log('3. 저장된 토큰 확인:', localStorage.getItem('accessToken'));
+
+      // 4. 스토어 업데이트 및 이동
+      setTokens(accessToken, refreshToken || '');
+
+      if (isMobile) nav('/setting');
+      else nav('/select-doctor');
+    } catch (error: any) {
+      console.error('로그인 에러 발생:', error);
+      setError('password', { type: 'unauthorized', message: '로그인 실패' });
     }
-
-    // try {
-    //   // API 엔드포인트는 하나만 있어도 됩니다.
-    //   await axios.post('https://api.example.com/auth/login', payload);
-    //   alert('로그인 성공!');
-
-    //   // 백엔드 로그 확인: { email: '...', password: '...', deviceType: 'mobile' }
-    //   console.log('전송한 데이터:', payload);
-
-    // } catch (error) {
-    //   alert('로그인 실패');
-    // }
   };
 
   return (
