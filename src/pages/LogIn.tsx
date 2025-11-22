@@ -41,10 +41,10 @@ const LogIn = () => {
         });
         console.log('로그인 성공');
 
-        const { accessToken, refreshToken } = response;
-        setTokens(accessToken, refreshToken);
+        const { accessToken, refreshToken } = response.data;
+        setTokens(accessToken, refreshToken || null);
         localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
 
         nav('/hospitalmap');
       } else {
@@ -54,10 +54,10 @@ const LogIn = () => {
         });
         console.log('로그인 성공');
 
-        const { accessToken, refreshToken } = response;
-        setTokens(accessToken, refreshToken);
+        const { accessToken, refreshToken } = response.data;
+        setTokens(accessToken, refreshToken || null);
         localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
 
         nav('/select-doctor');
       }

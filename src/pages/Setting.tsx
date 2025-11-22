@@ -4,11 +4,14 @@ import ToggleSwitch from '../components/ToggleSwitch';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { logoutPatientApi } from '../apis/auth';
+import { useAuthStore } from '../hooks/useAuthStore';
 
 const Setting = () => {
   const nav = useNavigate();
   const [isOn, setIsOn] = useState(true);
   const [isLogOut, setIsLogOut] = useState(false);
+  const { clearAuth } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsOn(e.target.checked);
@@ -20,6 +23,25 @@ const Setting = () => {
 
   const handleCloseModal = () => {
     setIsLogOut(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      // 1. 서버에 "나 갈게!" 하고 알려주기 (API 호출)
+      await logoutPatientApi();
+      console.log('서버 로그아웃 성공');
+    } catch (error) {
+      // 서버 에러가 나더라도, 프론트에서는 로그아웃 시켜주는 게 국룰입니다.
+      console.error('로그아웃 에러(무시하고 진행):', error);
+      // } finally {
+      //   clearAuth();
+
+      //   localStorage.removeItem('accessToken');
+      //   localStorage.removeItem('refreshToken');
+
+      //   alert('로그아웃 되었습니다.');
+      //   nav('/');
+    }
   };
 
   return (
@@ -45,6 +67,7 @@ const Setting = () => {
         confirmButtonText="확인"
         cancelButtonText="취소"
         onCancel={handleCloseModal}
+        onConfirm={handleLogout}
       />
     </div>
   );
