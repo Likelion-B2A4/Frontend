@@ -68,3 +68,56 @@ export const transformOperatingData = (operatingTime: IOperatingTime) => {
 
   return { operatingHours, breakTimes };
 };
+
+export const reverseTransformOperatingData = (serverData: any, serverBreak: any) => {
+  const result: any = {
+    mon: null,
+    tue: null,
+    wed: null,
+    thu: null,
+    fri: null,
+    sat: null,
+    sun: null,
+  };
+
+  // 대문자 키(MON)를 소문자 키(mon)로 매핑
+  const dayMap: Record<string, string> = {
+    MON: 'mon',
+    TUE: 'tue',
+    WED: 'wed',
+    THU: 'thu',
+    FRI: 'fri',
+    SAT: 'sat',
+    SUN: 'sun',
+  };
+
+  if (!serverData) return result;
+
+  Object.keys(serverData).forEach((upperDay) => {
+    const lowerDay = dayMap[upperDay];
+    if (!lowerDay) return;
+
+    const timeInfo = serverData[upperDay];
+
+    // 휴무인 경우
+    if (timeInfo.isClosed) {
+      result[lowerDay] = '휴무';
+      return;
+    }
+
+    // 영업 시간 문자열 만들기 (예: "09:00 ~ 18:00")
+    let timeString = `${timeInfo.openTime} ~ ${timeInfo.closeTime}`;
+
+    // 휴게 시간이 있다면 붙이기
+    if (serverBreak && serverBreak[upperDay]) {
+      const breakInfo = serverBreak[upperDay];
+      if (breakInfo.breakStartTime && breakInfo.breakEndTime) {
+        timeString += ` 휴게: ${breakInfo.breakStartTime} ~ ${breakInfo.breakEndTime}`;
+      }
+    }
+
+    result[lowerDay] = timeString;
+  });
+
+  return result;
+};
