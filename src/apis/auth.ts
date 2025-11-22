@@ -73,7 +73,7 @@ export const signUpHospitalApi = async (formData: FormData) => {
 };
 
 export const getHospitalInfoApi = async (hospitalId: string) => {
-  const response = await instance.patch(`/api/hospitals/${hospitalId}`);
+  const response = await instance.get(`/api/hospitals/${hospitalId}`);
   return response.data;
 };
 

@@ -44,15 +44,19 @@ const LogIn = () => {
         response = await loginHospitalApi({ loginId: data.id, pwd: data.password });
       }
 
-      // 📸 CCTV 1: 서버가 준 전체 응답 확인
       console.log('1. 서버 응답 전체:', response);
 
-      // 2. 토큰 꺼내기 (구조에 따라 다를 수 있음)
-      // 만약 response.data가 없다면 여기서 에러가 날 겁니다.
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken, hospitalId, name } = response.data;
 
       // 📸 CCTV 2: 꺼낸 토큰 확인
       console.log('2. 꺼낸 토큰:', accessToken);
+
+      if (hospitalId) {
+        localStorage.setItem('hospitalId', String(hospitalId));
+      }
+      if (name) {
+        localStorage.setItem('hospitalName', name);
+      }
 
       if (!accessToken) {
         alert('큰일 났다! 토큰이 없어요!');

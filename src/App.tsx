@@ -33,8 +33,8 @@ function App() {
 
       <Route path="/signuphosp" element={<SignUpHosp />} />
 
-      <Route path="/hospital-profile/{id}" element={<HospitalProfile />} />
-      <Route path="/hospital-profile-edit/{id}" element={<HospitalProfileEdit />} />
+      <Route path="/hospital-profile/:hospitalId" element={<HospitalProfile />} />
+      <Route path="/hospital-profile-edit/:hospitalId" element={<HospitalProfileEdit />} />
       <Route
         path="*"
         element={
