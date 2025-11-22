@@ -9,6 +9,8 @@ import MyLocation from "../assets/hospitalmap/mylocation.png";
 import LocationPin from "../assets/hospitalmap/locationpin.png";
 import { debounce } from "lodash";
 import { useKakaoMaps } from "../hooks/useKakaoMaps";
+import { getLocationPermissionApi } from "../apis/location";
+import { useAuthStore } from "../hooks/useAuthStore";
 declare global {
   interface Window {
     kakao: any;
@@ -77,7 +79,8 @@ const HOSPITAL_DATA: Hospital[] = [
 const Hospitalmap = () => {
   const navigate = useNavigate();
   const { isReady: kakaoReady } = useKakaoMaps();
-  const [modalOpen, setModalOpen] = useState(true);
+  const { isLoggedIn } = useAuthStore();
+  const [modalOpen, setModalOpen] = useState(false);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const mapRef = useRef<any>(null);
@@ -93,6 +96,8 @@ const Hospitalmap = () => {
   const myLocationMarkerRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const watchPositionIdRef = useRef<number | null>(null);
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 지도 중심좌표 이동 감지 시 이동된 중심좌표로 설정
   const updateCenterWhenMapMoved = useMemo(
@@ -106,11 +111,73 @@ const Hospitalmap = () => {
     []
   );
 
+  // 위치 권한 상태 확인 (로그인 후 최초 방문인지 확인)
+  useEffect(() => {
+    const checkLocationPermission = async () => {
+      try {
+        if (!isLoggedIn) {
+          // 로그인하지 않은 상태 - 기본 위치로 지도 표시
+          setShowMyLocationMarker(false);
+          setCenter({ lat: 37.55561, lng: 126.9234 });
+          setIsLoading(false);
+          return;
+        }
+
+        // API로 위치 권한 상태 확인
+        const response = await getLocationPermissionApi();
+        console.log('위치 권한 API 응답:', response);
+
+        if (response.isSuccess && response.data.locationPermission) {
+          // 권한이 있으면 현재 위치 기반으로 지도 초기화
+          setShowMyLocationMarker(true);
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+              setCenter(userLocation);
+              setPosition(userLocation);
+            },
+            (error) => {
+              console.error('위치 정보를 가져올 수 없습니다:', error);
+            }
+          );
+
+          // 위치 변화 감지
+          const watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+              setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            },
+            (error) => {
+              console.error('위치 감시 중 오류:', error);
+            }
+          );
+          watchPositionIdRef.current = watchId;
+        } else {
+          // 권한 요청 필요 - 최초 방문 모달 표시
+          setModalOpen(true);
+          setShowMyLocationMarker(false);
+          setCenter({ lat: 37.55561, lng: 126.9234 });
+        }
+      } catch (error) {
+        console.error('위치 권한 확인 중 오류:', error);
+        // 오류 발생 시 모달 표시
+        setModalOpen(true);
+        setShowMyLocationMarker(false);
+        setCenter({ lat: 37.55561, lng: 126.9234 });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkLocationPermission();
+  }, [isLoggedIn]);
+
   // 지도 초기화 (한 번만)
   useEffect(() => {
     // Kakao Maps SDK가 로드될 때까지 기다림
     if (!kakaoReady) return;
     if (mapRef.current) return; // 이미 초기화됨
+    if (isLoading) return; // 로딩 중이면 대기
 
     // 카카오맵 SDK가 완전히 로드되었는지 확인
     if (!window.kakao || !window.kakao.maps || !window.kakao.maps.LatLng) {
@@ -154,7 +221,7 @@ const Hospitalmap = () => {
         });
       });
     });
-  }, [kakaoReady]);
+  }, [kakaoReady, isLoading, center]);
 
   // 위치 권한 허용
   const handleConfirmLocation = () => {
@@ -178,6 +245,8 @@ const Hospitalmap = () => {
       },
       (error) => {
         console.error('위치 정보를 가져올 수 없습니다:', error);
+        // 오류 발생 시 기본 위치로 설정
+        setCenter({ lat: 37.55561, lng: 126.9234 });
       }
     );
 
@@ -250,6 +319,15 @@ const Hospitalmap = () => {
       }
     }
   }, [position, showMyLocationMarker]);
+
+  // 컴포넌트 언마운트 시 cleanup
+  useEffect(() => {
+    return () => {
+      if (watchPositionIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchPositionIdRef.current);
+      }
+    };
+  }, []);
 
   const handleFavoriteToggle = () => {
     if (selectedHospital) {
