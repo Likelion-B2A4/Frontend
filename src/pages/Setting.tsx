@@ -27,20 +27,25 @@ const Setting = () => {
 
   const handleLogout = async () => {
     try {
-      // 1. 서버에 "나 갈게!" 하고 알려주기 (API 호출)
+      console.log('🚀 로그아웃 요청 시작!');
+
+      // 1. API 호출 (여기서 에러나면 바로 catch로 점프!)
       await logoutPatientApi();
-      console.log('서버 로그아웃 성공');
+
+      console.log('✅ 서버 로그아웃 성공!');
+
+      // 2. 성공했을 때만 실행되는 뒷정리
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      clearAuth(); // 스토어 초기화
+
+      alert('로그아웃 되었습니다.');
+      nav('/login'); // 로그인 페이지로 이동
     } catch (error) {
-      // 서버 에러가 나더라도, 프론트에서는 로그아웃 시켜주는 게 국룰입니다.
-      console.error('로그아웃 에러(무시하고 진행):', error);
-      // } finally {
-      //   clearAuth();
-
-      //   localStorage.removeItem('accessToken');
-      //   localStorage.removeItem('refreshToken');
-
-      //   alert('로그아웃 되었습니다.');
-      //   nav('/');
+      // 3. 실패하면 여기서 멈춤! (화면 이동 안 함)
+      console.error('🚨 로그아웃 실패! (여기서 멈춤)');
+      console.error('에러 내용:', error);
+      alert('로그아웃 요청 중 에러가 발생했습니다. 콘솔을 확인하세요.');
     }
   };
 
