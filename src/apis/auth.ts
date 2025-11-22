@@ -52,10 +52,8 @@ export const loginHospitalApi = async (payload: LoginPayload) => {
 };
 
 export const logoutHospitalApi = async () => {
-  await instance.post('/api/hospitals/login');
-  useAuthStore.getState().clearAuth();
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
+  const response = await instance.post('/api/hospitals/logout');
+  return response.data;
 };
 
 export const signupPatientApi = async (payload: SignupPatientPayload) => {
