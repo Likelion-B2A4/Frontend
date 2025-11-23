@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useChatStore } from '../hooks/useChatStore';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { wsService } from '../services/websocketService';
+import { logoutHospitalApi } from '../apis/auth';
 
 interface ActiveChatRoom {
   chatRoomId: string;
@@ -14,69 +15,53 @@ interface ActiveChatRoom {
 const DoctorWaiting = () => {
   const navigate = useNavigate();
   const { setChatRoom } = useChatStore();
-  const { accessToken } = useAuthStore();
+  const { accessToken, doctorId } = useAuthStore();
   const [activeChatRooms, setActiveChatRooms] = useState<ActiveChatRoom[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [showChatList, setShowChatList] = useState(true);
 
-  // WebSocket 초기화 및 의사 구독
+  // 새로운 채팅방 알림 수신 (App.tsx에서 전역으로 초기화되었으므로, 여기서는 상태만 업데이트)
   useEffect(() => {
-    const initializeDoctor = async () => {
-      if (isInitialized || !accessToken) return;
-      setIsInitialized(true);
+    if (!doctorId || !accessToken) return;
+    if (isInitialized) return;
 
-      try {
-        const wsUrl = import.meta.env.VITE_WS_URL;
-        if (!wsUrl) {
-          throw new Error('WebSocket URL not configured');
-        }
+    setIsInitialized(true);
+    setIsConnecting(true);
 
-        setIsConnecting(true);
-
-        // 의사 ID를 localStorage에서 가져옴
-        const doctorId = localStorage.getItem('doctorId') || 'doctor';
-
-        // WebSocket 연결 + 의사 구독
-        await wsService.connectAsDoctor(
-          {
-            url: wsUrl,
-            accessToken,
-          },
-          doctorId
-        );
-
-        // 새로운 채팅방 알림 수신 (subscribe에서 콜백으로 처리)
-        wsService.subscribe(
-          `/sub/doctors/${doctorId}`,
-          (message: { body: string }) => {
-            console.log('[DoctorWaiting] 새로운 채팅방 알림 수신:', message.body);
-            const newRoom = JSON.parse(message.body);
-            console.log('[DoctorWaiting] 파싱된 newRoom:', newRoom);
-            if (newRoom.id) {
-              const room: ActiveChatRoom = {
-                chatRoomId: newRoom.id,
-                patientName: newRoom.patientName || '환자',
-                status: 'active',
-                createdAt: new Date().toISOString(),
-              };
-              console.log('[DoctorWaiting] 채팅방 추가:', room);
-              setActiveChatRooms((prev) => [...prev, room]);
-            }
+    // 채팅방 구독 콜백 등록
+    const unsubscribe = wsService.subscribe(
+      `/sub/doctors/${doctorId}`,
+      (message: { body: string }) => {
+        console.log('[DoctorWaiting] 새로운 채팅방 알림 수신:', message.body);
+        try {
+          const newRoom = JSON.parse(message.body);
+          console.log('[DoctorWaiting] 파싱된 newRoom:', newRoom);
+          if (newRoom.id) {
+            const room: ActiveChatRoom = {
+              chatRoomId: newRoom.id,
+              patientName: newRoom.patientName || '환자',
+              status: 'active',
+              createdAt: new Date().toISOString(),
+            };
+            console.log('[DoctorWaiting] 채팅방 추가:', room);
+            setActiveChatRooms((prev) => [...prev, room]);
           }
-        );
+        } catch (error) {
+          console.error('[DoctorWaiting] 파싱 실패:', error);
+        }
+      }
+    );
 
-        console.log('[DoctorWaiting] Connected as doctor:', doctorId);
-        setIsConnecting(false);
-      } catch (error) {
-        console.error('[DoctorWaiting] Failed to initialize:', error);
-        alert('연결에 실패했습니다.');
-        setIsConnecting(false);
+    setIsConnecting(false);
+    console.log('[DoctorWaiting] 채팅방 구독 완료');
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
       }
     };
-
-    initializeDoctor();
-  }, [accessToken, isInitialized]);
+  }, [accessToken, doctorId, isInitialized]);
 
   // 채팅방 입장
   const handleEnterChatRoom = (chatRoomId: string) => {
@@ -97,15 +82,22 @@ const DoctorWaiting = () => {
   };
 
   // 의사 로그아웃
-  const handleLogout = () => {
-    // WebSocket 연결 해제
-    wsService.disconnect();
+  const handleLogout = async () => {
+    try {
+      // WebSocket 연결 해제
+      wsService.disconnect();
 
-    // 상태 초기화
-    localStorage.removeItem('doctorId');
+      // 로그아웃 API 호출
+      await logoutHospitalApi();
 
-    // 로그아웃
-    navigate('/login');
+      // 상태 초기화
+      localStorage.removeItem('doctorId');
+
+      // 로그인 페이지로 이동
+      navigate('/login');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
 
