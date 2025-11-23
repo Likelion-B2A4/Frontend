@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import { useChatStore } from '../hooks/useChatStore';
-import { useAuthStore } from '../hooks/useAuthStore';
 import { scanQRAndCreateChat } from '../apis/chatApi';
 import WaitTreat from '../components/WaitTreat';
 
@@ -11,7 +10,6 @@ const CamQR: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const qrScannerRef = useRef<QrScanner | null>(null);
     const { setChatRoom } = useChatStore();
-    const { accessToken } = useAuthStore();
 
     const [scanResult, setScanResult] = useState<string | null>(null);
     const [isScanning, setIsScanning] = useState(false);
@@ -26,12 +24,12 @@ const CamQR: React.FC = () => {
         const createChatRoom = async () => {
             setIsCreatingChat(true);
             try {
-                // QR 코드 값에서 의사 ID 추출 (QR 코드 형식에 따라 조정 필요)
-                const doctorId = scanResult.split('?')[1]?.split('=')[1] || scanResult;
-
                 // 채팅방 생성 API 호출
-                const response = await scanQRAndCreateChat(doctorId, scanResult);
-                const chatRoomId = response.chatRoomId || response.id;
+                const response = await scanQRAndCreateChat(scanResult);
+                console.log('[CamQR] API Response:', response);
+                const chatRoomId = response.data?.chatRoomId;
+                const accessToken = localStorage.getItem('accessToken');
+                console.log('[CamQR] chatRoomId:', chatRoomId, 'accessToken:', accessToken);
 
                 if (chatRoomId && accessToken) {
                     // 채팅 상태 저장
@@ -56,7 +54,7 @@ const CamQR: React.FC = () => {
         };
 
         createChatRoom();
-    }, [scanResult, isCreatingChat, accessToken, navigate, setChatRoom]);
+    }, [scanResult, isCreatingChat, navigate, setChatRoom]);
 
     useEffect(() => {
         if (!videoRef.current) return;
