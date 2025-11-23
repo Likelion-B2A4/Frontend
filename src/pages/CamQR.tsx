@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import { useChatStore } from '../hooks/useChatStore';
+import { useAuthStore } from '../hooks/useAuthStore';
+import { wsService } from '../services/websocketService';
 import { scanQRAndCreateChat } from '../apis/chatApi';
 import WaitTreat from '../components/WaitTreat';
 
@@ -10,6 +12,7 @@ const CamQR: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const qrScannerRef = useRef<QrScanner | null>(null);
     const { setChatRoom } = useChatStore();
+    const { accessToken } = useAuthStore();
 
     const [scanResult, setScanResult] = useState<string | null>(null);
     const [isScanning, setIsScanning] = useState(false);
@@ -27,13 +30,29 @@ const CamQR: React.FC = () => {
                 // 채팅방 생성 API 호출
                 const response = await scanQRAndCreateChat(scanResult);
                 console.log('[CamQR] API Response:', response);
-                const chatRoomId = response.data?.chatRoomId;
-                const accessToken = localStorage.getItem('accessToken');
-                console.log('[CamQR] chatRoomId:', chatRoomId, 'accessToken:', accessToken);
+                const chatRoomId = response?.data?.chatRoomId;
+                const token = localStorage.getItem('accessToken');
+                console.log('[CamQR] chatRoomId:', chatRoomId, 'accessToken:', token);
 
-                if (chatRoomId && accessToken) {
+                if (chatRoomId && token) {
+                    // WebSocket 연결
+                    const wsUrl = import.meta.env.VITE_WS_URL;
+                    if (!wsUrl) {
+                        throw new Error('WebSocket URL not configured');
+                    }
+                    console.log('[CamQR] WebSocket 연결 시도');
+                    await wsService.connectAsPatient({
+                        url: wsUrl,
+                        accessToken: token,
+                    });
+                    console.log('[CamQR] WebSocket 연결 성공');
+
+                    // 채팅방 구독
+                    wsService.subscribe(`/sub/chats/${chatRoomId}/messages`);
+                    console.log('[CamQR] 채팅방 구독 완료');
+
                     // 채팅 상태 저장
-                    setChatRoom(chatRoomId, 'patient', accessToken);
+                    setChatRoom(chatRoomId, 'patient', token);
 
                     // 사전질문 페이지로 이동
                     navigate('/pre-question1');
@@ -104,7 +123,6 @@ const CamQR: React.FC = () => {
             }
         }
     }, []);
-    console.log(scanResult);
 
     if (isSuccess) {
         return (
