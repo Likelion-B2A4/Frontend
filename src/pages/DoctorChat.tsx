@@ -102,6 +102,17 @@ const DoctorChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 진료 종료 후 3초 뒤 완료 페이지로 이동
+  useEffect(() => {
+    if (isChatClosed) {
+      const timer = setTimeout(() => {
+        navigate('/doctor/consultation-completed');
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isChatClosed, navigate]);
+
   // 진료 종료 처리
   const handleEndConsultation = async () => {
     if (!chatRoomId) return;

@@ -27,6 +27,8 @@ import HospitalProfile from './pages/HospitalProfile.tsx';
 import HospitalProfileEdit from './pages/HospitalProfileEdit.tsx';
 import DoctorChat from './pages/DoctorChat.tsx';
 import DoctorWaiting from './pages/DoctorWaiting.tsx';
+import ConsultationCompleted from './pages/ConsultationCompleted.tsx';
+import PatientConsultationCompleted from './pages/PatientConsultationCompleted.tsx';
 
 function App() {
   const navigate = useNavigate();
@@ -111,6 +113,7 @@ function App() {
       <Route path="/qr-checkin" element={<QrCheckIn />} />
       <Route path="/doctor/waiting" element={<DoctorWaiting />} />
       <Route path="/doctor/chat/:chatRoomId" element={<DoctorChat />} />
+      <Route path="/doctor/consultation-completed" element={<ConsultationCompleted />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signuphosp" element={<SignUpHosp />} />
       <Route path="/hospital-profile/:hospitalId" element={<HospitalProfile />} />
@@ -136,6 +139,7 @@ function App() {
               <Route path="/pre-question2" element={<PreQuestion2 />} />
               <Route path="/pre-question3" element={<PreQuestion3 />} />
               <Route path="/patientchat" element={<PatientChat />} />
+              <Route path="/patient-consultation-completed" element={<PatientConsultationCompleted />} />
             </Routes>
           </div>
         }

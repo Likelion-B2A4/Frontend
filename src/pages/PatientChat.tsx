@@ -81,6 +81,17 @@ const PatientChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 진료 종료 후 3초 뒤 완료 페이지로 이동
+  useEffect(() => {
+    if (isChatClosed) {
+      const timer = setTimeout(() => {
+        navigate('/patient-consultation-completed');
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isChatClosed, navigate]);
+
   // 사전질문 답변을 기반으로 자동 메시지 전송 (WebSocket 연결 후)
   useEffect(() => {
     if (
