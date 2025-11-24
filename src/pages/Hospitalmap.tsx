@@ -9,7 +9,9 @@ import MyLocation from "../assets/hospitalmap/mylocation.png";
 import LocationPin from "../assets/hospitalmap/locationpin.png";
 import { debounce } from "lodash";
 import { useKakaoMaps } from "../hooks/useKakaoMaps";
-import { getLocationPermissionApi } from "../apis/location";
+import { getLocationPermissionApi, updateLocationPermissionApi } from "../apis/location";
+import { getNearbyHospitalsApi, getHospitalDetailApi } from "../apis/hospital";
+import { addBookmarkApi, deleteBookmarkApi } from "../apis/bookmark";
 import { useAuthStore } from "../hooks/useAuthStore";
 declare global {
   interface Window {
@@ -39,43 +41,6 @@ interface LatLng {
   lng: number;
 }
 
-// 샘플 병원 데이터
-const HOSPITAL_DATA: Hospital[] = [
-  {
-    id: 1,
-    lat: 37.5560379420754,
-    lng: 126.924462416982,
-    image: hospitalImage,
-    name: '농인사랑병원',
-    department: '외과·정형외과',
-    address: '서울특별시 마포구 양화로 188 (동교동)',
-    hours: { day: '월', startTime: '09:00', endTime: '18:00' },
-    phone: '02-789-9800',
-  },
-  {
-    id: 2,
-    lat: 37.5553020767532,
-    lng: 126.923590029183,
-    image: hospitalImage,
-    name: '마포의료센터',
-    department: '내과·외과',
-    address: '서울특별시 마포구 양화로 200',
-    hours: { day: '월', startTime: '08:00', endTime: '19:00' },
-    phone: '02-789-9801',
-  },
-  {
-    id: 3,
-    lat: 37.5545808852364,
-    lng: 126.922708589618,
-    image: hospitalImage,
-    name: '동교병원',
-    department: '정형외과',
-    address: '서울특별시 마포구 양화로 180',
-    hours: { day: '월', startTime: '09:30', endTime: '18:30' },
-    phone: '02-789-9802',
-  },
-];
-
 const Hospitalmap = () => {
   const navigate = useNavigate();
   const { isReady: kakaoReady } = useKakaoMaps();
@@ -83,6 +48,7 @@ const Hospitalmap = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const mapRef = useRef<any>(null);
   const [center, setCenter] = useState<LatLng>({
     lat: 37.55561,
@@ -132,10 +98,38 @@ const Hospitalmap = () => {
           setShowMyLocationMarker(true);
 
           navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            async (pos) => {
               const userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
               setCenter(userLocation);
               setPosition(userLocation);
+              localStorage.setItem('userLocation', JSON.stringify(userLocation));
+
+              // 주변 병원 검색 API 호출
+              try {
+                const hospitalResponse = await getNearbyHospitalsApi(userLocation.lat, userLocation.lng, 2000);
+                console.log('주변 병원 검색 성공:', hospitalResponse.data);
+
+                // API 응답을 Hospital 타입으로 변환
+                const convertedHospitals: Hospital[] = hospitalResponse.data.map((hospital) => ({
+                  id: hospital.hospitalId,
+                  lat: hospital.latitude,
+                  lng: hospital.longitude,
+                  image: hospitalImage,
+                  name: hospital.hospitalName,
+                  department: '',
+                  address: '',
+                  hours: {
+                    day: '',
+                    startTime: '',
+                    endTime: '',
+                  },
+                  phone: '',
+                }));
+
+                setHospitals(convertedHospitals);
+              } catch (error) {
+                console.error('주변 병원 검색 실패:', error);
+              }
             },
             (error) => {
               console.error('위치 정보를 가져올 수 없습니다:', error);
@@ -156,14 +150,74 @@ const Hospitalmap = () => {
           // 권한 요청 필요 - 최초 방문 모달 표시
           setModalOpen(true);
           setShowMyLocationMarker(false);
-          setCenter({ lat: 37.55561, lng: 126.9234 });
+
+          // 기본 위치로 주변 병원 검색
+          try {
+            const hospitalResponse = await getNearbyHospitalsApi(37.55561, 126.9234, 2000);
+            const convertedHospitals: Hospital[] = hospitalResponse.data.map((hospital) => ({
+              id: hospital.hospitalId,
+              lat: hospital.latitude,
+              lng: hospital.longitude,
+              image: hospitalImage,
+              name: hospital.hospitalName,
+              department: '',
+              address: '',
+              hours: {
+                day: '',
+                startTime: '',
+                endTime: '',
+              },
+              phone: '',
+            }));
+            setHospitals(convertedHospitals);
+
+            // 첫 번째 병원을 중심으로 지도 표시
+            if (convertedHospitals.length > 0) {
+              setCenter({ lat: convertedHospitals[0].lat, lng: convertedHospitals[0].lng });
+            } else {
+              setCenter({ lat: 37.55561, lng: 126.9234 });
+            }
+          } catch (error) {
+            console.error('주변 병원 검색 실패:', error);
+            setCenter({ lat: 37.55561, lng: 126.9234 });
+          }
         }
       } catch (error) {
         console.error('위치 권한 확인 중 오류:', error);
         // 오류 발생 시 모달 표시
         setModalOpen(true);
         setShowMyLocationMarker(false);
-        setCenter({ lat: 37.55561, lng: 126.9234 });
+
+        // 기본 위치로 주변 병원 검색
+        try {
+          const hospitalResponse = await getNearbyHospitalsApi(37.55561, 126.9234, 2000);
+          const convertedHospitals: Hospital[] = hospitalResponse.data.map((hospital) => ({
+            id: hospital.hospitalId,
+            lat: hospital.latitude,
+            lng: hospital.longitude,
+            image: hospitalImage,
+            name: hospital.hospitalName,
+            department: '',
+            address: '',
+            hours: {
+              day: '',
+              startTime: '',
+              endTime: '',
+            },
+            phone: '',
+          }));
+          setHospitals(convertedHospitals);
+
+          // 첫 번째 병원을 중심으로 지도 표시
+          if (convertedHospitals.length > 0) {
+            setCenter({ lat: convertedHospitals[0].lat, lng: convertedHospitals[0].lng });
+          } else {
+            setCenter({ lat: 37.55561, lng: 126.9234 });
+          }
+        } catch (hospitalError) {
+          console.error('주변 병원 검색 실패:', hospitalError);
+          setCenter({ lat: 37.55561, lng: 126.9234 });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -203,8 +257,14 @@ const Hospitalmap = () => {
       updateCenterWhenMapMoved(map);
     });
 
+    // 기존 마커 제거
+    markersRef.current.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markersRef.current = [];
+
     // 마커 생성
-    HOSPITAL_DATA.forEach((hospital) => {
+    hospitals.forEach((hospital) => {
       const marker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(hospital.lat, hospital.lng),
         map: map,
@@ -213,34 +273,99 @@ const Hospitalmap = () => {
       markersRef.current.push(marker);
 
       // 마커 클릭 이벤트
-      window.kakao.maps.event.addListener(marker, 'click', () => {
+      window.kakao.maps.event.addListener(marker, 'click', async () => {
         console.log('마커 클릭:', hospital.name);
-        setSelectedHospital({
-          ...hospital,
-          isFavorite: favorites.has(hospital.id),
-        });
+
+        // 상세 정보 조회 API 호출
+        try {
+          const detailResponse = await getHospitalDetailApi(hospital.id);
+          console.log('병원 상세 정보:', detailResponse.data);
+
+          // API 응답 데이터로 selectedHospital 업데이트
+          setSelectedHospital({
+            id: detailResponse.data.hospitalId,
+            lat: detailResponse.data.latitude,
+            lng: detailResponse.data.longitude,
+            image: detailResponse.data.imageUrl || hospitalImage,
+            name: detailResponse.data.name,
+            department: detailResponse.data.specialties.join('·'),
+            address: detailResponse.data.address,
+            hours: {
+              day: '',
+              startTime: '',
+              endTime: '',
+            },
+            phone: detailResponse.data.contact,
+            isFavorite: detailResponse.data.bookmark,
+          });
+        } catch (error) {
+          console.error('병원 상세 정보 조회 실패:', error);
+          // 오류 발생 시 기존 정보로 표시
+          setSelectedHospital({
+            ...hospital,
+            isFavorite: favorites.has(hospital.id),
+          });
+        }
       });
     });
-  }, [kakaoReady, isLoading, center]);
+  }, [kakaoReady, isLoading, center, hospitals]);
 
   // 위치 권한 허용
-  const handleConfirmLocation = () => {
+  const handleConfirmLocation = async () => {
     console.log('위치 권한이 승인되었습니다!');
     setModalOpen(false);
     setShowMyLocationMarker(true);
 
+    // API 호출: 위치 권한 true로 업데이트
+    try {
+      const response = await updateLocationPermissionApi(true);
+      console.log('위치 권한 업데이트 성공:', response.message);
+    } catch (error) {
+      console.error('위치 권한 업데이트 실패:', error);
+    }
+
     // 현재 위치 가져오기
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setCenter(userLocation);
         setPosition(userLocation);
+
+        // localStorage에 위치 정보 저장
+        localStorage.setItem('userLocation', JSON.stringify(userLocation));
 
         // 지도 포커싱
         if (mapRef.current) {
           mapRef.current.setCenter(
             new window.kakao.maps.LatLng(userLocation.lat, userLocation.lng)
           );
+        }
+
+        // 주변 병원 검색 API 호출
+        try {
+          const hospitalResponse = await getNearbyHospitalsApi(userLocation.lat, userLocation.lng, 2000);
+          console.log('주변 병원 검색 성공:', hospitalResponse.data);
+
+          // API 응답을 Hospital 타입으로 변환
+          const convertedHospitals: Hospital[] = hospitalResponse.data.map((hospital) => ({
+            id: hospital.hospitalId,
+            lat: hospital.latitude,
+            lng: hospital.longitude,
+            image: hospitalImage,
+            name: hospital.hospitalName,
+            department: '',
+            address: '',
+            hours: {
+              day: '',
+              startTime: '',
+              endTime: '',
+            },
+            phone: '',
+          }));
+
+          setHospitals(convertedHospitals);
+        } catch (error) {
+          console.error('주변 병원 검색 실패:', error);
         }
       },
       (error) => {
@@ -270,13 +395,58 @@ const Hospitalmap = () => {
   };
 
   // 위치 권한 거부
-  const handleCancelLocation = () => {
+  const handleCancelLocation = async () => {
     console.log('위치 권한이 거부되었습니다!');
     setModalOpen(false);
     setShowMyLocationMarker(false);
 
+    // API 호출: 위치 권한 false로 업데이트
+    try {
+      const response = await updateLocationPermissionApi(false);
+      console.log('위치 권한 업데이트 성공:', response.message);
+    } catch (error) {
+      console.error('위치 권한 업데이트 실패:', error);
+    }
+
     // 기본 위치로 유지
-    setCenter({ lat: 37.55561, lng: 126.9234 });
+    const defaultLocation = { lat: 37.55561, lng: 126.9234 };
+    setCenter(defaultLocation);
+    localStorage.removeItem('userLocation');
+
+    // 기본 위치로 주변 병원 검색 API 호출
+    try {
+      const hospitalResponse = await getNearbyHospitalsApi(defaultLocation.lat, defaultLocation.lng, 2000);
+      console.log('주변 병원 검색 성공:', hospitalResponse.data);
+
+      // API 응답을 Hospital 타입으로 변환
+      const convertedHospitals: Hospital[] = hospitalResponse.data.map((hospital) => ({
+        id: hospital.hospitalId,
+        lat: hospital.latitude,
+        lng: hospital.longitude,
+        image: hospitalImage,
+        name: hospital.hospitalName,
+        department: '',
+        address: '',
+        hours: {
+          day: '',
+          startTime: '',
+          endTime: '',
+        },
+        phone: '',
+      }));
+
+      setHospitals(convertedHospitals);
+
+      // 첫 번째 병원을 중심으로 지도 표시
+      if (convertedHospitals.length > 0) {
+        setCenter({ lat: convertedHospitals[0].lat, lng: convertedHospitals[0].lng });
+      } else {
+        setCenter(defaultLocation);
+      }
+    } catch (error) {
+      console.error('주변 병원 검색 실패:', error);
+      setCenter(defaultLocation);
+    }
 
     // 마커 제거
     if (myLocationMarkerRef.current) {
@@ -329,8 +499,21 @@ const Hospitalmap = () => {
     };
   }, []);
 
-  const handleFavoriteToggle = () => {
-    if (selectedHospital) {
+  const handleFavoriteToggle = async () => {
+    if (!selectedHospital) return;
+
+    try {
+      if (selectedHospital.isFavorite) {
+        // 즐겨찾기 제거 API 호출
+        const response = await deleteBookmarkApi(selectedHospital.id);
+        console.log('즐겨찾기 제거 성공:', response.message);
+      } else {
+        // 즐겨찾기 추가 API 호출
+        const response = await addBookmarkApi(selectedHospital.id);
+        console.log('즐겨찾기 추가 성공:', response.message);
+      }
+
+      // 로컬 상태 업데이트
       const newFavorites = new Set(favorites);
       if (newFavorites.has(selectedHospital.id)) {
         newFavorites.delete(selectedHospital.id);
@@ -338,11 +521,14 @@ const Hospitalmap = () => {
         newFavorites.add(selectedHospital.id);
       }
       setFavorites(newFavorites);
-      // selectedHospital의 isFavorite 상태 즉시 업데이트
+
+      // selectedHospital의 isFavorite 상태 토글
       setSelectedHospital({
         ...selectedHospital,
         isFavorite: !selectedHospital.isFavorite,
       });
+    } catch (error) {
+      console.error('즐겨찾기 처리 실패:', error);
     }
   };
 
