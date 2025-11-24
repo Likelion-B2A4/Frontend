@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useChatStore } from '../hooks/useChatStore';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { wsService } from '../services/websocketService';
+import { closeChatRoom } from '../apis/chatApi';
 import ChatMessage from '../components/Chat/ChatMessage';
 import ChatInput from '../components/Chat/ChatInput';
 
@@ -29,6 +30,7 @@ const PatientChat = () => {
   const chatRoomId = storeChatRoomId || localChatRoomId;
   const userId = storeUserId || localUserId;
   const doctorName = localStorage.getItem('doctorName') || '의사';
+  const appointmentTime = localStorage.getItem('appointmentTime') || '';
 
   // 로컬스토리지 값을 store에 저장
   useEffect(() => {
@@ -152,17 +154,23 @@ const PatientChat = () => {
     return checkAndSendMessage();
   }, [chatRoomId, preQuestionAnswers, clearPreQuestionAnswers]);
 
-  // 나가기 버튼 처리
-  const handleExit = () => {
-    if (isChatClosed) {
-      // 구독 해제 및 세션 종료
-      if (chatRoomId) {
-        wsService.unsubscribe(`/sub/chats/${chatRoomId}/messages`);
-      }
-      clearChatRoom();
-      navigate('/');
-    } else {
-      alert('진료를 먼저 종료해주세요.');
+  // 진료 종료 처리
+  const handleEndConsultation = async () => {
+    if (!chatRoomId) return;
+
+    try {
+      await closeChatRoom(chatRoomId);
+      // UI 업데이트는 WebSocket 브로드캐스트로 처리됨
+    } catch (error) {
+      console.error('[PatientChat] Failed to close chat:', error);
+      alert('진료 종료에 실패했습니다.');
+    }
+  };
+
+  // 빠른 응답 버튼 메시지 전송
+  const handleQuickReply = (message: string) => {
+    if (chatRoomId) {
+      wsService.sendChatMessage(chatRoomId, message);
     }
   };
 
@@ -185,34 +193,67 @@ const PatientChat = () => {
   return (
     <div className="w-full h-screen flex flex-col bg-[#3A3F47]">
       {/* 헤더 */}
-      <div className="bg-[#3A3F47] px-4 py-3 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-baseline gap-2">
-          <h1
-            style={{
-              color: '#FFF',
-              fontFamily: 'Inter',
-              fontSize: '20px',
-              fontWeight: '600',
-              lineHeight: '150%',
-              letterSpacing: '-0.4px',
-            }}
-          >
-            {doctorName}
-          </h1>
+      <div className="bg-[#3A3F47] px-5 py-3 flex items-center justify-between flex-shrink-0">
+        <div className="flex flex-col gap-0">
+          <div className="flex items-baseline gap-2">
+            <h1
+              style={{
+                color: 'var(--Greyscale-White, #FFF)',
+                fontFamily: 'Pretendard',
+                fontSize: '16px',
+                fontStyle: 'normal',
+                fontWeight: '600',
+                lineHeight: '150%',
+                letterSpacing: '-0.32px',
+                margin: 0,
+              }}
+            >
+              {doctorName} 의사
+            </h1>
+            {appointmentTime && (
+              <p
+                style={{
+                  color: 'var(--Greyscale-200, #E2E4E8)',
+                  fontFamily: 'Pretendard',
+                  fontSize: '14px',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '150%',
+                  letterSpacing: '-0.28px',
+                  margin: 0,
+                }}
+              >
+                {appointmentTime}
+              </p>
+            )}
+          </div>
           <p className="text-[#B0B5BC] text-xs">
             {isChatClosed ? '진료 종료됨' : '진료 중'}
           </p>
         </div>
         <button
-          onClick={handleExit}
-          className="text-[#B0B5BC] hover:text-white transition-colors text-lg font-medium flex-shrink-0"
+          onClick={handleEndConsultation}
+          style={{
+            color: 'var(--color-main-varient, #3D84FF)',
+            textAlign: 'right',
+            fontFamily: 'Pretendard',
+            fontSize: '16px',
+            fontStyle: 'normal',
+            fontWeight: '600',
+            lineHeight: '150%',
+            letterSpacing: '-0.32px',
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+          }}
         >
-          ✕
+          진료 종료
         </button>
       </div>
 
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+      <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-[#7A8090]">
@@ -233,7 +274,44 @@ const PatientChat = () => {
       </div>
 
       {/* 입력 영역 */}
-      <div className="flex-shrink-0 px-4 py-3 bg-[#3A3F47]">
+      <div className="flex-shrink-0 px-5 py-3 bg-[#3A3F47]">
+        {/* 빠른 응답 버튼들 */}
+        {!isChatClosed && (
+          <div className="mb-2 flex gap-2 overflow-x-auto pb-2" style={{ scrollBehavior: 'smooth' }}>
+            {['네', '아니요', '잘 모르겠어요', '다시 한번 말씀해주세요'].map((text) => (
+              <button
+                key={text}
+                onClick={() => handleQuickReply(text)}
+                style={{
+                  display: 'flex',
+                  padding: '6px 12px',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  borderRadius: '100px',
+                  background: 'var(--color-main-varient, #3D84FF)',
+                  color: 'var(--Greyscale-White, #FFF)',
+                  fontFamily: 'Pretendard',
+                  fontSize: '14px',
+                  fontStyle: 'normal',
+                  fontWeight: '600',
+                  lineHeight: '150%',
+                  letterSpacing: '-0.28px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.2s',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+        )}
         <ChatInput chatRoomId={chatRoomId} isEnabled={!isChatClosed} userRole="patient" />
       </div>
     </div>
