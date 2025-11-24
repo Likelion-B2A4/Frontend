@@ -70,7 +70,6 @@ const Hospitalmap = () => {
   const myLocationMarkerRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const watchPositionIdRef = useRef<number | null>(null);
-  const [isFirstVisit, setIsFirstVisit] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   // 지도 중심좌표 이동 감지 시 이동된 중심좌표로 설정
