@@ -30,7 +30,7 @@ class WebSocketService {
         this.stompClient.connect(
           {
             Authorization: `Bearer ${config.accessToken}`,
-            'heart-beat': '30000,30000', // 클라이언트→서버: 30초, 서버→클라이언트: 30초
+            'heart-beat': '10000,10000', // 클라이언트→서버: 10초, 서버→클라이언트: 10초 (연결 유지용)
           }, // connectHeaders
           () => {
             // onConnect callback

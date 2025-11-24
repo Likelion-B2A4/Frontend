@@ -31,7 +31,7 @@ import DoctorWaiting from './pages/DoctorWaiting.tsx';
 function App() {
   const navigate = useNavigate();
   const { accessToken, doctorId } = useAuthStore();
-  const { setChatRoom } = useChatStore();
+  const { setChatRoom, setChatRoomInfo } = useChatStore();
   const [, setNotificationCount] = useState(0);
 
   // 의사 전역 WebSocket 초기화
@@ -74,6 +74,11 @@ function App() {
                 // 채팅 상태 저장
                 setChatRoom(chatRoomId.toString(), 'doctor', String(doctorId));
 
+                // 환자 정보 저장
+                if (newRoom.patientName || newRoom.startedAt) {
+                  setChatRoomInfo(newRoom.patientName, newRoom.doctorName, newRoom.startedAt);
+                }
+
                 // 자동으로 채팅 페이지로 이동
                 console.log('[App] 채팅 페이지로 이동:', `/doctor/chat/${chatRoomId}`);
                 navigate(`/doctor/chat/${chatRoomId}`);
@@ -99,12 +104,11 @@ function App() {
     };
 
     initializeDoctorWebSocket();
-  }, [doctorId, accessToken, navigate, setChatRoom]);
+  }, [doctorId, accessToken, navigate, setChatRoom, setChatRoomInfo]);
 
   return (
     <Routes>
       <Route path="/qr-checkin" element={<QrCheckIn />} />
-      <Route path="/patientchat" element={<PatientChat />} />
       <Route path="/doctor/waiting" element={<DoctorWaiting />} />
       <Route path="/doctor/chat/:chatRoomId" element={<DoctorChat />} />
       <Route path="/signup" element={<SignUp />} />
@@ -131,6 +135,7 @@ function App() {
               <Route path="/pre-question1" element={<PreQuestion1 />} />
               <Route path="/pre-question2" element={<PreQuestion2 />} />
               <Route path="/pre-question3" element={<PreQuestion3 />} />
+              <Route path="/patientchat" element={<PatientChat />} />
             </Routes>
           </div>
         }

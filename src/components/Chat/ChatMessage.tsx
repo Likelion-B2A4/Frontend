@@ -18,7 +18,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
   if (message.type === 'system') {
     return (
       <div className="flex justify-center my-4">
-        <div className="bg-[#666B76] text-white px-4 py-2 rounded-full text-sm">
+        <div className="bg-[#5A6270] text-[#B0B5BC] px-4 py-2 rounded-full text-sm">
           {message.content}
         </div>
       </div>
@@ -40,16 +40,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
         <div
           style={{
             display: 'flex',
-            padding: '8px 16px',
+            padding: '12px 16px',
             alignItems: 'center',
             gap: '10px',
-            borderRadius: isOwnMessage ? '12px 0 12px 12px' : '0 12px 12px 12px',
+            borderRadius: '16px',
             background: isOwnMessage
-              ? 'var(--color-main-variant, #3D84FF)'
-              : 'var(--Greyscale-100, #F4F6F8)',
+              ? '#3D84FF'
+              : '#FFFFFF',
             color: isOwnMessage
-              ? 'var(--Greyscale-White, #FFF)'
-              : 'var(--Greyscale-900, #1A1A1A)',
+              ? '#FFFFFF'
+              : '#1A1A1A',
             fontFamily: 'Pretendard',
             fontSize: '14px',
             fontWeight: '500',
@@ -66,8 +66,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
         <p
           style={{
             margin: 0,
-            fontSize: '12px',
-            color: isOwnMessage ? '#B3D9FF' : '#999',
+            fontSize: '11px',
+            color: '#7A8090',
             textAlign: isOwnMessage ? 'right' : 'left',
             paddingRight: isOwnMessage ? '16px' : '0',
             paddingLeft: isOwnMessage ? '0' : '16px',

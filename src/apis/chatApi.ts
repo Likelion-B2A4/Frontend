@@ -88,9 +88,10 @@ export const closeChatRoom = async (
 ): Promise<CloseChatRoomResponse> => {
   try {
     const response = await axiosInstance.post<CloseChatRoomResponse>(
-      `/chats/${chatRoomId}/close`,
+      `/api/chats/${chatRoomId}/close`,
       {}
     );
+    console.log('[ChatAPI] Chat room closed successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('[ChatAPI] Failed to close chat room:', error);
