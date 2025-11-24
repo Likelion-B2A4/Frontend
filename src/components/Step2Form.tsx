@@ -22,6 +22,7 @@ interface Step2FormProps {
   onDayToggle: (dayKey: keyof IOperatingTime) => void;
   onBatchTimeApply: (time: string) => void;
   onBatchDayOffApply: (dayOff: boolean) => void;
+  isEdit?: boolean;
 }
 
 const weeklist = [
@@ -168,6 +169,7 @@ const Step2Form = ({
   onDayToggle,
   onBatchTimeApply,
   onBatchDayOffApply,
+  isEdit = false,
 }: Step2FormProps) => {
   // 3. 'Locked' state는 폼 데이터가 아닌 UI 상태이므로 useState로 유지
   const [clinicLocked, setClinicLocked] = useState(false);
@@ -320,7 +322,11 @@ const Step2Form = ({
   useEffect(() => {
     // 1. 선택된 요일이나 운영시간 데이터가 없으면 리셋 X (혹은 초기화)
     if (selectedDays.length === 0) {
-      // reset(defaultValues); // 필요 시 주석 해제
+      if (isEdit) {
+        reset(defaultValues); // 필요 시 주석 해제
+        setClinicLocked(false); // 버튼 상태 초기화
+        setBreakLocked(false);
+      }
       return;
     }
 
@@ -362,7 +368,7 @@ const Step2Form = ({
   // 핸들러 함수
   const handleClinicTimeApplyClick = () => {
     if (selectedDays.length === 0) {
-      console.error('요일을 먼저 선택해주세요.');
+      alert('요일을 먼저 선택해주세요.');
       return;
     }
 
@@ -374,7 +380,7 @@ const Step2Form = ({
     // --- '입력 완료' 로직 (잠겨있지 않을 때) ---
 
     if (!hasValidMainTime()) {
-      console.error('진료 시간을 모두 입력해주세요');
+      alert('진료 시간을 모두 입력해주세요');
       return;
     }
 
@@ -398,7 +404,7 @@ const Step2Form = ({
     if (dayOff) return; // 'dayOff'는 watch된 값
 
     if (isSingleSelection && !clinicLocked) {
-      console.error('진료 시간을 먼저 입력 완료해주세요.');
+      alert('진료 시간을 먼저 입력 완료해주세요.');
       return;
     }
 
