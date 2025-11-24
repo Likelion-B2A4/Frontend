@@ -34,6 +34,14 @@ interface Hospital {
   };
   phone: string;
   isFavorite?: boolean;
+  operatingHours?: Array<{
+    dayOfWeek: string;
+    openTime?: string;
+    closeTime?: string;
+    breakStartTime?: string;
+    breakEndTime?: string;
+    isClosed: boolean;
+  }>;
 }
 
 interface LatLng {
@@ -297,6 +305,7 @@ const Hospitalmap = () => {
             },
             phone: detailResponse.data.contact,
             isFavorite: detailResponse.data.bookmark,
+            operatingHours: detailResponse.data.operatingHours,
           });
         } catch (error) {
           console.error('병원 상세 정보 조회 실패:', error);

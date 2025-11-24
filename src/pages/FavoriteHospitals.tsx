@@ -20,6 +20,14 @@ interface Hospital {
   };
   phone: string;
   isFavorite?: boolean;
+  operatingHours?: Array<{
+    dayOfWeek: string;
+    openTime?: string;
+    closeTime?: string;
+    breakStartTime?: string;
+    breakEndTime?: string;
+    isClosed: boolean;
+  }>;
 }
 
 const FavoriteHospitals = () => {
@@ -49,6 +57,7 @@ const FavoriteHospitals = () => {
           },
           phone: hospital.contact,
           isFavorite: hospital.bookmark,
+          operatingHours: hospital.operatingHours,
         }));
 
         setHospitals(convertedHospitals);
@@ -102,6 +111,7 @@ const FavoriteHospitals = () => {
                   phone={hospital.phone}
                   isFavorite={hospital.isFavorite || false}
                   onFavoriteToggle={() => handleRemoveFavorite(hospital.id)}
+                  operatingHours={hospital.operatingHours}
                 />
               </div>
             ))}
