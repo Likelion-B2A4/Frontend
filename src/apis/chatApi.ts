@@ -1,10 +1,19 @@
 import axiosInstance from '../utils/axiosInstance';
 
-export interface VoiceMessageResponse {
+export interface VoiceMessageData {
+  messageId: number;
+  roomId: number;
+  senderId: number;
+  senderType: string;
   messageType: string;
   content: string;
   originalVoiceUrl: string;
   createdAt: string;
+}
+
+export interface VoiceMessageResponse {
+  message: string;
+  data: VoiceMessageData;
   success: boolean;
 }
 
@@ -46,20 +55,25 @@ export const sendVoiceMessage = async (
 ): Promise<VoiceMessageResponse> => {
   try {
     const formData = new FormData();
-    formData.append('audio', audioFile);
+    formData.append('voice', audioFile);
+
+    console.log('[ChatAPI] Sending voice message with file:', audioFile.name, audioFile.type, audioFile.size);
 
     const response = await axiosInstance.post<VoiceMessageResponse>(
-      `/chats/${chatRoomId}/messages/voice`,
+      `/api/chats/${chatRoomId}/messages/voice`,
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': undefined,
         },
       }
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[ChatAPI] Failed to send voice message:', error);
+    if (error.response) {
+      console.error('[ChatAPI] Backend error response:', error.response.data);
+    }
     throw error;
   }
 };

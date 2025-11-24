@@ -17,13 +17,13 @@ const DoctorChat = () => {
     userId: storeUserId,
     setChatRoom,
   } = useChatStore();
-  const { accessToken } = useAuthStore();
+  const { accessToken, doctorId: authDoctorId } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitializedRef = useRef(false);
 
   // localStorage에서 값 읽기
   const localDoctorId = localStorage.getItem('doctorId');
-  const userId = storeUserId || localDoctorId || 'doctor';
+  const userId = storeUserId || String(authDoctorId || localDoctorId || 'doctor');
 
   // URL 파라미터로 전달된 chatRoomId 또는 store의 chatRoomId 또는 localStorage 사용
   const chatRoomId = paramChatRoomId || storeChatRoomId;
@@ -53,9 +53,10 @@ const DoctorChat = () => {
         // 채팅방 구독
         if (chatRoomId) {
           wsService.subscribe(`/sub/chats/${chatRoomId}/messages`);
+          console.log('[DoctorChat] userId:', userId, 'authDoctorId:', authDoctorId);
           // store에 채팅방 정보 설정 (필요시)
           if (!storeChatRoomId && accessToken) {
-            setChatRoom(chatRoomId, 'doctor', accessToken);
+            setChatRoom(chatRoomId, 'doctor', userId);
           }
         }
       } catch (error) {

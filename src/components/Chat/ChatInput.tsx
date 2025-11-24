@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { wsService } from '../../services/websocketService';
 import { sendVoiceMessage } from '../../apis/chatApi';
+import { useChatStore } from '../../hooks/useChatStore';
 
 interface ChatInputProps {
   chatRoomId: string;
@@ -14,6 +15,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatRoomId, isEnabled, userRole =
   const [isSending, setIsSending] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const { addMessage } = useChatStore();
 
   const handleSendMessage = () => {
     if (message.trim() && chatRoomId) {
@@ -42,19 +44,18 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatRoomId, isEnabled, userRole =
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: 'audio/wav',
+          type: 'audio/webm',
         });
 
         // 의사만 음성 메시지 전송 가능
         if (userRole === 'doctor') {
           setIsSending(true);
           try {
-            const audioFile = new File([audioBlob], `voice-${Date.now()}.wav`, {
-              type: 'audio/wav',
+            const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, {
+              type: 'audio/webm',
             });
             const response = await sendVoiceMessage(chatRoomId, audioFile);
             console.log('[ChatInput] Voice message sent successfully:', response);
-            // 음성 메시지는 WebSocket 브로드캐스트로 수신됨
           } catch (error) {
             console.error('[ChatInput] Failed to send voice message:', error);
             alert('음성 메시지 전송에 실패했습니다.');

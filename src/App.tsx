@@ -1,5 +1,5 @@
 import './App.css';
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './hooks/useAuthStore';
 import { useChatStore } from './hooks/useChatStore';
@@ -30,10 +30,9 @@ import DoctorWaiting from './pages/DoctorWaiting.tsx';
 
 function App() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { accessToken, doctorId } = useAuthStore();
   const { setChatRoom } = useChatStore();
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [, setNotificationCount] = useState(0);
 
   // 의사 전역 WebSocket 초기화
   useEffect(() => {
@@ -73,7 +72,7 @@ function App() {
                 setNotificationCount((prev) => prev + 1);
 
                 // 채팅 상태 저장
-                setChatRoom(chatRoomId.toString(), 'doctor', accessToken);
+                setChatRoom(chatRoomId.toString(), 'doctor', String(doctorId));
 
                 // 자동으로 채팅 페이지로 이동
                 console.log('[App] 채팅 페이지로 이동:', `/doctor/chat/${chatRoomId}`);

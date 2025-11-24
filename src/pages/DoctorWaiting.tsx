@@ -30,8 +30,9 @@ const DoctorWaiting = () => {
     setIsConnecting(true);
 
     // 채팅방 구독 콜백 등록
-    const unsubscribe = wsService.subscribe(
-      `/sub/doctors/${doctorId}`,
+    const topic = `/sub/doctors/${doctorId}`;
+    wsService.subscribe(
+      topic,
       (message: { body: string }) => {
         console.log('[DoctorWaiting] 새로운 채팅방 알림 수신:', message.body);
         try {
@@ -57,9 +58,7 @@ const DoctorWaiting = () => {
     console.log('[DoctorWaiting] 채팅방 구독 완료');
 
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      wsService.unsubscribe(topic);
     };
   }, [accessToken, doctorId, isInitialized]);
 

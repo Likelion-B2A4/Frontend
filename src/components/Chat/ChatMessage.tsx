@@ -31,17 +31,47 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
     >
       {/* 메시지 내용 */}
       <div
-        className={`max-w-xs px-4 py-2 rounded-lg ${
-          isOwnMessage
-            ? 'bg-[#5B9EFF] text-white rounded-br-none'
-            : 'bg-[#E8EAED] text-[#1A1A1A] rounded-bl-none'
-        }`}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+        }}
       >
-        <p className="break-words text-sm">{message.content}</p>
+        <div
+          style={{
+            display: 'flex',
+            padding: '8px 16px',
+            alignItems: 'center',
+            gap: '10px',
+            borderRadius: isOwnMessage ? '12px 0 12px 12px' : '0 12px 12px 12px',
+            background: isOwnMessage
+              ? 'var(--color-main-variant, #3D84FF)'
+              : 'var(--Greyscale-100, #F4F6F8)',
+            color: isOwnMessage
+              ? 'var(--Greyscale-White, #FFF)'
+              : 'var(--Greyscale-900, #1A1A1A)',
+            fontFamily: 'Pretendard',
+            fontSize: '14px',
+            fontWeight: '500',
+            lineHeight: '150%',
+            letterSpacing: '-0.28px',
+            width: 'fit-content',
+            maxWidth: '80%',
+          }}
+        >
+          <p style={{ margin: 0, wordBreak: 'break-word' }}>
+            {message.content}
+          </p>
+        </div>
         <p
-          className={`text-xs mt-1 ${
-            isOwnMessage ? 'text-blue-200' : 'text-[#999]'
-          }`}
+          style={{
+            margin: 0,
+            fontSize: '12px',
+            color: isOwnMessage ? '#B3D9FF' : '#999',
+            textAlign: isOwnMessage ? 'right' : 'left',
+            paddingRight: isOwnMessage ? '16px' : '0',
+            paddingLeft: isOwnMessage ? '0' : '16px',
+          }}
         >
           {formatTime(message.timestamp)}
         </p>
