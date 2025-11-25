@@ -110,7 +110,7 @@ const HospitalProfileEdit = () => {
     // 초기값이 null이면 안전을 위해 true 반환 (변경되었다고 가정하고 전송)
     if (!initial) return true;
     // 모든 요일의 값이 하나라도 다르면 true 반환
-    const days: (keyof IOperatingTime)[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    // const days: (keyof IOperatingTime)[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     // JSON.stringify를 사용하면 객체 구조 전체를 비교하여 안정성이 높습니다.
     return JSON.stringify(current) !== JSON.stringify(initial);
   };
