@@ -612,7 +612,7 @@ const Hospitalmap = () => {
           손빛이 닿는 병원을 찾아보세요
         </span>
       </div>
-      <div className="relative w-[360px] h-[510px]">
+      <div className="relative w-[360px] h-[480px]">
         <div id="map" className="w-full h-full" />
         <div className="flex flex-col gap-[10px] absolute z-1 top-0 right-0 p-[10px]">
           <button
