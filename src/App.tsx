@@ -32,9 +32,26 @@ import PatientConsultationCompleted from './pages/PatientConsultationCompleted.t
 
 function App() {
   const navigate = useNavigate();
-  const { accessToken, doctorId } = useAuthStore();
+  const { accessToken, doctorId, setAccessToken, setDoctorId, setTokens } = useAuthStore();
   const { setChatRoom, setChatRoomInfo } = useChatStore();
   const [, setNotificationCount] = useState(0);
+
+  // 앱 시작 시 localStorage에서 accessToken 로드 (처음 마운트할 때만)
+  useEffect(() => {
+    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+    const storedDoctorId = localStorage.getItem('doctorId');
+
+    if (storedAccessToken) {
+      setTokens(storedAccessToken, storedRefreshToken || null);
+      console.log('[App] AccessToken loaded from localStorage:', storedAccessToken.substring(0, 20) + '...');
+    }
+
+    if (storedDoctorId) {
+      setDoctorId(storedDoctorId);
+      console.log('[App] DoctorId loaded from localStorage:', storedDoctorId);
+    }
+  }, []);
 
   // 의사 전역 WebSocket 초기화
   useEffect(() => {

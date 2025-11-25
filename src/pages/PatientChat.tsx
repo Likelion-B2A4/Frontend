@@ -16,13 +16,14 @@ const PatientChat = () => {
     userId: storeUserId,
     clearChatRoom,
     setChatRoom,
+    setMessages,
     preQuestionAnswers,
     clearPreQuestionAnswers,
   } = useChatStore();
   const { accessToken } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isInitializedRef = useRef(false);
   const isMessageSentRef = useRef(false);
+  const wsInitializedRef = useRef(false);
 
   // localStorage에서 값 읽기
   const localChatRoomId = localStorage.getItem('chatRoomId');
@@ -32,22 +33,30 @@ const PatientChat = () => {
   const doctorName = localStorage.getItem('doctorName') || '의사';
   const appointmentTime = localStorage.getItem('appointmentTime') || '';
 
-  // 로컬스토리지 값을 store에 저장
+  // 로컬스토리지 값을 store에 저장 및 메시지 복구
   useEffect(() => {
     if (localChatRoomId && !storeChatRoomId) {
       setChatRoom(localChatRoomId, 'patient', localUserId || 'patient');
+
+      // localStorage에 저장된 메시지 복구
+      const savedMessages = localStorage.getItem(`chat_${localChatRoomId}`);
+      if (savedMessages) {
+        try {
+          const parsedMessages = JSON.parse(savedMessages);
+          setMessages(parsedMessages);
+        } catch (error) {
+          console.error('[PatientChat] Failed to load messages from localStorage:', error);
+        }
+      }
     }
-  }, [localChatRoomId, storeChatRoomId, localUserId, setChatRoom]);
+  }, [localChatRoomId, storeChatRoomId, localUserId, setChatRoom, setMessages]);
 
   // WebSocket 초기화 및 채팅방 구독
   useEffect(() => {
-    if (isInitializedRef.current) return;
-    isInitializedRef.current = true;
-
     const initializeChat = async () => {
       try {
         // WebSocket 연결 (아직 연결되지 않았으면)
-        if (!wsService.isConnected() && accessToken) {
+        if (!wsService.isConnected() && accessToken && !wsInitializedRef.current) {
           const wsUrl = import.meta.env.VITE_WS_URL;
           if (!wsUrl) {
             throw new Error('WebSocket URL not configured');
@@ -56,6 +65,7 @@ const PatientChat = () => {
             url: wsUrl,
             accessToken,
           });
+          wsInitializedRef.current = true;
         }
 
         // 채팅방 구독
@@ -83,9 +93,12 @@ const PatientChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 진료 종료 후 3초 뒤 완료 페이지로 이동
+  // 진료 종료 후 WebSocket 연결 끊기 및 완료 페이지로 이동
   useEffect(() => {
     if (isChatClosed) {
+      // WebSocket 연결 종료
+      wsService.disconnect();
+
       const timer = setTimeout(() => {
         navigate('/patient-consultation-completed');
       }, 3000);

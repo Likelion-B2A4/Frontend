@@ -18,10 +18,11 @@ const DoctorChat = () => {
     patientName: storePatientName,
     appointmentTime: storeAppointmentTime,
     setChatRoom,
+    setMessages,
   } = useChatStore();
   const { accessToken, doctorId: authDoctorId } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isInitializedRef = useRef(false);
+  const isFirstLoadRef = useRef(true);
 
   const [isRecording, setIsRecording] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -52,9 +53,6 @@ const DoctorChat = () => {
 
   // WebSocket 초기화 및 채팅방 구독
   useEffect(() => {
-    if (isInitializedRef.current) return;
-    isInitializedRef.current = true;
-
     const initializeChat = async () => {
       try {
         // WebSocket 연결 (아직 연결되지 않았으면)
@@ -80,6 +78,21 @@ const DoctorChat = () => {
           if (!storeChatRoomId && accessToken) {
             setChatRoom(chatRoomId, 'doctor', userId);
           }
+
+          // 처음 마운트할 때만 localStorage에서 메시지 복구
+          if (isFirstLoadRef.current) {
+            const savedMessages = localStorage.getItem(`chat_${chatRoomId}`);
+            if (savedMessages) {
+              try {
+                const parsedMessages = JSON.parse(savedMessages);
+                setMessages(parsedMessages);
+                console.log('[DoctorChat] Messages restored from localStorage:', parsedMessages.length);
+              } catch (error) {
+                console.error('[DoctorChat] Failed to load messages from localStorage:', error);
+              }
+            }
+            isFirstLoadRef.current = false;
+          }
         }
       } catch (error) {
         console.error('[DoctorChat] Failed to initialize chat:', error);
@@ -95,16 +108,19 @@ const DoctorChat = () => {
     return () => {
       // 언마운트 시 구독 해제는 하지 않음
     };
-  }, [chatRoomId, accessToken, navigate, userId, storeChatRoomId, setChatRoom]);
+  }, [chatRoomId, accessToken, navigate, userId, storeChatRoomId, setChatRoom, setMessages]);
 
   // 메시지 스크롤 자동 이동
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 진료 종료 후 3초 뒤 완료 페이지로 이동
+  // 진료 종료 후 WebSocket 연결 끊기 및 완료 페이지로 이동
   useEffect(() => {
     if (isChatClosed) {
+      // WebSocket 연결 종료
+      wsService.disconnect();
+
       const timer = setTimeout(() => {
         navigate('/doctor/consultation-completed');
       }, 3000);
