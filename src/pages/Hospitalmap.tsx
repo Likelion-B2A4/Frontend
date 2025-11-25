@@ -72,6 +72,11 @@ const Hospitalmap = () => {
   const watchPositionIdRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 페이지 마운트 시 스크롤을 맨 위로 리셋
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // 지도 중심좌표 이동 감지 시 이동된 중심좌표로 설정
   const updateCenterWhenMapMoved = useMemo(
     () =>
