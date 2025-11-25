@@ -27,6 +27,7 @@ import HospitalProfile from './pages/HospitalProfile.tsx';
 import HospitalProfileEdit from './pages/HospitalProfileEdit.tsx';
 import DoctorChat from './pages/DoctorChat.tsx';
 import DoctorWaiting from './pages/DoctorWaiting.tsx';
+import DoctorChatList from './pages/DoctorChatList.tsx';
 import ConsultationCompleted from './pages/ConsultationCompleted.tsx';
 import PatientConsultationCompleted from './pages/PatientConsultationCompleted.tsx';
 
@@ -96,6 +97,8 @@ function App() {
                 // 환자 정보 저장
                 if (newRoom.patientName || newRoom.startedAt) {
                   setChatRoomInfo(newRoom.patientName, newRoom.doctorName, newRoom.startedAt);
+                  // localStorage에도 저장 (새로고침 후 데이터 복구용)
+                  localStorage.setItem('patientName', newRoom.patientName || '환자');
                 }
 
                 // 자동으로 채팅 페이지로 이동
@@ -128,6 +131,7 @@ function App() {
   return (
     <Routes>
       <Route path="/qr-checkin" element={<QrCheckIn />} />
+      <Route path="/doctor/consultation-list" element={<DoctorChatList />} />
       <Route path="/doctor/waiting" element={<DoctorWaiting />} />
       <Route path="/doctor/chat/:chatRoomId" element={<DoctorChat />} />
       <Route path="/doctor/consultation-completed" element={<ConsultationCompleted />} />

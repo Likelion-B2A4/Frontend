@@ -280,6 +280,7 @@ const PatientChat = () => {
             key={message.id}
             message={message}
             isOwnMessage={message.senderId === userId}
+            userRole="patient"
           />
         ))}
 

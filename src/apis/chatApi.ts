@@ -140,3 +140,35 @@ export const getChatSummary = async (chatRoomId: string) => {
     throw error;
   }
 };
+
+export interface DoctorChatRoom {
+  chatRoomId: number;
+  patientId: number;
+  patientName: string;
+  status: 'waiting' | 'active' | 'closed';
+  startedAt: string;
+  finishedAt: string | null;
+}
+
+export interface DoctorChatListResponse {
+  message: string;
+  data: DoctorChatRoom[];
+  success: boolean;
+}
+
+/**
+ * 의사의 채팅방 목록 조회
+ * GET /api/doctors/{doctorId}/chats
+ */
+export const getDoctorChatRooms = async (doctorId: string): Promise<DoctorChatListResponse> => {
+  try {
+    const response = await axiosInstance.get<DoctorChatListResponse>(
+      `/api/doctors/${doctorId}/chats`
+    );
+    console.log('[ChatAPI] Doctor chat rooms retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[ChatAPI] Failed to get doctor chat rooms:', error);
+    throw error;
+  }
+};

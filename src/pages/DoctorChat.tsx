@@ -31,7 +31,9 @@ const DoctorChat = () => {
 
   // localStorage에서 값 읽기
   const localDoctorId = localStorage.getItem('doctorId');
+  const localPatientName = localStorage.getItem('patientName');
   const userId = storeUserId || String(authDoctorId || localDoctorId || 'doctor');
+  const patientName = storePatientName || localPatientName || '환자';
 
   // URL 파라미터로 전달된 chatRoomId 또는 store의 chatRoomId 또는 localStorage 사용
   const chatRoomId = paramChatRoomId || storeChatRoomId;
@@ -225,7 +227,7 @@ const DoctorChat = () => {
               letterSpacing: '-0.64px',
             }}
           >
-            {storePatientName || '환자'}
+            {patientName} 환자
           </h1>
           <p className="text-[#B0B5BC] text-sm">
             {formatAppointmentTime(storeAppointmentTime)}
@@ -261,7 +263,7 @@ const DoctorChat = () => {
       </div>
 
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-hidden p-4 space-y-4 pb-20">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-[#7A8090]">
@@ -275,6 +277,7 @@ const DoctorChat = () => {
             key={message.id}
             message={message}
             isOwnMessage={message.senderId === userId}
+            userRole="doctor"
           />
         ))}
 
