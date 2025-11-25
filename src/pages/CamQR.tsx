@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import { useChatStore } from '../hooks/useChatStore';
-import { wsService } from '../services/websocketService';
 import { scanQRAndCreateChat } from '../apis/chatApi';
 import WaitTreat from '../components/WaitTreat';
 
@@ -33,24 +32,31 @@ const CamQR: React.FC = () => {
                 console.log('[CamQR] chatRoomId:', chatRoomId, 'accessToken:', token);
 
                 if (chatRoomId && token) {
-                    // WebSocket 연결
-                    const wsUrl = import.meta.env.VITE_WS_URL;
-                    if (!wsUrl) {
-                        throw new Error('WebSocket URL not configured');
+                    // localStorage에 저장
+                    localStorage.setItem('chatRoomId', chatRoomId.toString());
+                    localStorage.setItem('userId', '1'); // 환자 ID는 실제 사용자 정보에서 가져오기
+                    localStorage.setItem('accessToken', token);
+
+                    // doctorName 저장
+                    if (response?.data?.doctorName) {
+                        localStorage.setItem('doctorName', response.data.doctorName);
                     }
-                    console.log('[CamQR] WebSocket 연결 시도');
-                    await wsService.connectAsPatient({
-                        url: wsUrl,
-                        accessToken: token,
-                    });
-                    console.log('[CamQR] WebSocket 연결 성공');
 
-                    // 채팅방 구독
-                    wsService.subscribe(`/sub/chats/${chatRoomId}/messages`);
-                    console.log('[CamQR] 채팅방 구독 완료');
+                    // startedAt을 포맷해서 appointmentTime으로 저장
+                    if (response?.data?.startedAt) {
+                        const date = new Date(response.data.startedAt);
+                        const month = date.getMonth() + 1;
+                        const day = date.getDate();
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const appointmentTime = `${month}월 ${day}일 ${hours}:${minutes}`;
+                        localStorage.setItem('appointmentTime', appointmentTime);
+                    }
 
-                    // 채팅 상태 저장
-                    setChatRoom(chatRoomId, 'patient', token);
+                    // 채팅 상태 저장 (WebSocket 구독은 PatientChat에서 처리)
+                    setChatRoom(chatRoomId.toString(), 'patient', '1');
+
+                    console.log('[CamQR] 채팅방 생성 완료:', chatRoomId);
 
                     // 사전질문 페이지로 이동
                     navigate('/pre-question1');

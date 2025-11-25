@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getHospitalInfoApi } from '../apis/auth';
 import { processOperatingTimeForDisplay } from '../utils/timeConvertor';
+import LocaionIcon from '../assets/profile/location.svg';
+import CallIcon from '../assets/profile/call.svg';
+import TimeIcon from '../assets/profile/time.svg';
 
 interface HospitalData {
   name: string;
@@ -13,6 +16,7 @@ interface HospitalData {
   contact: string;
   operatingTime: Array<{ day: string; hours: string; break: string | null }>;
   subject: string;
+  imageUrl: string | null;
 }
 
 const HospitalProfile = () => {
@@ -54,12 +58,12 @@ const HospitalProfile = () => {
         const processedTime = processOperatingTimeForDisplay(hospitalDataFromApi.operatingHours);
 
         setHospitalData({
-          // ... (데이터 매핑) ...
           name: hospitalDataFromApi.name,
           address: hospitalDataFromApi.address,
           contact: hospitalDataFromApi.contact,
           subject: hospitalDataFromApi.specialties ? hospitalDataFromApi.specialties[0] : '',
           operatingTime: processedTime,
+          imageUrl: hospitalDataFromApi.imageUrl || null,
         });
       } catch (error: any) {
         // ⭐️ CCTV 3: 최종 실패! Network 탭 상태 코드와 함께 이 로그를 확인해주세요.
@@ -82,8 +86,12 @@ const HospitalProfile = () => {
   if (!hospitalData) {
     return <div>병원 정보를 찾을 수 없습니다.</div>;
   }
-  const defaultTime = hospitalData.operatingTime[0];
 
+  const validOperatingTime = hospitalData.operatingTime.filter(
+    (item) => item.hours && item.hours.trim() !== '' && item.hours.trim() !== 'null - null'
+  );
+
+  const defaultTime = validOperatingTime.length > 0 ? validOperatingTime[0] : null;
   return (
     <div className="w-screen max-h-screen">
       <WebTopbar />
@@ -93,7 +101,7 @@ const HospitalProfile = () => {
             id="프로필 기본 정보"
             className="flex flex-col justify-center items-center content-center gap-y-[16px]"
           >
-            <FileForm mainImage={null} type="profile" />
+            <FileForm mainImage={null} type="profile" previewUrl={hospitalData.imageUrl} />{' '}
             <div
               id="텍스트 디바이스"
               className="flex flex-col justify-center items-center content-center"
@@ -112,31 +120,44 @@ const HospitalProfile = () => {
             style={hospitalProfileText}
           >
             <div id="위치" className="flex flex-row gap-[8px]">
-              <img src="../src/assets/profile/location.svg" className="w-[20px] h-[20px]" />
+              <img src={LocaionIcon} className="w-[20px] h-[20px]" />
               {hospitalData.address}
             </div>
             <div id="운영일" className="flex flex-row gap-[8px] ">
               <div>
-                <img src="../src/assets/profile/time.svg" className="w-[20px] h-[20px]" />
+                <img src={TimeIcon} className="w-[20px] h-[20px]" />
               </div>
               <div className="flex w-full max-h-[145px] overflow-y-auto ">
                 {isTimeOpen ? (
-                  <div className="flex flex-col">
-                    {hospitalData.operatingTime.map((item) => (
-                      <div className="flex flex-row gap-x-[4px]">
-                        <div>{item.day}</div>
-                        <div>
-                          {item.hours}
-                          {item.break && <div className="">{item.break}</div>}
+                  <div className="w-full flex flex-col">
+                    {hospitalData.operatingTime.map((item) => {
+                      if (!item.hours || item.hours.trim() === 'null - null') {
+                        return null;
+                      }
+                      const isDayOff = item.hours === '휴무';
+
+                      return (
+                        <div className="flex flex-row gap-x-[4px]">
+                          <div>{item.day}</div>
+                          {isDayOff ? (
+                            '휴무'
+                          ) : (
+                            <div>
+                              {item.hours}
+                              {item.break && <div className="">{item.break}</div>}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
-                ) : (
+                ) : defaultTime ? (
                   <div className="flex flex-row gap-x-[4px]">
                     <div>{defaultTime.day}</div>
                     <div>{defaultTime.hours}</div>
                   </div>
+                ) : (
+                  <div>운영 정보 없음</div>
                 )}
               </div>
               <div
@@ -155,7 +176,7 @@ const HospitalProfile = () => {
               </div>
             </div>
             <div id="연락처" className="flex flex-row gap-[8px]">
-              <img src="../src/assets/profile/call.svg" className="w-[20px] h-[20px]" />
+              <img src={CallIcon} className="w-[20px] h-[20px]" />
               {hospitalData.contact}
             </div>
           </div>

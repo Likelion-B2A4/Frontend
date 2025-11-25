@@ -3,30 +3,42 @@ import TypoLogo from '../components/TypoLogo';
 import { topHeader } from '../styles/typography';
 import { useNavigate } from 'react-router-dom';
 import StarOffIcon from '../assets/hospitalmap/star-off.svg';
+import SettingIcon from '../assets/topbar/setting.svg';
 
 interface TopbarProps {
   title?: string;
   showLogo?: boolean;
   type?: string;
+  setting?: boolean;
   onStarClick?: () => void;
 }
 
-const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '', onStarClick }) => {
+const Topbar: React.FC<TopbarProps> = ({
+  title,
+  showLogo = false,
+  type = '',
+  onStarClick,
+  setting,
+}) => {
   const nav = useNavigate();
 
   return type === 'header' ? (
-    <div style={{
-      width: '360px',
-      margin: '0 auto',
-      padding: '14px 20px',
-      position: 'relative'
-    }}>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        position: 'relative'
-      }}>
+    <div
+      style={{
+        width: '360px',
+        margin: '0 auto',
+        padding: '14px 20px',
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          position: 'relative',
+        }}
+      >
         <img
           src="/goback.svg"
           onClick={() => nav(-1)}
@@ -35,7 +47,7 @@ const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '', onS
             left: '0',
             width: '24px',
             height: '24px',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         />
         <div style={topHeader}>{title}</div>
@@ -84,6 +96,20 @@ const Topbar: React.FC<TopbarProps> = ({ title, showLogo = false, type = '', onS
         >
           {title}
         </span>
+      )}
+      {setting && (
+        <div
+          className="flex justify-between w-[24px] h-[24px]"
+          style={{
+            position: 'absolute',
+            right: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            cursor: 'pointer', // 클릭 가능하도록 커서 추가
+          }}
+        >
+          <img src={SettingIcon} onClick={() => nav('/setting')} />
+        </div>
       )}
     </div>
   );

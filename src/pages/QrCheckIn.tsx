@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { fetchDoctorQR } from '../apis/DoctorAPI';
+import { useAuthStore } from '../hooks/useAuthStore';
 
 interface DoctorData {
   qr: string;
@@ -27,6 +28,7 @@ interface LocationState {
 const QrCheckIn = () => {
   const location = useLocation();
   const state = location.state as LocationState;
+  const { doctorId: authDoctorId } = useAuthStore();
   const [doctorData, setDoctorData] = useState<DoctorData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +37,24 @@ const QrCheckIn = () => {
     const loadQRData = async () => {
       try {
         setIsLoading(true);
-        if (!state?.DoctorData?.doctorId) {
+
+        // location.state에서 doctorId를 가져오고, 없으면 localStorage 또는 useAuthStore에서 가져옴
+        let doctorId: number | null = state?.DoctorData?.doctorId ?? null;
+        if (!doctorId) {
+          const localDoctorId = localStorage.getItem('doctorId');
+          if (localDoctorId) {
+            doctorId = parseInt(localDoctorId);
+          } else if (authDoctorId) {
+            doctorId = parseInt(authDoctorId);
+          }
+        }
+
+        if (!doctorId) {
           setError('의사 정보가 없습니다');
           return;
         }
 
-        const response = await fetchDoctorQR(state.DoctorData.doctorId);
+        const response = await fetchDoctorQR(doctorId);
 
         if (response.success && response.data) {
           setDoctorData({
@@ -62,12 +76,12 @@ const QrCheckIn = () => {
     };
 
     loadQRData();
-  }, [state]);
+  }, [state, authDoctorId]);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center h-screen bg-white">
-        <WebTopbar showDoctorReselect={true} />
+        <WebTopbar showDoctorReselect={true} showConsultationList={true} />
         <div className="flex-1 flex items-center justify-center">
           <div>로딩 중...</div>
         </div>
@@ -78,7 +92,7 @@ const QrCheckIn = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center h-screen bg-white">
-        <WebTopbar showDoctorReselect={true} />
+        <WebTopbar showDoctorReselect={true} showConsultationList={true} />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-red-500">{error}</div>
         </div>
@@ -92,7 +106,7 @@ const QrCheckIn = () => {
 
   return (
     <div className="flex flex-col items-center h-screen bg-white overflow-hidden">
-      <WebTopbar showDoctorReselect={true} />
+      <WebTopbar showDoctorReselect={true} showConsultationList={true} />
 
       <div className="flex-1 pt-[91px] flex flex-col items-center gap-[49px] w-full overflow-y-auto">
         {/* 의사 정보 영역 */}

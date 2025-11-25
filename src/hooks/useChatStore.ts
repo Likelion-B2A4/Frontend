@@ -32,6 +32,11 @@ export interface ChatState {
   userRole: 'patient' | 'doctor' | null; // 환자 또는 의사
   doctorId: string | null;
 
+  // 환자/의사 정보
+  patientName: string | null;
+  doctorName: string | null;
+  appointmentTime: string | null; // ISO 형식의 시간 문자열
+
   // 상태 업데이트 함수들
   setPreQuestion1: (symptom: string) => void;
   setPreQuestion2: (duration: string) => void;
@@ -39,6 +44,7 @@ export interface ChatState {
 
   setChatRoom: (chatRoomId: string, userRole: 'patient' | 'doctor', userId: string) => void;
   setDoctorId: (doctorId: string) => void;
+  setChatRoomInfo: (patientName?: string, doctorName?: string, appointmentTime?: string) => void;
   addMessage: (message: ChatMessage) => void;
   setMessages: (messages: ChatMessage[]) => void;
   clearMessages: () => void;
@@ -63,6 +69,10 @@ export const useChatStore = create<ChatState>((set) => ({
   userId: null,
   userRole: null,
   doctorId: null,
+
+  patientName: null,
+  doctorName: null,
+  appointmentTime: null,
 
   // 사전질문 관련 함수
   setPreQuestion1: (symptom) =>
@@ -102,13 +112,32 @@ export const useChatStore = create<ChatState>((set) => ({
   setDoctorId: (doctorId) =>
     set({ doctorId }),
 
-  addMessage: (message) =>
-    set((state) => ({
-      messages: [...state.messages, message],
-    })),
+  setChatRoomInfo: (patientName, doctorName, appointmentTime) =>
+    set({
+      ...(patientName !== undefined && { patientName }),
+      ...(doctorName !== undefined && { doctorName }),
+      ...(appointmentTime !== undefined && { appointmentTime }),
+    }),
 
-  setMessages: (messages) =>
-    set({ messages }),
+  addMessage: (message) =>
+    set((state) => {
+      const updatedMessages = [...state.messages, message];
+      // localStorage에 메시지 저장
+      if (state.chatRoomId) {
+        localStorage.setItem(`chat_${state.chatRoomId}`, JSON.stringify(updatedMessages));
+      }
+      return { messages: updatedMessages };
+    }),
+
+  setMessages: (messages) => {
+    set((state) => {
+      // localStorage에 메시지 저장
+      if (state.chatRoomId) {
+        localStorage.setItem(`chat_${state.chatRoomId}`, JSON.stringify(messages));
+      }
+      return { messages };
+    });
+  },
 
   clearMessages: () =>
     set({ messages: [] }),
@@ -128,6 +157,9 @@ export const useChatStore = create<ChatState>((set) => ({
       userId: null,
       userRole: null,
       doctorId: null,
+      patientName: null,
+      doctorName: null,
+      appointmentTime: null,
       preQuestionAnswers: {
         symptom: null,
         duration: null,

@@ -1,10 +1,19 @@
 import axiosInstance from '../utils/axiosInstance';
 
-export interface VoiceMessageResponse {
+export interface VoiceMessageData {
+  messageId: number;
+  roomId: number;
+  senderId: number;
+  senderType: string;
   messageType: string;
   content: string;
   originalVoiceUrl: string;
   createdAt: string;
+}
+
+export interface VoiceMessageResponse {
+  message: string;
+  data: VoiceMessageData;
   success: boolean;
 }
 
@@ -46,20 +55,25 @@ export const sendVoiceMessage = async (
 ): Promise<VoiceMessageResponse> => {
   try {
     const formData = new FormData();
-    formData.append('audio', audioFile);
+    formData.append('voice', audioFile);
+
+    console.log('[ChatAPI] Sending voice message with file:', audioFile.name, audioFile.type, audioFile.size);
 
     const response = await axiosInstance.post<VoiceMessageResponse>(
-      `/chats/${chatRoomId}/messages/voice`,
+      `/api/chats/${chatRoomId}/messages/voice`,
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': undefined,
         },
       }
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[ChatAPI] Failed to send voice message:', error);
+    if (error.response) {
+      console.error('[ChatAPI] Backend error response:', error.response.data);
+    }
     throw error;
   }
 };
@@ -74,9 +88,10 @@ export const closeChatRoom = async (
 ): Promise<CloseChatRoomResponse> => {
   try {
     const response = await axiosInstance.post<CloseChatRoomResponse>(
-      `/chats/${chatRoomId}/close`,
+      `/api/chats/${chatRoomId}/close`,
       {}
     );
+    console.log('[ChatAPI] Chat room closed successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('[ChatAPI] Failed to close chat room:', error);
@@ -98,13 +113,32 @@ export const getChatRoom = async (chatRoomId: string) => {
   }
 };
 
+export interface ChatMessageResponse {
+  messageId: number;
+  senderType: 'patient' | 'hospital';
+  senderId: number;
+  messageType: 'text' | 'voice';
+  content: string;
+  originalVoiceUrl: string | null;
+  createdAt: string;
+}
+
+export interface GetChatMessagesResponse {
+  success: boolean;
+  message: string;
+  data: ChatMessageResponse[];
+}
+
 /**
  * 채팅 메시지 히스토리 조회
  * GET /api/chats/{chatRoomId}/messages
  */
-export const getChatMessages = async (chatRoomId: string) => {
+export const getChatMessages = async (chatRoomId: string): Promise<GetChatMessagesResponse> => {
   try {
-    const response = await axiosInstance.get(`/chats/${chatRoomId}/messages`);
+    const response = await axiosInstance.get<GetChatMessagesResponse>(
+      `/api/chats/${chatRoomId}/messages`
+    );
+    console.log('[ChatAPI] Chat messages retrieved:', response.data);
     return response.data;
   } catch (error) {
     console.error('[ChatAPI] Failed to get chat messages:', error);
@@ -122,6 +156,38 @@ export const getChatSummary = async (chatRoomId: string) => {
     return response.data;
   } catch (error) {
     console.error('[ChatAPI] Failed to get chat summary:', error);
+    throw error;
+  }
+};
+
+export interface DoctorChatRoom {
+  chatRoomId: number;
+  patientId: number;
+  patientName: string;
+  status: 'waiting' | 'active' | 'closed';
+  startedAt: string;
+  finishedAt: string | null;
+}
+
+export interface DoctorChatListResponse {
+  message: string;
+  data: DoctorChatRoom[];
+  success: boolean;
+}
+
+/**
+ * 의사의 채팅방 목록 조회
+ * GET /api/doctors/{doctorId}/chats
+ */
+export const getDoctorChatRooms = async (doctorId: string): Promise<DoctorChatListResponse> => {
+  try {
+    const response = await axiosInstance.get<DoctorChatListResponse>(
+      `/api/doctors/${doctorId}/chats`
+    );
+    console.log('[ChatAPI] Doctor chat rooms retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[ChatAPI] Failed to get doctor chat rooms:', error);
     throw error;
   }
 };
