@@ -36,6 +36,7 @@ const HospitalProfileEdit = () => {
 
   // ⭐️ [추가] 기존 이미지 URL을 저장할 state
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [initialOperatingTime, setInitialOperatingTime] = useState<IOperatingTime | null>(null);
 
   // 폼 데이터 관리
   const [formData, setFormData] = useState<IFormData>({
@@ -65,6 +66,7 @@ const HospitalProfileEdit = () => {
         // 운영시간 역변환
         const convertedTime = reverseTransformOperatingData(data.operatingHours, data.breakTimes);
 
+        setInitialOperatingTime(convertedTime);
         setSelectedDays(['mon']);
 
         // 폼 데이터 채우기
@@ -90,16 +92,28 @@ const HospitalProfileEdit = () => {
     fetchHospitalInfo();
   }, [nav]);
 
-  // 2. 유효성 검사 (수정 페이지용)
-  const isStep1Valid =
-    formData.hospitalName !== '' &&
-    formData.subject !== '' &&
-    formData.address !== '' &&
-    formData.contactNumber.length >= 9;
-  // ⭐️ [수정] 이미지는 '새 파일(mainImage)'이 있거나 '기존 URL(previewImageUrl)'이 있으면 통과
-  // (formData.mainImage !== null || previewImageUrl !== null);
+  // // 2. 유효성 검사 (수정 페이지용)
+  // const isStep1Valid =
+  //   formData.hospitalName !== '' &&
+  //   formData.subject !== '' &&
+  //   formData.address !== '' &&
+  //   formData.contactNumber.length >= 9;
+  // // ⭐️ [수정] 이미지는 '새 파일(mainImage)'이 있거나 '기존 URL(previewImageUrl)'이 있으면 통과
+  // // (formData.mainImage !== null || previewImageUrl !== null);
 
-  const isStep2Valid = Object.values(formData.operatingTime).every((time) => time !== null);
+  // const isStep2Valid = Object.values(formData.operatingTime).every((time) => time !== null);
+
+  const isOperatingTimeChanged = (
+    current: IOperatingTime,
+    initial: IOperatingTime | null
+  ): boolean => {
+    // 초기값이 null이면 안전을 위해 true 반환 (변경되었다고 가정하고 전송)
+    if (!initial) return true;
+    // 모든 요일의 값이 하나라도 다르면 true 반환
+    const days: (keyof IOperatingTime)[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    // JSON.stringify를 사용하면 객체 구조 전체를 비교하여 안정성이 높습니다.
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  };
 
   const handleDayToggle = (dayKey: keyof IOperatingTime) => {
     // 1. 이미 선택된 요일을 또 눌렀다면? -> 선택 해제 (빈 배열)
@@ -160,7 +174,6 @@ const HospitalProfileEdit = () => {
   const handleKeyDownEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (isStep1Valid) setCurrentStep(2);
     }
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -183,53 +196,48 @@ const HospitalProfileEdit = () => {
   // 3. 수정 제출 핸들러 (Blob 방식)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('➡️ DTO 생성 직전 폼 데이터:', formData);
+    const myId = localStorage.getItem('hospitalId');
+    // ⭐️ [수정] initialOperatingTime을 상태에서 가져옴
+    const initialTime = initialOperatingTime;
+
+    if (!myId) {
+      alert('병원 ID를 찾을 수 없습니다.');
+      return;
+    }
 
     try {
-      const apiFormData = new FormData();
+      const apiFormData = new FormData(); // 1. 운영시간 변환 (DTO에 포함될 데이터)
 
-      // 1. 운영시간 변환
-      const { operatingHours, breakTimes } = transformOperatingData(formData.operatingTime);
+      const { operatingHours, breakTimes } = transformOperatingData(formData.operatingTime); // 2. DTO 객체 생성 (기본 필드는 무조건 포함)
 
-      // 2. DTO 객체 생성 (명세서 일치)
-      const updateDto = {
+      const updateDto: { [key: string]: any } = {
         name: formData.hospitalName,
         address: formData.address,
         contact: formData.contactNumber,
         specialties: [formData.subject], // 배열
-        operatingHours: operatingHours,
-        breakTimes: breakTimes,
-      };
+      }; // ⭐️ [핵심 로직] 운영시간 수정 여부 확인 // initialTime이 null이면 (로딩 실패나 초기 상태) 변경된 것으로 간주하고 전송 (shouldSendOperatingTime = true)
+      const timeHasChanged = initialTime
+        ? isOperatingTimeChanged(formData.operatingTime, initialTime)
+        : true;
 
-      const jsonString = JSON.stringify(updateDto);
-      console.log(`1. JSON 문자열 길이: ${jsonString.length}`);
-      console.log(`2. JSON 문자열 시작: ${jsonString.substring(0, 50)}...`);
-
-      if (jsonString.length < 10) {
-        // 길이가 10자 이하('{}'만 있을 확률 높음)
-        alert('DTO 객체가 비어있습니다. 데이터를 확인해주세요.');
-        return;
-      }
-
-      console.log('📦 전송할 DTO:', updateDto);
-
-      // 3. JSON Blob
+      if (timeHasChanged) {
+        // 수정사항이 있을 때만 필드를 DTO에 추가
+        updateDto.operatingHours = operatingHours;
+        updateDto.breakTimes = breakTimes;
+      } // ➡️ 수정하지 않은 경우, updateDto에 해당 필드들은 존재하지 않게 됩니다. // 3. JSON Blob
       const jsonBlob = new Blob([JSON.stringify(updateDto)], {
         type: 'application/json',
       });
-      apiFormData.append('request', jsonBlob);
-      // apiFormData.append('request', jsonBlob);
+      apiFormData.append('request', jsonBlob); // 4. 이미지 (새로 올린 파일이 있을 때만!)
 
-      // 4. 이미지 (새로 올린 파일이 있을 때만!)
       if (formData.mainImage) {
         apiFormData.append('image', formData.mainImage);
-      }
-
-      // 5. 전송
+      } // 5. 전송
 
       await updateHospitalInfoApi(apiFormData);
+
       alert('정보 수정이 완료되었습니다!');
-      // nav(`/hospital-profile/${myId}`); // 프로필로 이동
+      nav(`/hospital-profile/${myId}`); // 프로필로 이동
     } catch (error) {
       console.error('수정 실패:', error);
       alert('수정 중 오류가 발생했습니다.');
@@ -297,10 +305,7 @@ const HospitalProfileEdit = () => {
                 </div>
 
                 <div className="flex flex-col justify-center content-center items-center">
-                  <Button
-                    type="submit"
-                    variant={isStep1Valid && isStep2Valid ? 'colored' : 'default'}
-                  >
+                  <Button type="submit" variant={'colored'}>
                     수정
                   </Button>
                 </div>
