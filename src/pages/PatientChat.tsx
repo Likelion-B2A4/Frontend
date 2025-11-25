@@ -14,7 +14,6 @@ const PatientChat = () => {
     messages,
     isChatClosed,
     userId: storeUserId,
-    clearChatRoom,
     setChatRoom,
     setMessages,
     preQuestionAnswers,

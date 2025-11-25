@@ -17,7 +17,6 @@ class WebSocketService {
   private stompClient: StompClient | null = null;
   private subscriptions: Map<string, StompClient> = new Map();
   private subscriptionCallbacks: Map<string, (message: StompMessage) => void> = new Map();
-  private connectionConfig: WebSocketConfig | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
   private reconnectDelay = 3000; // 시작: 3초
@@ -31,8 +30,6 @@ class WebSocketService {
   connect(config: WebSocketConfig): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        // 연결 설정 저장 (재연결 시 사용)
-        this.connectionConfig = config;
         this.stompClient = Stomp.client(config.url);
         this.stompClient.debug = () => {}; // 디버그 로그 비활성화
 
@@ -56,7 +53,10 @@ class WebSocketService {
           },
           (error: StompMessage) => {
             // onError callback
-            console.error('[WebSocket] Connection error:', error);
+            // 사용자가 명시적으로 연결 해제한 경우는 에러 로그를 남기지 않음
+            if (!this.isManuallyDisconnected) {
+              console.error('[WebSocket] Connection error:', error);
+            }
             useChatStore.getState().setConnected(false);
 
             // 사용자가 명시적으로 연결 해제한 경우는 재연결 안 함
@@ -308,6 +308,7 @@ class WebSocketService {
   disconnect(): void {
     // 재연결 시도 중지
     this.isManuallyDisconnected = true;
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -315,22 +316,29 @@ class WebSocketService {
 
     // 모든 구독 해제
     this.subscriptions.forEach((subscription) => {
-      subscription.unsubscribe();
+      try {
+        subscription.unsubscribe();
+      } catch (error) {
+        console.error('[WebSocket] Error unsubscribing:', error);
+      }
     });
     this.subscriptions.clear();
     this.subscriptionCallbacks.clear();
 
     // 연결 해제
-    if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.disconnect(() => {
-        console.log('[WebSocket] Disconnected');
-        this.stompClient = null;
-      });
-    } else {
+    if (this.stompClient) {
+      try {
+        if (this.stompClient.connected) {
+          this.stompClient.disconnect(() => {
+            console.log('[WebSocket] Disconnected gracefully');
+          });
+        }
+      } catch (error) {
+        console.error('[WebSocket] Error during disconnect:', error);
+      }
       this.stompClient = null;
     }
 
-    this.connectionConfig = null;
     useChatStore.getState().setConnected(false);
     console.log('[WebSocket] Disconnected');
   }

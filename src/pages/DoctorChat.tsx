@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useChatStore } from '../hooks/useChatStore';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { wsService } from '../services/websocketService';
-import { closeChatRoom, sendVoiceMessage } from '../apis/chatApi';
+import { closeChatRoom, sendVoiceMessage, getChatMessages } from '../apis/chatApi';
 import ChatMessage from '../components/Chat/ChatMessage';
 import ChatInput from '../components/Chat/ChatInput';
 
@@ -81,8 +81,9 @@ const DoctorChat = () => {
             setChatRoom(chatRoomId, 'doctor', userId);
           }
 
-          // 처음 마운트할 때만 localStorage에서 메시지 복구
+          // 처음 마운트할 때만 메시지 조회
           if (isFirstLoadRef.current) {
+            // localStorage에 저장된 메시지가 있으면 사용
             const savedMessages = localStorage.getItem(`chat_${chatRoomId}`);
             if (savedMessages) {
               try {
@@ -91,6 +92,26 @@ const DoctorChat = () => {
                 console.log('[DoctorChat] Messages restored from localStorage:', parsedMessages.length);
               } catch (error) {
                 console.error('[DoctorChat] Failed to load messages from localStorage:', error);
+              }
+            } else {
+              // localStorage에 없으면 API에서 조회
+              try {
+                const response = await getChatMessages(chatRoomId);
+                if (response.success && response.data) {
+                  // API 응답을 ChatMessage 형식으로 변환
+                  const convertedMessages = response.data.map((msg) => ({
+                    id: String(msg.messageId),
+                    senderId: String(msg.senderId),
+                    type: 'text' as const,
+                    content: msg.content,
+                    timestamp: msg.createdAt,
+                  }));
+                  setMessages(convertedMessages);
+                  console.log('[DoctorChat] Messages loaded from API:', convertedMessages.length);
+                }
+              } catch (error) {
+                console.error('[DoctorChat] Failed to load messages from API:', error);
+                // API 실패해도 계속 진행 (WebSocket으로 새 메시지 받을 수 있음)
               }
             }
             isFirstLoadRef.current = false;

@@ -33,7 +33,7 @@ import PatientConsultationCompleted from './pages/PatientConsultationCompleted.t
 
 function App() {
   const navigate = useNavigate();
-  const { accessToken, doctorId, setAccessToken, setDoctorId, setTokens } = useAuthStore();
+  const { accessToken, doctorId, setDoctorId, setTokens } = useAuthStore();
   const { setChatRoom, setChatRoomInfo } = useChatStore();
   const [, setNotificationCount] = useState(0);
 
@@ -126,7 +126,7 @@ function App() {
     };
 
     initializeDoctorWebSocket();
-  }, [doctorId, accessToken, navigate, setChatRoom, setChatRoomInfo]);
+  }, [doctorId, accessToken]);
 
   return (
     <Routes>

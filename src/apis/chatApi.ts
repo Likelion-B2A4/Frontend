@@ -113,13 +113,32 @@ export const getChatRoom = async (chatRoomId: string) => {
   }
 };
 
+export interface ChatMessageResponse {
+  messageId: number;
+  senderType: 'patient' | 'hospital';
+  senderId: number;
+  messageType: 'text' | 'voice';
+  content: string;
+  originalVoiceUrl: string | null;
+  createdAt: string;
+}
+
+export interface GetChatMessagesResponse {
+  success: boolean;
+  message: string;
+  data: ChatMessageResponse[];
+}
+
 /**
  * 채팅 메시지 히스토리 조회
  * GET /api/chats/{chatRoomId}/messages
  */
-export const getChatMessages = async (chatRoomId: string) => {
+export const getChatMessages = async (chatRoomId: string): Promise<GetChatMessagesResponse> => {
   try {
-    const response = await axiosInstance.get(`/chats/${chatRoomId}/messages`);
+    const response = await axiosInstance.get<GetChatMessagesResponse>(
+      `/api/chats/${chatRoomId}/messages`
+    );
+    console.log('[ChatAPI] Chat messages retrieved:', response.data);
     return response.data;
   } catch (error) {
     console.error('[ChatAPI] Failed to get chat messages:', error);
