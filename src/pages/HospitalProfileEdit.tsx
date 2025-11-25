@@ -32,7 +32,6 @@ const HospitalProfileEdit = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDays, setSelectedDays] = useState<(keyof IOperatingTime)[]>([]);
   const nav = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   // ⭐️ [추가] 기존 이미지 URL을 저장할 state
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -86,6 +85,7 @@ const HospitalProfileEdit = () => {
         alert('정보를 불러오지 못했습니다.');
       } finally {
         setIsLoading(false);
+        alert('병원 정보를 불러오지 못했습니다. 콘솔을 확인해주세요.');
       }
     };
 

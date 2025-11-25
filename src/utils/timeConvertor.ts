@@ -151,6 +151,21 @@ const dayMapKR: Record<string, string> = {
   SUN: '일',
 };
 
+/**
+ * 시간 포맷 변환: "HH:MM:SS" -> "HH:MM"
+ */
+const formatTime = (time: string | undefined): string => {
+  if (!time) return '';
+  // 첫 5글자(HH:MM)만 추출
+  return time.substring(0, 5);
+};
+
+/**
+ * 서버에서 받은 복잡한 운영 시간 배열을 UI 표시용 간결한 배열로 변환합니다.
+ * (Break time 정보가 operatingHours 배열 객체 안에 포함되어 있는 구조 처리)
+ * * @param serverOperatingHours API 응답의 operatingHours 필드 (배열)
+ * @returns {ProcessedOperatingDay[]} UI 표시용 배열
+ */
 export const processOperatingTimeForDisplay = (
   serverOperatingHours: any[]
 ): ProcessedOperatingDay[] => {
@@ -160,13 +175,14 @@ export const processOperatingTimeForDisplay = (
     const krDay = dayMapKR[dayInfo.dayOfWeek] || dayInfo.dayOfWeek;
     const isClosed = dayInfo.isClosed;
 
-    const hours = isClosed ? '휴무' : `${dayInfo.openTime} - ${dayInfo.closeTime}`;
+    // 1. 진료 시간 문자열 생성 (초 제거)
+    const hours = isClosed ? '휴무' : `${formatTime(dayInfo.openTime)} - ${formatTime(dayInfo.closeTime)}`;
+
     let breakStr: string | null = null;
 
     if (!isClosed && dayInfo.breakStartTime && dayInfo.breakEndTime) {
-      breakStr = `${dayInfo.breakStartTime} - ${dayInfo.breakEndTime} 휴게시간`;
-    } else if (!isClosed) {
-      breakStr = '휴게시간 없음';
+      // 예: "12:00 - 13:00 휴게시간"
+      breakStr = `${formatTime(dayInfo.breakStartTime)} - ${formatTime(dayInfo.breakEndTime)} 휴게시간`;
     }
 
     return {
