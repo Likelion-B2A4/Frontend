@@ -23,6 +23,7 @@ import HospitalProfile from './pages/HospitalProfile.tsx';
 import HospitalProfileEdit from './pages/HospitalProfileEdit.tsx';
 import DoctorChat from './pages/DoctorChat.tsx';
 import DoctorWaiting from './pages/DoctorWaiting.tsx';
+import TreatmentDetail from './pages/TreatmentDetail.tsx';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               <Route path="/favorite-hospitals" element={<FavoriteHospitals />} />
               <Route path="/select-doctor" element={<SelectDoctor />} />
               <Route path='/camqr' element={<CamQR />} />
+              <Route path='/treatmentDetail/:chatRoomId' element={<TreatmentDetail />} />
             </Routes>
           </div>
         }

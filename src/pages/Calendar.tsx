@@ -84,8 +84,18 @@ const Calendar = () => {
         }
     }
 
-    const refeshDailyRecords = () => {
-        if (selectedDateString) loadDailyRecord(selectedDateString);
+    const refreshMonthlyCalendar = async () => {
+        const yearstr = calendarDate.getFullYear().toString();
+        const monthstr = (calendarDate.getMonth() + 1).toString().padStart(2, '0');
+
+        await loadAllMedication(yearstr, monthstr);
+    };
+
+    const refeshDailyRecords = async () => {
+        if (selectedDateString) {
+            await loadDailyRecord(selectedDateString);
+            await refreshMonthlyCalendar();
+        }
     }
 
     const loadAllMedication = async (year: string, month: string) => {
@@ -98,9 +108,12 @@ const Calendar = () => {
             } else {
                 setMonthlyScheduleMap([]);
             }
+
+            setStatusLoadedForMonth('');
         } catch (error) {
             console.log("error", error);
             setMonthlyScheduleMap([]);
+            setStatusLoadedForMonth('');
         }
     }
 
@@ -160,6 +173,7 @@ const Calendar = () => {
         const yearstr = calendarDate.getFullYear().toString();
         const monthstr = (calendarDate.getMonth() + 1).toString().padStart(2, '0');
         const currentMonthYearKey = `${yearstr}-${monthstr}`;
+       
 
         if (statusLoadedForMonth === currentMonthYearKey || statusLoadedForMonth === 'LOADING') return;
 
